@@ -1,0 +1,9 @@
+{
+  "name": "Letra Viva",
+  "short_name": "Letra Viva",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F2F5F9",
+  "theme_color": "#2F62B8",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
