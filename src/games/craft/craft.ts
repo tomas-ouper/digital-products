@@ -628,6 +628,17 @@ export function start(ctx: GameContext): GameInstance {
     if (player.pos.y < -4) player.pos.set(16.5, 8, 24.5);
     camera.position.set(player.pos.x, player.pos.y + EYE + Math.sin(bob) * 0.04, player.pos.z);
     camera.rotation.set(player.pitch, player.yaw, 0);
+    // cámara de cine (solo para grabar tráilers)
+    const cine = (window as any).__cine as { pos: number[]; look: number[]; fov?: number } | undefined;
+    hand.visible = !cine;
+    if (cine) {
+      camera.position.set(cine.pos[0], cine.pos[1], cine.pos[2]);
+      camera.lookAt(cine.look[0], cine.look[1], cine.look[2]);
+      if (cine.fov && camera.fov !== cine.fov) {
+        camera.fov = cine.fov;
+        camera.updateProjectionMatrix();
+      }
+    }
     // contorno del bloque apuntado
     const h = ray();
     const cell = h?.ghost ? [h.ghost.x, h.ghost.y, h.ghost.z] : h?.hit;
@@ -684,7 +695,7 @@ export function start(ctx: GameContext): GameInstance {
   };
   ctx.setRepeat(() => intro());
   intro();
-  if (location.search.includes('debug')) (window as any).__craft = { rebuildTime: () => { const t0 = performance.now(); rebuild(); return performance.now() - t0; }, world, player, ghosts, place, breakBlock, ray, camera, hotbar, setSel: (i: number) => ((sel = i), drawBar()) };
+  if (location.search.includes('debug')) (window as any).__craft = { placeAt: (x: number, y: number, z: number, id: number) => { world.set(x, y, z, id); rebuild(); updateGhosts(); updateGoal(); if (id === 0) burst(x, y, z, B.STONE); }, burst, rebuildTime: () => { const t0 = performance.now(); rebuild(); return performance.now() - t0; }, world, player, ghosts, place, breakBlock, ray, camera, hotbar, setSel: (i: number) => ((sel = i), drawBar()) };
   raf = requestAnimationFrame(loop);
 
   return {

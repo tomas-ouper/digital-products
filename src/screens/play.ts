@@ -45,7 +45,7 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
   );
   root.append(host, hud);
   // En celular: se juega en horizontal. Si está vertical, pantalla clara para girar.
-  const isPhone = () => settings.device === 'phone' || Math.min(window.screen.width, window.screen.height) < 600;
+  const isPhone = () => !location.search.includes('rec') && (settings.device === 'phone' || Math.min(window.screen.width, window.screen.height) < 600);
   let rotDismissed = false;
   const rot = h(
     'div',

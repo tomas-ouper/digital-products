@@ -131,7 +131,7 @@ class NinjaScene extends Phaser.Scene {
   }
 
   create() {
-    if (location.search.includes('debug')) (window as any).__scene = this;
+    if (location.search.includes('debug')) Object.assign(window as any, { __scene: this, __LETTERS: LETTERS });
     this.bg = this.add.graphics();
     this.trail = this.add.graphics().setDepth(20);
     this.bannerBox = this.add.graphics();

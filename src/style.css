@@ -289,3 +289,6 @@ input[type=range] { width: 100%; max-width: 420px; height: 40px; accent-color: v
 .game-card .art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.18), transparent 40%); pointer-events: none; }
 .play-badge { position: absolute; right: 12px; top: 12px; width: 46px; height: 46px; border-radius: 50%; background: #fff; color: var(--green); font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 rgba(0,0,0,.15); padding-left: 4px; }
 @media (max-height: 500px) { .hub-logo { display: none; } }
+/* Grabación de tráiler: plano limpio */
+.rec-clean .game-hud, .rec-clean #rec-finger, .rec-clean .mc-ui, .rec-clean .rotate-hint { display: none !important; }
+.rec-clean-hud .game-hud { display: none !important; }

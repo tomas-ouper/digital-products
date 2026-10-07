@@ -10,10 +10,10 @@
 - [x] **H4 · CaliCrash** — 10 niveles: tacha A/O/M/L, forma SOL/MESA/LUNA, y en cursiva: tacha a, forma sol y casa. Fichas con relieve (sombra, degradé, brillo). Intercambio deslizando (o tocando dos fichas); palabras tocando letras adyacentes (incluye diagonales) en orden. Las letras tachadas muestran una cruz. El tablero siempre tiene la palabra formable y algún movimiento posible. Sin movimientos: "Intentar otra vez". 3-5 años: +6 movimientos y pista a los 5 s.
 - [x] **H5 · Angry Forms** — 8 niveles con física Matter: lanza el círculo / el cuadrado, elige el triángulo / la estrella / el rombo (bandeja de formas; la equivocada se nombra en voz alta), derriba solo los círculos / triángulos, formas de 4 lados. Las 6 formas con carita. Gomera con línea de puntería (más larga en 3-5 años, +2 tiros). Sin tiros: "Intentar otra vez".
 - [x] **H6 · Montecraft** — 3D en **primera persona** (Three.js): mundo 32x32x16 con plaza, lomas, nieve y árboles; 20 bloques con texturas 16x16 propias; sombreado por cara + oclusión ambiental; nubes, sol, piso infinito con niebla. Mira central con contorno del bloque, mano con el bloque elegido, partículas al romper. Táctil: joystick (mitad izquierda), arrastrar para mirar, tocar = poner, mantener = quitar, botón saltar, subida automática de escalones. PC: WASD/flechas, espacio, 1-9, rueda, clic derecho = quitar, E = inventario. 6 niveles + modo libre: letra L, torre de 10 (cuenta en voz alta), colores (rojo/azul/amarillo; color equivocado no se pone), letra T, tu inicial, tu nombre (hasta 5 letras). Tocar una "sombra" la llena directamente (para los más chicos).
-- [ ] **H7 · Pulido y entrega** — hecho: tutorial "Cómo se juega" al entrar a cada juego (objetivo, 5 reglas con íconos, tipos de nivel; botón ? para volver a verlo), cartel animado "Nivel N". Falta: pasada visual, clips, README final.
+- [ ] **H7 · Pulido y entrega** — hecho: tutorial "Cómo se juega" por juego, cartel "Nivel N", pasada visual de los 5 juegos y el hub, celular en horizontal (pantalla "Gira tu teléfono" + bloqueo de orientación en Android), diseño compacto para celular acostado. En curso: planos 9:16 para tráiler (`scripts/clips/planos.mjs` → `media/clips/`, guía en `media/PLANOS.md`). Falta: README final.
 
 ## Siguiente paso exacto
-H7: tutorial de reglas al entrar a cada juego (pedido de Tomás), pasada de calidad visual, clips de 4-5 s (3-6 por juego) en `/media`, README final.
+Grabar los planos 9:16: `npm run build && npm run preview` y en otra terminal `node scripts/clips/planos.mjs` (todos) o con filtro (`node scripts/clips/planos.mjs angry`). Revisar `media/clips/*.mp4`, ajustar los que fallen y completar README.
 
 ## Esfuerzo restante (estimado)
 - H2: hecho · H3: hecho · H4: hecho · H5: hecho · H6: hecho · H7: M
@@ -34,6 +34,7 @@ H7: tutorial de reglas al entrar a cada juego (pedido de Tomás), pasada de cali
 - **Ninja**: el reconocedor ($P, `src/core/recognizer.ts`) solo compara contra las letras que están en pantalla → mucho más preciso. Un toque corto cuenta como punto (la i). En sílabas se dibuja la primera letra (dibujar la sílaba entera era demasiado para 6 años).
 - **Tests**: con `?debug` en la URL, la escena activa queda en `window.__scene` y `window.mpGo(pantalla, params)` navega (útil para pruebas automáticas con Playwright).
 - **Montecraft**: malla única con caras ocultas eliminadas + oclusión ambiental (mejor rendimiento y look que instanced meshes para el terreno); las "sombras" de las plantillas sí son InstancedMesh. Sin pointer lock (no anda en iframes ni en tablets): se mira arrastrando.
+- **Grabación de clips**: reloj virtual propio (`scripts/clips/vt.js`) que reemplaza performance.now/Date.now/rAF/timers y anima el CSS cuadro a cuadro → 30 fps exactos y cámara lenta real aunque la máquina sea lenta (sin GPU). Formato 9:16 1080x1920 (pedido de Tomás). `?rec` desactiva la pantalla "Gira tu teléfono"; la clase `rec-clean` oculta HUD/dedo en planos de cine. Cámaras de cine: Phaser `cameras.main` (zoom/seguimiento), Montecraft `window.__cine`.
 - **Guardado**: localStorage con fallback a memoria (`src/core/storage.ts`).
 
 ## Problemas abiertos
