@@ -455,7 +455,7 @@ const SHOTS = {
     await sh.skip(1200);
     sh.cam = kf([
       { f: 0, pos: [15, 4.4, 21], look: [16, 8.5, 14], fov: 78 },
-      { f: 150, pos: [16.5, 9.5, 37], look: [16, 7, 14], fov: 66 },
+      { f: 150, pos: [16.5, 10.5, 28.5], look: [16, 6.5, 14], fov: 94 },
     ]);
     sh.record();
     const left = await sh.page.evaluate(() => window.__craft.ghosts.slice(-6).map((g) => [g.x, g.y, g.z]));
