@@ -41,9 +41,27 @@ export function start(ctx: GameContext): GameInstance {
   host.append(renderer.domElement);
 
   const scene = new THREE.Scene();
-  const sky = new THREE.Color('#8fd3ff');
+  const sky = new THREE.Color('#bfe6ff');
   scene.background = sky;
-  scene.fog = new THREE.Fog(sky, 22, 70);
+  scene.fog = new THREE.Fog(sky, 24, 72);
+  // cúpula de cielo con degradé
+  {
+    const geo = new THREE.SphereGeometry(150, 24, 16);
+    const top = new THREE.Color('#3f8ee8');
+    const mid = new THREE.Color('#8fcaff');
+    const cols: number[] = [];
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const y = pos.getY(i) / 150;
+      const c = y > 0.05 ? mid.clone().lerp(top, Math.min(1, (y - 0.05) / 0.6)) : sky.clone().lerp(mid, Math.max(0, (y + 0.1) / 0.15));
+      cols.push(c.r, c.g, c.b);
+    }
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+    const dome = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false }));
+    dome.renderOrder = -1;
+    dome.position.set(SX / 2, 0, SZ / 2);
+    scene.add(dome);
+  }
   const camera = new THREE.PerspectiveCamera(72, host.clientWidth / host.clientHeight, 0.05, 200);
   camera.rotation.order = 'YXZ';
   scene.add(camera);
@@ -99,11 +117,11 @@ export function start(ctx: GameContext): GameInstance {
       const cl = new THREE.Group();
       const parts = 2 + ((Math.random() * 3) | 0);
       for (let k = 0; k < parts; k++) {
-        const m = new THREE.Mesh(new THREE.BoxGeometry(4 + r(6), 1.2, 3 + r(5)), mat);
+        const m = new THREE.Mesh(new THREE.BoxGeometry(6 + r(8), 1, 4 + r(6)), mat);
         m.position.set(r(6) - 3, 0, r(5) - 2.5);
         cl.add(m);
       }
-      cl.position.set(r(140) - 54, 26 + r(4), r(140) - 54);
+      cl.position.set(r(160) - 64, 40 + r(5), r(160) - 64);
       clouds.add(cl);
     }
     scene.add(clouds);
@@ -208,8 +226,8 @@ export function start(ctx: GameContext): GameInstance {
   const placeHand = () => {
     const a = camera.aspect;
     const s = Math.sin(Math.min(1, swing) * Math.PI);
-    hand.scale.setScalar(a < 1 ? 0.13 : 0.2);
-    hand.position.set(0.36 * Math.min(1.4, a) - s * 0.1, -0.36 + s * 0.06 + Math.sin(bob) * 0.012, -0.62 - s * 0.08);
+    hand.scale.setScalar(a < 1 ? 0.16 : 0.22);
+    hand.position.set(0.5 * Math.min(1.4, a) - s * 0.12, -0.52 + s * 0.08 + Math.sin(bob) * 0.015, -1.0 - s * 0.1);
     hand.rotation.set(0.2 - s * 0.6, 0.65, 0.05);
   };
 
