@@ -64,6 +64,9 @@ class AngryScene extends Phaser.Scene {
   settled = false;
   aim!: Phaser.GameObjects.Graphics;
   band!: Phaser.GameObjects.Graphics;
+  bandBack!: Phaser.GameObjects.Graphics;
+  trailG!: Phaser.GameObjects.Graphics;
+  trailPts: { x: number; y: number }[] = [];
   hudText!: Phaser.GameObjects.Text;
   trayObjs: Phaser.GameObjects.GameObject[] = [];
   gPx = 0.28; // gravedad en px/paso²
@@ -109,6 +112,8 @@ class AngryScene extends Phaser.Scene {
     for (const b of this.lv.blocks) this.addBlock(b);
     this.aim = this.add.graphics().setDepth(4);
     this.band = this.add.graphics().setDepth(6);
+    this.bandBack = this.add.graphics().setDepth(3);
+    this.trailG = this.add.graphics().setDepth(2);
     this.hudText = this.add.text(w - 16, HUD_TOP + 8, '', { fontFamily: FONT, fontSize: '22px', color: '#3a3f6b', fontStyle: 'bold', backgroundColor: '#ffffffd9', padding: { x: 12, y: 6 } }).setOrigin(1, 0).setDepth(10);
     this.updateHud();
 
@@ -120,6 +125,24 @@ class AngryScene extends Phaser.Scene {
         t.a0 = t.img.angle;
       }
       this.settled = true;
+    });
+
+    // polvo y temblor en los choques fuertes
+    let lastPuff = 0;
+    this.matter.world.on('collisionstart', (ev: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
+      if (!this.settled) return;
+      for (const pair of ev.pairs) {
+        const va = pair.bodyA.velocity, vb = pair.bodyB.velocity;
+        const rel = Math.hypot(va.x - vb.x, va.y - vb.y);
+        if (rel < 3 || this.time.now - lastPuff < 70) continue;
+        lastPuff = this.time.now;
+        const sp = pair.collision.supports?.[0] || pair.bodyA.position;
+        this.puff(sp.x, sp.y, Math.min(1.6, rel / 6));
+        if (rel > 6) {
+          sfx.thud();
+          this.cameras.main.shake(120, Math.min(0.012, rel * 0.0012));
+        }
+      }
     });
 
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.onDown(p));
@@ -152,41 +175,83 @@ class AngryScene extends Phaser.Scene {
   drawBackground() {
     const w = this.scale.width;
     const h = this.scale.height;
-    const g = this.add.graphics().setDepth(-10);
-    g.fillGradientStyle(0xbfe0ff, 0xbfe0ff, 0xeaf6ff, 0xeaf6ff, 1);
-    g.fillRect(0, 0, w, h);
-    // nubes
-    g.fillStyle(0xffffff, 0.9);
-    for (const [cx, cy, s] of [
-      [0.2, 0.28, 1],
-      [0.55, 0.2, 1.3],
-      [0.85, 0.32, 0.9],
-    ]) {
-      const x = w * cx, y = h * cy, r = this.U * s;
-      g.fillCircle(x, y, r);
-      g.fillCircle(x + r, y + r * 0.2, r * 0.8);
-      g.fillCircle(x - r, y + r * 0.25, r * 0.7);
-    }
-    // colinas
-    g.fillStyle(0xa6dca0, 1);
-    g.fillEllipse(w * 0.25, this.groundY + 10, w * 0.8, this.U * 5);
-    g.fillStyle(0x93d08e, 1);
-    g.fillEllipse(w * 0.8, this.groundY + 10, w * 0.7, this.U * 4);
-    // piso
-    g.fillStyle(0x7cc576, 1);
-    g.fillRect(0, this.groundY, w, h - this.groundY);
-    g.fillStyle(0x6bb565, 1);
-    g.fillRect(0, this.groundY, w, 8);
-    // catapulta (horqueta de madera)
-    const a = this.anchor;
     const U = this.U;
-    g.lineStyle(U * 0.38, 0x9a6a45, 1);
-    g.lineBetween(a.x - U * 0.1, this.groundY, a.x - U * 0.1, a.y + U * 1.2);
-    g.lineBetween(a.x - U * 0.1, a.y + U * 1.2, a.x - U * 0.7, a.y);
-    g.lineBetween(a.x - U * 0.1, a.y + U * 1.2, a.x + U * 0.5, a.y);
-    g.fillStyle(0x8a5a38, 1);
-    g.fillCircle(a.x - U * 0.7, a.y, U * 0.22);
-    g.fillCircle(a.x + U * 0.5, a.y, U * 0.22);
+    const gy = this.groundY;
+    const g = this.add.graphics().setDepth(-10);
+    g.fillGradientStyle(0x6fb6f5, 0x6fb6f5, 0xd9f0ff, 0xd9f0ff, 1);
+    g.fillRect(0, 0, w, gy);
+    // sol con rayos
+    const sx = w * 0.12, sy = h * 0.18, sr = U * 1.4;
+    for (let i = 10; i > 0; i--) {
+      g.fillStyle(0xfff3b0, 0.02 * (11 - i) / 3);
+      g.fillCircle(sx, sy, sr * (1 + i * 0.22));
+    }
+    g.fillStyle(0xffe066, 1);
+    g.fillCircle(sx, sy, sr);
+    g.fillStyle(0xfff3a8, 1);
+    g.fillCircle(sx - sr * 0.15, sy - sr * 0.15, sr * 0.7);
+    // nubes esponjosas con sombra
+    const cloud = (x: number, y: number, r: number) => {
+      g.fillStyle(0xbfd9ef, 1);
+      for (const [dx, dy, k] of [[0, 0.15, 1], [1, 0.3, 0.8], [-1, 0.35, 0.7], [0.5, -0.35, 0.75]]) g.fillCircle(x + dx * r, y + dy * r + r * 0.12, r * k);
+      g.fillStyle(0xffffff, 1);
+      for (const [dx, dy, k] of [[0, 0.15, 1], [1, 0.3, 0.8], [-1, 0.35, 0.7], [0.5, -0.35, 0.75]]) g.fillCircle(x + dx * r, y + dy * r, r * k);
+    };
+    cloud(w * 0.45, h * 0.16, U * 1.2);
+    cloud(w * 0.78, h * 0.26, U * 0.9);
+    cloud(w * 0.95, h * 0.1, U * 0.7);
+    // montañas lejanas
+    const ridge = (base: number, amp: number, col: number, seed: number, step: number) => {
+      const pts: Phaser.Math.Vector2[] = [new Phaser.Math.Vector2(0, gy)];
+      for (let x = 0; x <= w + step; x += step) pts.push(new Phaser.Math.Vector2(x, base - Math.abs(Math.sin(x * 0.004 + seed)) * amp - Math.sin(x * 0.013 + seed) * amp * 0.2));
+      pts.push(new Phaser.Math.Vector2(w, gy));
+      g.fillStyle(col, 1);
+      g.fillPoints(pts, true);
+    };
+    ridge(gy - U * 2.5, U * 3.2, 0xa9c8ea, 1.3, 30);
+    ridge(gy - U * 1.2, U * 2, 0x9bd38f, 4.1, 30);
+    // árboles en la colina
+    let sd = 3;
+    const rnd = () => ((sd = (sd * 9301 + 49297) % 233280) / 233280);
+    for (let i = 0; i < 7; i++) {
+      const x = w * (0.28 + rnd() * 0.7), y = gy - U * (0.3 + rnd() * 0.6), r = U * (0.45 + rnd() * 0.35);
+      g.fillStyle(0x8a6142, 1);
+      g.fillRect(x - r * 0.12, y - r * 0.2, r * 0.24, r * 1.1);
+      g.fillStyle(0x4f9e48, 1);
+      g.fillCircle(x, y - r * 0.6, r);
+      g.fillStyle(0x66b85c, 1);
+      g.fillCircle(x - r * 0.25, y - r * 0.8, r * 0.6);
+    }
+    // piso: pasto + tierra con piedritas
+    g.fillStyle(0x8a5b3b, 1);
+    g.fillRect(0, gy, w, h - gy);
+    g.fillStyle(0x7a4e32, 1);
+    for (let i = 0; i < 40; i++) g.fillCircle(rnd() * w, gy + U * 0.5 + rnd() * (h - gy), 2 + rnd() * 4);
+    g.fillStyle(0x5fb84a, 1);
+    g.fillRect(0, gy - 2, w, U * 0.38);
+    g.fillStyle(0x7fd062, 1);
+    g.fillRect(0, gy - 2, w, U * 0.12);
+    g.fillStyle(0x4f9e3c, 1);
+    for (let x = 0; x < w; x += U * 0.35) g.fillTriangle(x, gy + U * 0.36, x + U * 0.18, gy + U * 0.36, x + U * 0.09, gy + U * 0.55);
+    // resortera (atrás)
+    const a = this.anchor;
+    const wood = (x1: number, y1: number, x2: number, y2: number, wd: number) => {
+      g.lineStyle(wd + 4, 0x4d2f1a, 1);
+      g.lineBetween(x1, y1, x2, y2);
+      g.lineStyle(wd, 0x9a6a45, 1);
+      g.lineBetween(x1, y1, x2, y2);
+      g.lineStyle(wd * 0.3, 0xc08a5c, 1);
+      g.lineBetween(x1 - wd * 0.15, y1, x2 - wd * 0.15, y2);
+    };
+    wood(a.x - U * 0.1, gy + 4, a.x - U * 0.1, a.y + U * 1.2, U * 0.42);
+    wood(a.x - U * 0.1, a.y + U * 1.25, a.x - U * 0.7, a.y, U * 0.34);
+    wood(a.x - U * 0.1, a.y + U * 1.25, a.x + U * 0.5, a.y, U * 0.34);
+    g.fillStyle(0x4d2f1a, 1);
+    g.fillCircle(a.x - U * 0.7, a.y, U * 0.24);
+    g.fillCircle(a.x + U * 0.5, a.y, U * 0.24);
+    g.fillStyle(0x7a5236, 1);
+    g.fillCircle(a.x - U * 0.7, a.y, U * 0.17);
+    g.fillCircle(a.x + U * 0.5, a.y, U * 0.17);
   }
 
   /** Texturas de cada forma con carita */
@@ -247,8 +312,17 @@ class AngryScene extends Phaser.Scene {
     } else if (k === 'estrella') {
       W = H = U * 1.25;
     }
-    fillShape(shade(col, 0.72), 0);
-    fillShape(col, pad);
+    fillShape(shade(col, 0.62), 0);
+    fillShape(shade(col, 1.35), pad);
+    const bev = Math.max(2, U * 0.07);
+    g.translateCanvas(0, bev);
+    fillShape(col, pad + bev * 0.6);
+    g.translateCanvas(0, -bev);
+    if (k === 'rectangulo') {
+      // vetas de madera
+      g.lineStyle(Math.max(1, U * 0.03), shade(col, 0.82), 0.8);
+      for (let i = 1; i < 3; i++) g.lineBetween(pad + U * 0.2, (H * i) / 3 + bev * 0.5, W - pad - U * (0.3 + i * 0.4), (H * i) / 3 + bev * 0.5);
+    }
     // brillo
     g.fillStyle(0xffffff, 0.28);
     if (k === 'rectangulo') g.fillRoundedRect(pad + 4, pad + 2, W - pad * 2 - 8, H * 0.22, 4);
@@ -258,7 +332,9 @@ class AngryScene extends Phaser.Scene {
     const ey = k === 'triangulo' ? H / 2 : H * 0.48;
     const er = Math.max(2, U * 0.07);
     const sep = k === 'rectangulo' ? Math.min(U * 0.22, W * 0.2) : U * 0.17;
-    if (k === 'triangulo') {
+    if (k === 'rectangulo') {
+      // las tablas no llevan carita
+    } else if (k === 'triangulo') {
       // el triángulo se dibuja acostado: ojos en vertical para que queden horizontales al rotar
       for (const d of [-1, 1]) {
         g.fillStyle(0xffffff, 1);
@@ -429,6 +505,8 @@ class AngryScene extends Phaser.Scene {
       this.proj.setPosition(this.anchor.x, this.anchor.y);
       return;
     }
+    this.trailG.clear();
+    this.trailPts = [];
     this.proj.setStatic(false);
     this.proj.setVelocity(vx, vy);
     this.proj.setAngularVelocity(0.05);
@@ -445,6 +523,14 @@ class AngryScene extends Phaser.Scene {
     this.hudText.setText(`Tiros: ${'●'.repeat(Math.max(0, this.shotsLeft))}${'○'.repeat(Math.max(0, this.shotsUsed))}`);
   }
 
+  puff(x: number, y: number, k: number) {
+    for (let i = 0; i < 6; i++) {
+      const c = this.add.circle(x, y, this.U * (0.15 + Math.random() * 0.2) * k, 0xf3eadb, 0.9).setDepth(8);
+      const a = Math.random() * Math.PI * 2;
+      this.tweens.add({ targets: c, x: x + Math.cos(a) * this.U * 0.9 * k, y: y + Math.sin(a) * this.U * 0.6 * k - this.U * 0.3, scale: 2, alpha: 0, duration: 500 + Math.random() * 300, onComplete: () => c.destroy() });
+    }
+  }
+
   checkKnocks() {
     if (!this.settled) return;
     const U = this.U;
@@ -458,6 +544,11 @@ class AngryScene extends Phaser.Scene {
       t.down = true;
       if (t.block?.target) {
         sfx.pop();
+        for (let i = 0; i < 8; i++) {
+          const st = this.add.star(t.img.x, t.img.y, 5, U * 0.08, U * 0.2, 0xffd166).setDepth(14);
+          const a = (i / 8) * Math.PI * 2;
+          this.tweens.add({ targets: st, x: t.img.x + Math.cos(a) * U * 1.3, y: t.img.y + Math.sin(a) * U * 1.3, angle: 180, alpha: 0, duration: 600, onComplete: () => st.destroy() });
+        }
         const m = this.add.text(t.img.x, t.img.y - U, '✓', { fontFamily: FONT, fontSize: `${Math.round(U * 1.1)}px`, color: '#2fa36b', fontStyle: 'bold', stroke: '#ffffff', strokeThickness: 6 }).setOrigin(0.5).setDepth(15);
         this.tweens.add({ targets: m, y: m.y - U, alpha: 0, delay: 500, duration: 700, onComplete: () => m.destroy() });
       } else if (this.lv.only) {
@@ -475,12 +566,17 @@ class AngryScene extends Phaser.Scene {
     this.checkKnocks();
     // línea de puntería
     this.band.clear();
+    if (!(this.proj && this.proj.isStatic())) this.bandBack.clear();
     if (this.proj && this.proj.isStatic()) {
       const a = this.anchor;
       const U = this.U;
-      this.band.lineStyle(U * 0.18, 0x6b3f22, 1);
-      this.band.lineBetween(a.x - U * 0.7, a.y, this.proj.x, this.proj.y);
-      this.band.lineBetween(a.x + U * 0.5, a.y, this.proj.x, this.proj.y);
+      this.bandBack.clear();
+      this.bandBack.lineStyle(U * 0.2, 0x5a2d16, 1);
+      this.bandBack.lineBetween(a.x + U * 0.5, a.y, this.proj.x + U * 0.3, this.proj.y);
+      this.band.lineStyle(U * 0.22, 0x7a3b1d, 1);
+      this.band.lineBetween(a.x - U * 0.7, a.y, this.proj.x - U * 0.3, this.proj.y);
+      this.band.fillStyle(0x5a2d16, 1);
+      this.band.fillRoundedRect(this.proj.x - U * 0.42, this.proj.y - U * 0.2, U * 0.24, U * 0.4, 4);
     }
     if (this.dragging && this.proj) {
       const { vx, vy } = this.launchVelocity();
@@ -501,6 +597,12 @@ class AngryScene extends Phaser.Scene {
       }
     }
     if (this.flying && this.proj) {
+      const lp = this.trailPts[this.trailPts.length - 1];
+      if (!lp || Math.hypot(lp.x - this.proj.x, lp.y - this.proj.y) > this.U * 0.6) {
+        this.trailPts.push({ x: this.proj.x, y: this.proj.y });
+        this.trailG.fillStyle(0xffffff, 0.85);
+        this.trailG.fillCircle(this.proj.x, this.proj.y, this.U * (this.trailPts.length % 3 === 0 ? 0.14 : 0.08));
+      }
       this.flyTime += dt;
       const sp = this.proj.body ? Math.hypot((this.proj.body as MatterJS.BodyType).velocity.x, (this.proj.body as MatterJS.BodyType).velocity.y) : 0;
       const off = this.proj.x > this.scale.width + this.U * 2 || this.proj.x < -this.U * 3 || this.proj.y > this.scale.height + this.U * 2;
