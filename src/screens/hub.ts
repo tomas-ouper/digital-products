@@ -28,7 +28,26 @@ export function hubScreen(root: HTMLElement) {
   updTime(remainingTodaySec(p.id));
   const off = onTick(updTime);
 
+  const floaters = h('div', { class: 'floaters' });
+  const items = ['A', 'm', '★', 'o', '▲', 'S', '●', 'e', '◆', 'L', '■', 'u'];
+  const cols = ['#ff8a5b', '#5b8def', '#4cc38a', '#ffc93c', '#a98bff', '#ff8fb1'];
+  items.forEach((t, i) => {
+    const sp = h('span', {}, t);
+    sp.style.left = ((i * 83) % 100) + '%';
+    sp.style.top = ((i * 37) % 90) + 5 + '%';
+    sp.style.color = cols[i % cols.length];
+    sp.style.animationDelay = -i * 1.3 + 's';
+    sp.style.fontSize = 28 + ((i * 13) % 40) + 'px';
+    floaters.append(sp);
+  });
+  const logo = h(
+    'div',
+    { class: 'hub-logo' },
+    h('span', { class: 'wm' }, ...[...'Montessori'].map((c, i) => h('b', { style: { color: cols[i % cols.length], animationDelay: i * 0.08 + 's' } }, c))),
+    h('span', { class: 'wm2' }, 'Play')
+  );
   root.append(
+    floaters,
     h(
       'div',
       { class: 'topbar' },
@@ -38,7 +57,8 @@ export function hubScreen(root: HTMLElement) {
       soundToggle(),
       iconButton(ICONS.lock, 'Padres', () => go('parents'))
     ),
-    h('div', { class: 'counter' }, '5 juegos hoy · +15 para fin de año'),
+    logo,
+    h('div', { class: 'counter' }, '🎮 5 juegos hoy · +15 para fin de año'),
     h('div', { class: 'col', style: { gap: '4px', marginBottom: '14px', width: '100%' } }, h('div', { class: 'timebar' }, timeFill), h('small', { class: 'sub' }, timeLabel)),
     h(
       'div',
@@ -58,6 +78,7 @@ export function hubScreen(root: HTMLElement) {
             },
           },
           h('div', { class: 'art', html: g.art, style: { background: g.color } }),
+          g.ready ? h('span', { class: 'play-badge' }, '▶') : null,
           g.ready ? null : h('span', { class: 'soon-tag' }, 'Muy pronto'),
           h('div', { class: 'info' }, h('div', { class: 't' }, g.name), h('div', { class: 'd' }, g.desc), g.ready ? h('div', { class: 'stars' }, `★ ${stars} / ${g.levels.length * 3}`) : null)
         );
