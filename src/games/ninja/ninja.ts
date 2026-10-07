@@ -47,6 +47,7 @@ class NinjaScene extends Phaser.Scene {
   bannerText!: Phaser.GameObjects.Text;
   bannerLetter!: Phaser.GameObjects.Text;
   counter!: Phaser.GameObjects.Text;
+  blade: { x: number; y: number; t: number }[] = [];
   waveTimer = 0;
   waves = 0;
   over = false;
@@ -66,6 +67,60 @@ class NinjaScene extends Phaser.Scene {
   }
 
   /** plantilla que hay que dibujar para una etiqueta (sílaba → primera letra) */
+  bubbleTex(color: number) {
+    const key = 'bub-' + color.toString(16);
+    if (this.textures.exists(key)) return key;
+    const S = 230;
+    const tex = this.textures.createCanvas(key, S, S)!;
+    const c = tex.getContext();
+    const R = 100;
+    const cx = S / 2, cy = S / 2 - 4;
+    const hexs = (n: number) => '#' + n.toString(16).padStart(6, '0');
+    const lighten = (n: number, f: number) => {
+      const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+      const m = (v: number) => Math.round(v + (255 - v) * f);
+      return `rgb(${m(r)},${m(g)},${m(b)})`;
+    };
+    const darken = (n: number, f: number) => {
+      const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+      return `rgb(${Math.round(r * f)},${Math.round(g * f)},${Math.round(b * f)})`;
+    };
+    // sombra
+    c.fillStyle = 'rgba(0,0,0,0.25)';
+    c.beginPath();
+    c.ellipse(cx + 6, cy + 12, R, R * 0.98, 0, 0, Math.PI * 2);
+    c.fill();
+    // cuerpo con degradé radial
+    const grd = c.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
+    grd.addColorStop(0, lighten(color, 0.55));
+    grd.addColorStop(0.55, hexs(color));
+    grd.addColorStop(1, darken(color, 0.62));
+    c.fillStyle = grd;
+    c.beginPath();
+    c.arc(cx, cy, R, 0, Math.PI * 2);
+    c.fill();
+    // borde de luz
+    c.strokeStyle = 'rgba(255,255,255,0.55)';
+    c.lineWidth = 5;
+    c.beginPath();
+    c.arc(cx, cy, R - 4, Math.PI * 0.55, Math.PI * 1.45);
+    c.stroke();
+    // reflejo
+    const sp = c.createRadialGradient(cx - R * 0.38, cy - R * 0.5, 2, cx - R * 0.38, cy - R * 0.5, R * 0.42);
+    sp.addColorStop(0, 'rgba(255,255,255,0.95)');
+    sp.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = sp;
+    c.beginPath();
+    c.ellipse(cx - R * 0.38, cy - R * 0.5, R * 0.42, R * 0.26, -0.5, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = 'rgba(255,255,255,0.6)';
+    c.beginPath();
+    c.arc(cx + R * 0.5, cy + R * 0.45, R * 0.07, 0, Math.PI * 2);
+    c.fill();
+    tex.refresh();
+    return key;
+  }
+
   keyOf(label: string) {
     return this.lv.syllables ? label[0] : label;
   }
@@ -94,12 +149,16 @@ class NinjaScene extends Phaser.Scene {
       this.recTimer?.remove();
       this.recTimer = null;
       this.curStroke = [toLocal(p)];
+      this.blade = [{ x: p.x, y: p.y, t: this.time.now }];
       sfx.whoosh();
     });
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
       if (!this.curStroke || !p.isDown) return;
       const last = this.curStroke[this.curStroke.length - 1];
-      if (Math.hypot(p.x - last.x, p.y - last.y) > 3) this.curStroke.push(toLocal(p));
+      if (Math.hypot(p.x - last.x, p.y - last.y) > 3) {
+        this.curStroke.push(toLocal(p));
+        this.blade.push({ x: p.x, y: p.y, t: this.time.now });
+      }
     });
     const up = () => {
       if (!this.curStroke) return;
@@ -125,13 +184,37 @@ class NinjaScene extends Phaser.Scene {
     const h = this.scale.height;
     const g = this.bg;
     g.clear();
-    g.fillGradientStyle(0x3b4a8c, 0x3b4a8c, 0x6a5acd, 0x8a6fd6, 1);
+    g.fillGradientStyle(0x1d2457, 0x1d2457, 0x6a4fb8, 0x8e5fc4, 1);
     g.fillRect(0, 0, w, h);
     // estrellitas fijas (semilla fija para que no cambien)
     let s = 7;
     const rnd = () => ((s = (s * 9301 + 49297) % 233280) / 233280);
-    g.fillStyle(0xffffff, 0.5);
-    for (let i = 0; i < 60; i++) g.fillCircle(rnd() * w, rnd() * h, 1 + rnd() * 1.8);
+    for (let i = 0; i < 90; i++) {
+      g.fillStyle(0xffffff, 0.25 + rnd() * 0.6);
+      g.fillCircle(rnd() * w, rnd() * h * 0.7, 0.8 + rnd() * 1.8);
+    }
+    // luna con halo
+    const mx = w * 0.82, my = h * 0.3, mr = Math.min(w, h) * 0.09;
+    for (let i = 16; i > 0; i--) {
+      g.fillStyle(0xfff4c9, 0.018 * (17 - i) / 4);
+      g.fillCircle(mx, my, mr * (1 + i * 0.13));
+    }
+    g.fillStyle(0xfff6d8, 1);
+    g.fillCircle(mx, my, mr);
+    g.fillStyle(0xeadfb8, 1);
+    g.fillCircle(mx - mr * 0.35, my - mr * 0.2, mr * 0.18);
+    g.fillCircle(mx + mr * 0.25, my + mr * 0.35, mr * 0.12);
+    // montañas en capas
+    const hills = (base: number, amp: number, col: number, seed: number) => {
+      const pts: Phaser.Math.Vector2[] = [new Phaser.Math.Vector2(0, h)];
+      for (let x = 0; x <= w + 40; x += 40) pts.push(new Phaser.Math.Vector2(x, base - Math.abs(Math.sin(x * 0.006 + seed) * amp) - Math.sin(x * 0.017 + seed * 2) * amp * 0.25));
+      pts.push(new Phaser.Math.Vector2(w, h));
+      g.fillStyle(col, 1);
+      g.fillPoints(pts, true);
+    };
+    hills(h * 0.78, h * 0.2, 0x3a2f78, 1);
+    hills(h * 0.88, h * 0.14, 0x2a2360, 3);
+    hills(h * 0.96, h * 0.08, 0x1d1847, 5);
     // banner de consigna
     const bw = Math.min(w - 24, 460);
     const bh = 76;
@@ -162,7 +245,7 @@ class NinjaScene extends Phaser.Scene {
     const shown = this.lv.syllables ? `${this.target}` : glyph(this.target);
     this.bannerText.setText(this.lv.syllables ? 'Corta' : 'Corta la');
     this.bannerLetter.setText(this.lv.syllables ? `${shown} → ${this.target[0]}` : shown);
-    this.bannerLetter.setFontSize(this.lv.syllables ? 38 : 54);
+    this.bannerLetter.setFontSize(this.lv.syllables ? 38 : /^[a-zñ]$/.test(shown) && !this.cursive ? 70 : 54);
     this.bannerLetter.setX(20 + this.bannerText.width + 12);
   }
 
@@ -210,20 +293,12 @@ class NinjaScene extends Phaser.Scene {
     const vy = -Math.sqrt(2 * this.grav * (h + r - apex));
     const vx = (Math.random() - 0.5) * w * 0.04;
     const color = COLORS[(Math.random() * COLORS.length) | 0];
-    const g = this.add.graphics();
-    g.fillStyle(0x000000, 0.18);
-    g.fillCircle(4, 6, r);
-    g.fillStyle(color, 1);
-    g.fillCircle(0, 0, r);
-    g.fillStyle(0xffffff, 0.35);
-    g.fillEllipse(-r * 0.3, -r * 0.42, r * 0.9, r * 0.45);
-    g.lineStyle(4, 0xffffff, 0.6);
-    g.strokeCircle(0, 0, r - 2);
+    const g = this.add.image(0, 0, this.bubbleTex(color)).setDisplaySize(r * 2.3, r * 2.3);
     const cur = this.cursive;
     const t = this.add
       .text(0, cur ? 4 : 2, this.lv.syllables ? label : glyph(label), {
         fontFamily: cur ? CURSIVE : FONT,
-        fontSize: `${Math.round(r * (this.lv.syllables ? 0.85 : cur ? 0.95 : 1.15))}px`,
+        fontSize: `${Math.round(r * (this.lv.syllables ? 0.85 : cur ? 0.95 : /^[a-zñ]$/.test(label) ? 1.45 : 1.15))}px`,
         color: '#ffffff',
         fontStyle: cur ? 'normal' : 'bold',
         stroke: '#3a3f6b',
@@ -282,6 +357,19 @@ class NinjaScene extends Phaser.Scene {
   splitPiece(p: Piece, color: number) {
     p.alive = false;
     p.c.setVisible(false);
+    // salpicadura que se desvanece
+    const st = this.add.graphics({ x: p.x, y: p.y }).setDepth(1);
+    st.fillStyle(color, 0.55);
+    st.fillCircle(0, 0, p.r * 0.9);
+    for (let i = 0; i < 9; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = p.r * (0.9 + Math.random() * 0.8);
+      st.fillCircle(Math.cos(a) * d, Math.sin(a) * d, p.r * (0.12 + Math.random() * 0.22));
+    }
+    this.tweens.add({ targets: st, alpha: 0, delay: 600, duration: 1600, onComplete: () => st.destroy() });
+    // destello
+    const fl = this.add.circle(p.x, p.y, p.r, 0xffffff, 0.9).setDepth(24);
+    this.tweens.add({ targets: fl, scale: 2.2, alpha: 0, duration: 260, onComplete: () => fl.destroy() });
     for (const side of [-1, 1]) {
       const half = this.add.graphics({ x: p.x, y: p.y }).setDepth(6);
       half.fillStyle(color, 1);
@@ -372,26 +460,38 @@ class NinjaScene extends Phaser.Scene {
         this.spawnWave();
       }
     } else this.waveTimer = 0;
-    // estela del dedo
+    // trazo del niño (para que vea la letra que dibuja)
     const g = this.trail;
     g.clear();
     const all = [...this.strokes, ...(this.curStroke ? [this.curStroke] : [])];
-    for (const s of all) {
-      if (s.length === 1) {
+    for (const st of all) {
+      if (st.length === 1) {
         g.fillStyle(0xffffff, 0.9);
-        g.fillCircle(s[0].x, s[0].y, 8);
+        g.fillCircle(st[0].x, st[0].y, 9);
         continue;
       }
-      g.lineStyle(14, 0xfff27a, 0.35);
-      g.beginPath();
-      g.moveTo(s[0].x, s[0].y);
-      for (const p of s) g.lineTo(p.x, p.y);
-      g.strokePath();
-      g.lineStyle(6, 0xffffff, 0.95);
-      g.beginPath();
-      g.moveTo(s[0].x, s[0].y);
-      for (const p of s) g.lineTo(p.x, p.y);
-      g.strokePath();
+      g.lineStyle(18, 0x9fe7ff, 0.18);
+      g.strokePoints(st as Phaser.Types.Math.Vector2Like[]);
+      g.lineStyle(7, 0xffffff, 0.75);
+      g.strokePoints(st as Phaser.Types.Math.Vector2Like[]);
+    }
+    // filo luminoso en la punta del dedo (se afina hacia la cola)
+    const now = this.time.now;
+    this.blade = this.blade.filter((b) => now - b.t < 220);
+    const bl = this.blade;
+    for (let i = 1; i < bl.length; i++) {
+      const k = i / bl.length;
+      g.lineStyle(4 + k * 18, 0x7fdcff, 0.25 * k);
+      g.lineBetween(bl[i - 1].x, bl[i - 1].y, bl[i].x, bl[i].y);
+      g.lineStyle(2 + k * 7, 0xffffff, 0.95 * k);
+      g.lineBetween(bl[i - 1].x, bl[i - 1].y, bl[i].x, bl[i].y);
+    }
+    if (bl.length && this.curStroke) {
+      const tip = bl[bl.length - 1];
+      g.fillStyle(0xffffff, 1);
+      g.fillCircle(tip.x, tip.y, 6);
+      g.fillStyle(0x7fdcff, 0.35);
+      g.fillCircle(tip.x, tip.y, 14);
     }
   }
 }
