@@ -1,0 +1,14 @@
+{
+  "results": [
+    "Montecraft: doble espacio activa vuelo; espacio sube y Shift baja",
+    "Captura nativa rechazada en headless; alternativa de arrastre verificada",
+    "Montecraft: giro, doble clic y apertura del inventario",
+    "Ninja: comienza con una letra, espera al dibujar y acepta un trazo real",
+    "Ayuda: pausa y reanuda la escena",
+    "CaliCrash: tocar dos vecinas que forman tres resuelve el intercambio",
+    "CaliCrash: intercambio inválido tiene explicación y no gasta movimientos",
+    "CaliCrash: arrastrar por S → O → L forma la palabra",
+    "Angry Forms: objetivos visibles y un lanzamiento real derriba 2"
+  ],
+  "errors": []
+}

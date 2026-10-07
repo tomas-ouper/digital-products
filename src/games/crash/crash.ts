@@ -8,7 +8,7 @@ import { sfx } from '../../core/sound';
 
 const N = 7;
 const HUD_TOP = 84;
-const PALETTE = [0xff8a5b, 0x5b8def, 0x4cc38a, 0xf5b82e, 0xa98bff, 0xff7aa8];
+const LETTER_COLORS: Record<string, number> = { A: 0xff987c, E: 0x75b4ff, O: 0x61d5a5, S: 0xffd15a, L: 0xbda0ff, U: 0x55d9e0, N: 0xf58dd0, M: 0xc7dc68, C: 0xffb966 };
 
 interface Tile {
   letter: string;
@@ -49,6 +49,7 @@ class CrashScene extends Phaser.Scene {
   bgG!: Phaser.GameObjects.Graphics;
   idle = 0;
   hintTiles: Tile[] = [];
+  helpText!: Phaser.GameObjects.Text;
 
   constructor() {
     super('crash');
@@ -75,8 +76,7 @@ class CrashScene extends Phaser.Scene {
   }
 
   colorOf(letter: string) {
-    const i = this.lv.pool.indexOf(letter);
-    return PALETTE[(i < 0 ? 0 : i) % PALETTE.length];
+    return LETTER_COLORS[letter.toUpperCase()] ?? 0x9bb8dd;
   }
 
   create() {
@@ -88,7 +88,8 @@ class CrashScene extends Phaser.Scene {
     this.panelBg = this.add.graphics();
     this.goalText = this.add.text(0, 0, '', { fontFamily: FONT, fontSize: '22px', color: '#3a3f6b', fontStyle: 'bold' }).setOrigin(0, 0.5);
     this.movesText = this.add.text(0, 0, '', { fontFamily: FONT, fontSize: '20px', color: '#ffffff', fontStyle: 'bold' }).setOrigin(0.5);
-    this.panel = this.add.container(0, 0, [this.panelBg, this.goalText, this.movesText]).setDepth(10);
+    this.helpText = this.add.text(0, 0, '', { fontFamily: FONT, fontSize: '16px', color: '#3a3f6b', align: 'center' }).setOrigin(0.5, 0);
+    this.panel = this.add.container(0, 0, [this.panelBg, this.goalText, this.movesText, this.helpText]).setDepth(10);
     if (this.lv.kind === 'palabra') {
       for (let i = 0; i < this.lv.word!.length; i++) {
         const t = this.add.text(0, 0, '', { fontFamily: this.font, fontSize: '30px', color: '#3a3f6b', fontStyle: this.lv.cursive ? 'normal' : 'bold' }).setOrigin(0.5);
@@ -124,6 +125,11 @@ class CrashScene extends Phaser.Scene {
     this.ctx.setRepeat(intro);
     this.updatePanel();
     intro();
+    this.explain();
+  }
+
+  explain(text?: string) {
+    this.helpText.setText(text || (this.lv.kind === 'tacha' ? 'Cambia 2 vecinas para alinear 3 iguales' : `Toca o arrastra: ${this.lv.word!.split('').join(' → ')}`));
   }
 
   /** Texturas de ficha (relieve: sombra, cara con degradé, brillo) por color */
@@ -146,7 +152,7 @@ class CrashScene extends Phaser.Scene {
         g.fillRoundedRect(4, y, S - 8, (S - 22) / steps + 14, i === 0 ? 24 : 6);
       }
       g.fillStyle(color, 1);
-      g.fillRoundedRect(4, 30, S - 8, S - 52, 10);
+      g.fillRoundedRect(4, 12, S - 8, S - 30, 18);
       g.fillStyle(shade(color, 0.92), 1);
       g.fillRoundedRect(4, S - 40, S - 8, 24, { tl: 0, tr: 0, bl: 22, br: 22 });
       // brillo
@@ -175,11 +181,10 @@ class CrashScene extends Phaser.Scene {
       .text(0, -2, letter, {
         fontFamily: this.font,
         fontSize: '64px',
-        color: '#ffffff',
+        color: '#202944',
         fontStyle: this.lv.cursive ? 'normal' : 'bold',
-        stroke: '#00000033',
-        strokeThickness: 4,
-        shadow: { offsetX: 0, offsetY: 3, color: '#00000055', blur: 2, fill: true },
+        stroke: '#ffffff',
+        strokeThickness: 2,
       })
       .setOrigin(0.5);
     const cont = this.add.container(0, 0, [img, t]).setDepth(5);
@@ -213,10 +218,10 @@ class CrashScene extends Phaser.Scene {
       this.x0 = Math.round((w - this.cell * N) / 2);
       this.y0 = Math.round((h - this.cell * N) / 2);
       pw = Math.min(260, this.x0 - 24);
-      panelH = word ? 170 : 110;
+      panelH = word ? 225 : 175;
       this.panel.setPosition(12, HUD_TOP + 4);
     } else {
-      panelH = word ? 110 : 70;
+      panelH = word ? 154 : 114;
       const top = HUD_TOP + panelH + 14;
       this.cell = Math.floor(Math.min((w - 24) / N, (h - top - 16) / N, 96));
       this.x0 = Math.round((w - this.cell * N) / 2);
@@ -272,6 +277,7 @@ class CrashScene extends Phaser.Scene {
       this.movesText.setPosition(pw - 65, 34);
       slotY = 82;
     }
+    this.helpText.setPosition(pw / 2, panelH - (side ? 66 : 45)).setWordWrapWidth(pw - 24).setFontSize(side ? 16 : 17);
     const sx0 = (pw - this.slots.length * sw) / 2;
     this.slots.forEach((s, i) => s.setPosition(sx0 + i * sw + sw / 2, slotY));
     if (word) {
@@ -297,7 +303,7 @@ class CrashScene extends Phaser.Scene {
     else this.goalText.setText(`Forma ${this.lv.word}: ${this.progress}/${this.lv.count}`);
     if (this.lv.cursive) this.goalText.setFontFamily(FONT);
     this.movesText.setText(`${this.moves} mov.`);
-    this.slots.forEach((s, i) => s.setText(this.chain[i]?.letter || ''));
+    this.slots.forEach((s, i) => s.setText(this.lv.word![i]).setColor(i < this.chain.length ? '#19804e' : '#868baa'));
   }
 
   tileAt(x: number, y: number): Tile | null {
@@ -314,10 +320,17 @@ class CrashScene extends Phaser.Scene {
     const t = this.tileAt(p.x, p.y);
     if (!t) return;
     this.down = { tile: t, x: p.x, y: p.y, swiped: false };
+    if (this.lv.kind === 'palabra') { this.chainTap(t); this.down.swiped = true; }
   }
 
   onMove(p: Phaser.Input.Pointer) {
-    if (!this.down || this.down.swiped || this.busy) return;
+    if (!this.down || this.busy || this.over) return;
+    if (this.lv.kind === 'palabra') {
+      const t = this.tileAt(p.x, p.y);
+      if (t && t !== this.down.tile) { this.down.tile = t; this.chainTap(t); }
+      return;
+    }
+    if (this.down.swiped) return;
     const dx = p.x - this.down.x;
     const dy = p.y - this.down.y;
     if (Math.max(Math.abs(dx), Math.abs(dy)) < this.cell * 0.35) return;
@@ -384,6 +397,7 @@ class CrashScene extends Phaser.Scene {
       } else {
         sfx.bad();
         this.wiggle(t);
+        this.explain('Elige una letra vecina de la última');
       }
       this.afterChain();
       return;
@@ -391,9 +405,11 @@ class CrashScene extends Phaser.Scene {
     if (t.letter !== need) {
       sfx.bad();
       this.wiggle(t);
+      this.explain(`Ahora busca la ${need}`);
       if (!last) say(letterName(word[0]), {}, { raw: true });
       return;
     }
+    this.explain();
     this.chain.push(t);
     sfx.pop();
     this.afterChain();
@@ -458,10 +474,12 @@ class CrashScene extends Phaser.Scene {
     const matches = this.findMatches();
     if (!matches.length) {
       sfx.bad();
+      this.explain('¡Falta una! Alinea 3 iguales, no solo 2');
       await this.swapTiles(a, b);
       this.busy = false;
       return;
     }
+    this.explain();
     this.moves--;
     this.updatePanel();
     await this.settle();
@@ -519,6 +537,7 @@ class CrashScene extends Phaser.Scene {
 
   /** resuelve coincidencias en cascada y rellena */
   async settle(): Promise<void> {
+    if (this.lv.kind === 'palabra') { await this.collapse(); this.ensureWord(true); return; }
     for (let guard = 0; guard < 20; guard++) {
       const m = this.findMatches();
       if (!m.length) break;
@@ -530,8 +549,7 @@ class CrashScene extends Phaser.Scene {
     // tras armar palabras también hay que rellenar
     await this.collapse();
     if (this.findMatches().length) return this.settle();
-    if (this.lv.kind === 'palabra') this.ensureWord(true);
-    else if (!this.findMove()) this.shuffleBoard();
+    if (!this.findMove()) this.shuffleBoard();
   }
 
   async removeTiles(tiles: Tile[], word: boolean) {
@@ -782,7 +800,7 @@ class CrashScene extends Phaser.Scene {
     if (this.busy || this.over) return;
     this.idle += dt;
     // pista después de un rato sin jugar (antes en 3-5 años)
-    if (this.idle > (this.ctx.easy ? 5000 : 9000) && !this.hintTiles.length) {
+    if (this.idle > (this.ctx.easy ? 2500 : 4000) && !this.hintTiles.length) {
       let tiles: Tile[] = [];
       if (this.lv.kind === 'palabra') tiles = this.findWordPath()?.slice(this.chain.length ? 99 : 0, 1) || [];
       else {

@@ -17,6 +17,22 @@ export function createGame(host: HTMLElement, key: string, scene: Phaser.Scene, 
     audio: { noAudio: true },
     ...extra,
   });
+  const pause = (event: Event) => {
+    const value = (event as CustomEvent<boolean>).detail;
+    game.scene.getScenes(false).forEach(s => {
+      if (value) { if (s.sys.isActive()) s.scene.pause(); }
+      else if (s.sys.isPaused()) s.scene.resume();
+    });
+  };
+  host.addEventListener('game-pause', pause);
+  game.events.once('destroy', () => host.removeEventListener('game-pause', pause));
+  // Phaser inicializa los eventos de Scene durante el arranque, no en el constructor.
+  const instance = scene as Phaser.Scene & { create(...args: unknown[]): void };
+  const createScene = instance.create;
+  instance.create = function (...args: unknown[]) {
+    createScene.apply(this, args);
+    if (host.dataset.paused === 'true') this.scene.pause();
+  };
   game.scene.add(key, scene, true, data);
   return game;
 }

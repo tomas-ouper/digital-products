@@ -33,5 +33,5 @@ export function levelsScreen(root: HTMLElement, params: { game: string }) {
       )
     )
   );
-  setTimeout(() => say('elige_nivel'), 250);
+  setTimeout(() => root.isConnected && say('elige_nivel'), 250);
 }

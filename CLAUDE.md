@@ -16,6 +16,9 @@ npm install
 npm run dev        # http://localhost:5173 — código de acceso: CALIGRAFIA
 npm run build      # tsc --noEmit + vite build → dist/ (correrlo antes de cada commit)
 npm run preview    # sirve dist/ en :4173 (lo usan los scripts de clips)
+npm run qa:core    # regresiones de reloj por perfil, voz y caché
+npm run qa:touch   # vuelo táctil y pausas por ayuda/orientación (requiere preview)
+npm run qa:interactions # acciones reales con mouse/teclado y capturas (requiere preview)
 npm run smoke      # prueba de humo: todas las pantallas y niveles en 4 tamaños (necesita preview)
 npm run voces      # regenera voces.csv desde src/data/frases.json
 npm run planos     # graba los planos 9:16 en media/clips/ (necesita preview corriendo)

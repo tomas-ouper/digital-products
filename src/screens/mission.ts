@@ -56,7 +56,8 @@ export function missionScreen(root: HTMLElement) {
     )
   );
   setTimeout(async () => {
+    if (!root.isConnected) return;
     await say('tiempo_terminado');
-    sayText(m.texto);
+    if (root.isConnected) sayText(m.texto);
   }, 300);
 }

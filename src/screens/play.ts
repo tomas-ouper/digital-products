@@ -44,6 +44,22 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
     soundToggle()
   );
   root.append(host, hud);
+  let tutorialOpen = false;
+  let inst: GameInstance | null = null;
+  let dead = false;
+  let finished = false;
+  const timers = new Set<number>();
+  const later = (fn: () => void, ms: number) => {
+    const id = window.setTimeout(() => { timers.delete(id); if (!dead) fn(); }, ms);
+    timers.add(id); return id;
+  };
+  const syncPause = () => {
+    const paused = tutorialOpen || rot.style.display === 'flex' || document.hidden || finished;
+    host.dataset.paused = String(paused);
+    host.dispatchEvent(new CustomEvent('game-pause', { detail: paused }));
+    inst?.setPaused?.(paused);
+  };
+  document.addEventListener('visibilitychange', syncPause);
   // En celular: se juega en horizontal. Si está vertical, pantalla clara para girar.
   const isPhone = () => !location.search.includes('rec') && (settings.device === 'phone' || Math.min(window.screen.width, window.screen.height) < 600);
   let rotDismissed = false;
@@ -59,15 +75,12 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
   const updRot = () => {
     const show = isPhone() && window.innerHeight > window.innerWidth && !rotDismissed;
     rot.style.display = show ? 'flex' : 'none';
+    syncPause();
   };
   updRot();
   window.addEventListener('resize', updRot);
   root.append(rot);
-  if (rot.style.display === 'flex') setTimeout(() => sayText('Gira tu teléfono para jugar.'), 400);
-
-  let inst: GameInstance | null = null;
-  let dead = false;
-  let finished = false;
+  if (rot.style.display === 'flex') later(() => sayText('Gira tu teléfono para jugar.'), 400);
 
   const showComplete = (stars: number) => {
     const last = params.level >= g.levels.length - 1;
@@ -95,20 +108,23 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
     );
     root.append(ov);
     sfx.win();
-    for (let i = 0; i < stars; i++) setTimeout(() => sfx.star(i), 300 + i * 250);
-    setTimeout(() => say(key), 250);
+    for (let i = 0; i < stars; i++) later(() => sfx.star(i), 300 + i * 250);
+    later(() => say(key), 250);
   };
 
   const levelBanner = () => {
     const b = h('div', { class: 'level-banner' }, h('small', {}, `Nivel ${params.level + 1}`), h('span', {}, g.levels[params.level] || ''));
     root.append(b);
-    setTimeout(() => b.remove(), 2200);
+    later(() => b.remove(), 2200);
   };
 
   const tut = TUTORIALS[g.id];
   let started = false;
   function showTutorial(first: boolean) {
     if (!tut) return startGame();
+    if (tutorialOpen) return;
+    tutorialOpen = true;
+    syncPause();
     const ov = h(
       'div',
       { class: 'overlay tutorial' },
@@ -127,6 +143,8 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
             class: 'btn green tut-go',
             onTap: () => {
               ov.remove();
+              tutorialOpen = false;
+              syncPause();
               stopVoice();
               if (first) startGame();
             },
@@ -155,10 +173,11 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
         complete(stars, letters) {
           if (finished || dead) return;
           finished = true;
+          syncPause();
           const s = Math.max(1, Math.min(3, Math.round(stars)));
           setLevelStars(p.id, g.id, params.level, s);
           letters?.forEach((l) => markLetter(p.id, l));
-          setTimeout(() => !dead && showComplete(s), 500);
+          later(() => !dead && showComplete(s), 500);
         },
         setTitle(t) {
           title.textContent = t;
@@ -168,8 +187,10 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
           repeatBtn.style.visibility = fn ? 'visible' : 'hidden';
         },
       });
+      syncPause();
     })
     .catch((e) => {
+      if (dead) return;
       console.error(e);
       host.append(h('div', { style: { color: '#fff', padding: '120px 20px', textAlign: 'center' } }, 'No se pudo cargar el juego. Revisa tu conexión a internet.'));
     });
@@ -181,6 +202,8 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
   return () => {
     window.removeEventListener('resize', updRot);
     dead = true;
+    timers.forEach(clearTimeout);
+    document.removeEventListener('visibilitychange', syncPause);
     stopVoice();
     try {
       inst?.destroy();

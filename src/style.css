@@ -292,3 +292,13 @@ input[type=range] { width: 100%; max-width: 420px; height: 40px; accent-color: v
 /* Grabación de tráiler: plano limpio */
 .rec-clean .game-hud, .rec-clean #rec-finger, .rec-clean .mc-ui, .rec-clean .rotate-hint, .rec-clean .level-banner { display: none !important; }
 .rec-clean-hud .game-hud { display: none !important; }
+
+/* Vuelo y controles accesibles de Montecraft. */
+.mc-flight { position: absolute; top: 160px; right: 14px; min-width: 88px; min-height: 64px; border: 2px solid #fff8; border-radius: 16px; background: #20395ce6; color: white; font-size: 18px; }
+.mc-flight[aria-pressed="true"] { background: #226d59; }
+.mc-down { position: absolute; right: 120px; bottom: 100px; width: 64px; height: 64px; border-radius: 50%; background: #20395ce6; color: white; border: 2px solid #fff8; font-size: 32px; }
+.mc-down[hidden] { display: none; }
+.mc-keys { white-space: normal; width: max-content; max-width: calc(100% - 36px); text-align: center; }
+@media (max-height: 600px) and (orientation: landscape) { .mc-flight { top: 82px; } }
+
+.mc-toast { bottom: 142px; max-width: 75%; text-align: center; padding: 6px 12px; border-radius: 12px; background: #182536cc; font-size: 18px; }

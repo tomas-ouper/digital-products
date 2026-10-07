@@ -19,6 +19,7 @@ export function current() {
 export function go(name: string, params: any = {}) {
   const fn = screens.get(name);
   if (!fn) throw new Error('Pantalla desconocida: ' + name);
+  flushClock();
   stopVoice();
   if (cleanup) {
     try {
@@ -41,6 +42,7 @@ export function go(name: string, params: any = {}) {
 const TIMED = new Set(['hub', 'levels', 'play']);
 const listeners = new Set<(remaining: number) => void>();
 let pending = 0;
+let pendingProfile: string | null = null;
 
 export function onTick(fn: (remaining: number) => void) {
   listeners.add(fn);
@@ -51,6 +53,8 @@ export function startClock() {
   setInterval(() => {
     const p = activeProfile();
     if (!p || !TIMED.has(currentName) || document.visibilityState !== 'visible') return;
+    if (pendingProfile && pendingProfile !== p.id) flushClock();
+    pendingProfile = p.id;
     pending++;
     if (pending >= 5) {
       addPlaySeconds(p.id, pending);
@@ -69,9 +73,8 @@ export function startClock() {
 }
 
 export function flushClock() {
-  const p = activeProfile();
-  if (p && pending > 0) {
-    addPlaySeconds(p.id, pending);
+  if (pendingProfile && pending > 0) {
+    addPlaySeconds(pendingProfile, pending);
     pending = 0;
   }
 }

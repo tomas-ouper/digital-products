@@ -52,9 +52,12 @@ export function phrase(key: string, vars: Record<string, string | number> = {}):
 
 let current: HTMLAudioElement | null = null;
 let token = 0;
+let finishCurrent: (() => void) | null = null;
 
 export function stopVoice() {
   token++;
+  finishCurrent?.();
+  finishCurrent = null;
   try {
     window.speechSynthesis?.cancel();
   } catch {
@@ -81,9 +84,15 @@ export function say(key: string, vars: Record<string, string | number> = {}, opt
     return new Promise((res) => {
       const a = new Audio('./audio/' + mp3);
       current = a;
-      a.onended = () => res();
-      a.onerror = () => res();
-      a.play().catch(() => res());
+      const finish = () => {
+        a.onended = a.onerror = null;
+        if (finishCurrent === finish) finishCurrent = null;
+        res();
+      };
+      finishCurrent = finish;
+      a.onended = finish;
+      a.onerror = finish;
+      a.play().catch(finish);
     });
   }
   return speakText(text, my);
@@ -107,16 +116,20 @@ function speakText(text: string, my: number): Promise<void> {
     u.rate = 0.92;
     u.pitch = 1.1;
     let done = false;
+    let timeout: ReturnType<typeof setTimeout>;
     const finish = () => {
       if (!done) {
         done = true;
+        clearTimeout(timeout);
+        if (finishCurrent === finish) finishCurrent = null;
         res();
       }
     };
+    finishCurrent = finish;
     u.onend = finish;
     u.onerror = finish;
     // Algunos navegadores no disparan onend: tope de seguridad.
-    setTimeout(finish, 600 + text.length * 110);
+    timeout = setTimeout(finish, 600 + text.length * 110);
     s.speak(u);
   });
 }

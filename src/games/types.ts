@@ -16,6 +16,7 @@ export interface GameContext {
 
 export interface GameInstance {
   destroy(): void;
+  setPaused?(paused: boolean): void;
 }
 
 export interface GameModule {

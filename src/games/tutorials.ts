@@ -20,8 +20,8 @@ export const TUTORIALS: Record<string, Tutorial> = {
   ninja: {
     goal: 'Corta la letra que dice la voz dibujándola con tu dedo.',
     steps: [
-      ['🔊', 'Escucha qué letra hay que cortar (también está escrita arriba).'],
-      ['✍️', 'Dibuja esa letra en cualquier parte de la pantalla, grande y clara.'],
+      ['🔊', 'Empieza con una sola letra y una guía para practicar sin apuro.'],
+      ['✍️', 'Dibuja la letra, no solo una raya sobre ella. Mientras trazas, las letras esperan.'],
       ['🔪', 'Si tu trazo es la letra correcta, la burbuja se corta: +1.'],
       ['❌', 'Si cortas otra letra, pierdes un punto.'],
       ['🎯', 'Llega a la meta de cortes para pasar de nivel.'],
@@ -31,9 +31,9 @@ export const TUTORIALS: Record<string, Tutorial> = {
   crash: {
     goal: 'Junta letras iguales para tacharlas y forma palabras.',
     steps: [
-      ['↔️', 'Desliza una ficha hacia su vecina para cambiarlas de lugar.'],
+      ['↔️', 'Cambia dos fichas vecinas para dejar TRES letras iguales en una fila o columna.'],
       ['✖️', 'Tres letras iguales en línea se tachan y caen fichas nuevas.'],
-      ['🔤', 'En los niveles de palabras, toca letras vecinas en orden: S → O → L.'],
+      ['🔤', 'En palabras, toca o arrastra por letras vecinas en orden: S → O → L.'],
       ['👣', 'Mira tus movimientos: se terminan.'],
       ['💡', 'Si te quedas pensando, una ficha brilla para ayudarte.'],
     ],
@@ -42,7 +42,7 @@ export const TUTORIALS: Record<string, Tutorial> = {
   angry: {
     goal: 'Lanza formas con la resortera y derriba las que pide la voz.',
     steps: [
-      ['🔊', 'Escucha la consigna: qué forma lanzar o cuáles derribar.'],
+      ['🔊', 'Derriba las formas marcadas con aro dorado y flecha. El contador muestra cuántas faltan.'],
       ['🔺', 'Si aparecen formas abajo, elige la que te piden.'],
       ['🎯', 'Jala la forma hacia atrás y suéltala. Los puntitos muestran el camino.'],
       ['✅', 'Cada forma derribada se marca con un ✓.'],
@@ -54,8 +54,9 @@ export const TUTORIALS: Record<string, Tutorial> = {
     goal: 'Construye con bloques en un mundo 3D que recorres en primera persona.',
     steps: [
       ['🕹️', 'Camina con el joystick (mitad izquierda). En la compu: W A S D o flechas.'],
-      ['👀', 'Arrastra el dedo para mirar a tu alrededor.'],
-      ['🧱', 'Toca para poner un bloque. Mantén presionado para quitarlo.'],
+      ['👀', 'En la compu, haz clic para capturar el mouse y muévelo para mirar. Escape libera el cursor. En táctil, arrastra.'],
+      ['🕊️', 'Doble clic o doble espacio activa el vuelo. Espacio sube y Shift baja. En táctil usa Volar y las flechas.'],
+      ['🧱', 'Con mouse capturado: clic quita, clic derecho pone. En táctil: toca para poner y mantén para quitar.'],
       ['👻', 'Las sombras blancas muestran dónde va cada bloque: tócalas para llenarlas.'],
       ['🎨', 'Elige el bloque en la barra de abajo. El botón ▦ abre todos los bloques.'],
     ],

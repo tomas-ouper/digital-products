@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 import type { GameContext, GameInstance } from '../types';
 import { ANGRY_LEVELS, type AngryLevel, type ShapeKind, type Block } from './levels';
 import { createGame, FONT } from '../phaserHost';
-import { say } from '../../core/voice';
+import { say, sayText } from '../../core/voice';
 import { sfx } from '../../core/sound';
 
 const HUD_TOP = 84;
@@ -68,6 +68,10 @@ class AngryScene extends Phaser.Scene {
   trailG!: Phaser.GameObjects.Graphics;
   trailPts: { x: number; y: number }[] = [];
   hudText!: Phaser.GameObjects.Text;
+  objectiveText!: Phaser.GameObjects.Text;
+  targetsG!: Phaser.GameObjects.Graphics;
+  pullG!: Phaser.GameObjects.Graphics;
+  hintText!: Phaser.GameObjects.Text;
   trayObjs: Phaser.GameObjects.GameObject[] = [];
   gPx = 0.28; // gravedad en px/paso²
 
@@ -77,6 +81,9 @@ class AngryScene extends Phaser.Scene {
 
   init(data: { ctx: GameContext }) {
     this.ctx = data.ctx;
+    this.flyTime = 0;
+    this.trailPts = [];
+    this.events.once('shutdown', () => { this.over = true; });
     this.lv = ANGRY_LEVELS[this.ctx.level] || ANGRY_LEVELS[0];
     this.things = [];
     this.proj = null;
@@ -115,6 +122,12 @@ class AngryScene extends Phaser.Scene {
     this.bandBack = this.add.graphics().setDepth(3);
     this.trailG = this.add.graphics().setDepth(2);
     this.hudText = this.add.text(w - 16, HUD_TOP + 8, '', { fontFamily: FONT, fontSize: '22px', color: '#3a3f6b', fontStyle: 'bold', backgroundColor: '#ffffffd9', padding: { x: 12, y: 6 } }).setOrigin(1, 0).setDepth(10);
+    this.targetsG = this.add.graphics().setDepth(9);
+    this.pullG = this.add.graphics().setDepth(9);
+    this.objectiveText = this.add.text(16, HUD_TOP + 8, '', { fontFamily: FONT, fontSize: h < 500 ? '17px' : '21px', color: '#26354b', backgroundColor: '#fff8df', padding: { x: 12, y: 8 }, wordWrap: { width: Math.min(390, w - 48) } }).setDepth(11);
+    if (w < 600) this.hudText.setY(HUD_TOP + 100).setFontSize(18);
+    this.hintText = this.add.text(w / 2, h - 12, '', { fontFamily: FONT, fontSize: h < 500 ? '16px' : '20px', color: '#ffffff', backgroundColor: '#283e4dee', padding: { x: 12, y: 6 }, align: 'center', wordWrap: { width: w - 48 } }).setOrigin(0.5, 1).setDepth(15);
+    if (w < 600) this.hintText.setPosition(w / 2, HUD_TOP + 152).setOrigin(0.5, 0);
     this.updateHud();
 
     // dejar que la estructura se asiente antes de medir
@@ -130,7 +143,7 @@ class AngryScene extends Phaser.Scene {
     // polvo y temblor en los choques fuertes
     let lastPuff = 0;
     this.matter.world.on('collisionstart', (ev: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
-      if (!this.settled) return;
+      if (!this.settled || this.shotsUsed === 0) return;
       for (const pair of ev.pairs) {
         const va = pair.bodyA.velocity, vb = pair.bodyB.velocity;
         const rel = Math.hypot(va.x - vb.x, va.y - vb.y);
@@ -150,7 +163,7 @@ class AngryScene extends Phaser.Scene {
     this.input.on('pointerup', () => this.onUp());
     this.input.on('pointerupoutside', () => this.onUp());
 
-    const instr = () => say(this.lv.say.key, this.lv.say.vars || {});
+    const instr = () => sayText(`${this.objective()} Elige ${SHAPE_NAME[this.lv.launch].n}, arrastra hacia atrás y suelta.`);
     this.ctx.setTitle(this.lv.title);
     this.ctx.setRepeat(instr);
     if (this.lv.tray.length === 1) {
@@ -405,7 +418,7 @@ class AngryScene extends Phaser.Scene {
     const y = this.groundY + (this.scale.height - this.groundY) / 2 - 4;
     const x0 = 12 + size / 2;
     const yy = Math.min(y, this.scale.height - size / 2 - 6);
-    const label = this.add.text(12, yy - size / 2 - 8, 'Elige una forma:', { fontFamily: FONT, fontSize: '20px', color: '#3a3f6b', fontStyle: 'bold', backgroundColor: '#ffffffcc', padding: { x: 8, y: 3 } }).setOrigin(0, 1).setDepth(12);
+    const label = this.add.text(12, yy - size / 2 - 8, `Elige ${SHAPE_NAME[this.lv.launch].n}:`, { fontFamily: FONT, fontSize: '20px', color: '#3a3f6b', fontStyle: 'bold', backgroundColor: '#ffffffcc', padding: { x: 8, y: 3 } }).setOrigin(0, 1).setDepth(12);
     this.trayObjs.push(label);
     this.lv.tray.forEach((k, i) => {
       const x = x0 + i * (size + gap);
@@ -440,6 +453,7 @@ class AngryScene extends Phaser.Scene {
     this.loadProjectile(k);
     this.trayObjs.forEach((o) => o.destroy());
     this.trayObjs = [];
+    this.updateHud();
   }
 
   loadProjectile(k: ShapeKind) {
@@ -453,13 +467,15 @@ class AngryScene extends Phaser.Scene {
     this.projKind = k;
     img.setScale(0.3);
     this.tweens.add({ targets: img, scale: 1, duration: 300, ease: 'Back.easeOut' });
+    this.updateHud();
   }
 
   onDown(p: Phaser.Input.Pointer) {
-    if (!this.proj || this.flying || this.over || !this.proj.isStatic()) return;
+    if (!this.settled || !this.proj || this.flying || this.over || !this.proj.isStatic()) return;
     const d = Math.hypot(p.x - this.proj.x, p.y - this.proj.y);
     if (d < this.U * 2.2) {
       this.dragging = true;
+      this.hintText.setText('Apunta con los puntos blancos y suelta para lanzar');
       sfx.tap();
     }
   }
@@ -471,7 +487,7 @@ class AngryScene extends Phaser.Scene {
   onMove(p: Phaser.Input.Pointer) {
     if (!this.dragging || !this.proj) return;
     const a = this.anchor;
-    let dx = p.x - a.x;
+    let dx = Math.min(0, p.x - a.x);
     let dy = p.y - a.y;
     const d = Math.hypot(dx, dy);
     const m = this.maxPull();
@@ -503,7 +519,12 @@ class AngryScene extends Phaser.Scene {
     if (pull < 0.15) {
       // muy poquito: vuelve a su lugar
       this.proj.setPosition(this.anchor.x, this.anchor.y);
+      this.hintText.setText('Arrastra más hacia atrás y suelta');
+      this.aim.clear();
       return;
+    }
+    if (this.shotsUsed === 0) {
+      for (const t of this.things) { t.x0 = t.img.x; t.y0 = t.img.y; t.a0 = t.img.angle; }
     }
     this.trailG.clear();
     this.trailPts = [];
@@ -519,8 +540,18 @@ class AngryScene extends Phaser.Scene {
     this.aim.clear();
   }
 
+  objective() {
+    if (this.lv.only) return `${this.lv.title}. Evita las formas sin aro.`;
+    return 'Derriba las formas con aro dorado';
+  }
+
   updateHud() {
-    this.hudText.setText(`Tiros: ${'●'.repeat(Math.max(0, this.shotsLeft))}${'○'.repeat(Math.max(0, this.shotsUsed))}`);
+    const total = this.lv.blocks.filter(b => b.target).length;
+    const left = this.targetsLeft();
+    this.hudText.setText(`Tiros: ${this.shotsLeft}  ·  Objetivos: ${total - left}/${total}`);
+    this.objectiveText?.setText(`${this.objective()}\n${left} por derribar`);
+    this.hintText?.setVisible(!!this.proj || this.lv.tray.length === 1);
+    this.hintText?.setText(this.flying ? '¡Mira cuáles derribas!' : !this.proj && this.lv.tray.length > 1 ? `Elige ${SHAPE_NAME[this.lv.launch].n} abajo` : 'Arrastra la forma hacia atrás ↙ y suelta');
   }
 
   puff(x: number, y: number, k: number) {
@@ -532,7 +563,7 @@ class AngryScene extends Phaser.Scene {
   }
 
   checkKnocks() {
-    if (!this.settled) return;
+    if (!this.settled || this.shotsUsed === 0) return;
     const U = this.U;
     const w = this.scale.width;
     for (const t of this.things) {
@@ -551,9 +582,12 @@ class AngryScene extends Phaser.Scene {
         }
         const m = this.add.text(t.img.x, t.img.y - U, '✓', { fontFamily: FONT, fontSize: `${Math.round(U * 1.1)}px`, color: '#2fa36b', fontStyle: 'bold', stroke: '#ffffff', strokeThickness: 6 }).setOrigin(0.5).setDepth(15);
         this.tweens.add({ targets: m, y: m.y - U, alpha: 0, delay: 500, duration: 700, onComplete: () => m.destroy() });
-      } else if (this.lv.only) {
+      } else if (this.lv.only && t.block?.k !== 'rectangulo') {
         this.wrongDown++;
+        const m = this.add.text(t.img.x, t.img.y - U, '¡Cuida esta!', { fontFamily: FONT, fontSize: '18px', color: '#9f2843', backgroundColor: '#ffffff' }).setOrigin(0.5).setDepth(15);
+        this.tweens.add({ targets: m, y: m.y - U, alpha: 0, duration: 1500, onComplete: () => m.destroy() });
       }
+      this.updateHud();
     }
   }
 
@@ -561,9 +595,37 @@ class AngryScene extends Phaser.Scene {
     return this.things.filter((t) => t.block?.target && !t.down).length;
   }
 
+  drawTargets() {
+    const g = this.targetsG;
+    g.clear();
+    for (const t of this.things) {
+      if (!t.img.active || t.down || !t.block?.target) continue;
+      const r = Math.max(t.img.displayWidth, t.img.displayHeight) * 0.62 + 5;
+      g.lineStyle(7, 0xffffff, 0.85);
+      g.strokeCircle(t.img.x, t.img.y, r);
+      g.lineStyle(4, 0xffbd24, 1);
+      g.strokeCircle(t.img.x, t.img.y, r);
+      // flecha de objetivo, además del color
+      g.fillStyle(0xffbd24, 1);
+      const y = t.img.y - r - 7 - Math.sin(this.time.now / 400) * 3;
+      g.fillTriangle(t.img.x - 6, y - 8, t.img.x + 6, y - 8, t.img.x, y);
+    }
+    const p = this.pullG;
+    p.clear();
+    if (this.proj && !this.flying && !this.dragging && this.shotsUsed === 0) {
+      const a = this.anchor;
+      const dx = this.U * 1.7, dy = this.U;
+      p.lineStyle(4, 0xffffff, 0.9);
+      p.lineBetween(a.x, a.y, a.x - dx, a.y + dy);
+      p.fillStyle(0xffffff, 0.9);
+      p.fillTriangle(a.x - dx, a.y + dy, a.x - dx + 16, a.y + dy - 3, a.x - dx + 5, a.y + dy - 16);
+    }
+  }
+
   update(_t: number, dt: number) {
     if (this.over) return;
     this.checkKnocks();
+    this.drawTargets();
     // línea de puntería
     this.band.clear();
     if (!(this.proj && this.proj.isStatic())) this.bandBack.clear();

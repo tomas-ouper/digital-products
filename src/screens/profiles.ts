@@ -34,7 +34,7 @@ export function profilesScreen(root: HTMLElement) {
     ),
     h('button', { class: 'btn ghost small', onTap: () => go('device') }, '¿Desde dónde juegas?')
   );
-  setTimeout(() => say('quien_juega'), 300);
+  setTimeout(() => root.isConnected && say('quien_juega'), 300);
 }
 
 export function newProfileScreen(root: HTMLElement) {
@@ -116,5 +116,5 @@ export function newProfileScreen(root: HTMLElement) {
       h('div', { class: 'row' }, hasProfiles ? h('button', { class: 'btn ghost', onTap: () => go('profiles') }, 'Volver') : null, h('button', { class: 'btn green', onTap: create }, '¡Listo!'))
     )
   );
-  setTimeout(() => say('nuevo_perfil'), 300);
+  setTimeout(() => root.isConnected && say('nuevo_perfil'), 300);
 }

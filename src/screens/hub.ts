@@ -85,6 +85,6 @@ export function hubScreen(root: HTMLElement) {
       })
     )
   );
-  setTimeout(() => say('hola_nombre', { nombre: p.name }), 250);
+  setTimeout(() => root.isConnected && say('hola_nombre', { nombre: p.name }), 250);
   return () => off();
 }

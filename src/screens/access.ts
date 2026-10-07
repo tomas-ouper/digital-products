@@ -45,5 +45,5 @@ export function accessScreen(root: HTMLElement) {
       h('p', { class: 'small-note' }, 'Para mamá o papá: el código llegó en el correo del Kit Caligrafía Montessori.')
     )
   );
-  setTimeout(() => say('codigo'), 300);
+  setTimeout(() => root.isConnected && say('codigo'), 300);
 }

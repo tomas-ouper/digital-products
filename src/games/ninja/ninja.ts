@@ -53,6 +53,10 @@ class NinjaScene extends Phaser.Scene {
   waves = 0;
   over = false;
   spawning = false;
+  round = 0;
+  mastered = new Set<string>();
+  guide!: Phaser.GameObjects.Text;
+  guidePath!: Phaser.GameObjects.Graphics;
 
   constructor() {
     super('ninja');
@@ -60,6 +64,16 @@ class NinjaScene extends Phaser.Scene {
 
   init(data: { ctx: GameContext }) {
     this.ctx = data.ctx;
+    this.good = this.errors = this.waves = this.waveTimer = 0;
+    this.over = false;
+    this.spawning = false;
+    this.target = this.prevTarget = '';
+    this.pieces = [];
+    this.strokes = [];
+    this.curStroke = null;
+    this.mastered.clear();
+    this.round++;
+    this.events.once('shutdown', () => { this.over = true; this.round++; });
     this.lv = NINJA_LEVELS[this.ctx.level] || NINJA_LEVELS[0];
     for (const label of this.lv.pool) {
       const k = this.keyOf(label);
@@ -133,6 +147,8 @@ class NinjaScene extends Phaser.Scene {
   create() {
     if (location.search.includes('debug')) Object.assign(window as any, { __scene: this, __LETTERS: LETTERS });
     this.bg = this.add.graphics();
+    this.guidePath = this.add.graphics().setDepth(2);
+    this.guide = this.add.text(0, 0, 'Dibuja la letra · No basta con deslizar sobre ella', { fontFamily: FONT, fontSize: '18px', color: '#ffffff', backgroundColor: '#24204dcc', padding: { x: 14, y: 8 }, align: 'center' }).setOrigin(0.5, 0).setDepth(15);
     this.trail = this.add.graphics().setDepth(20);
     this.bannerBox = this.add.graphics();
     this.bannerText = this.add.text(0, 0, '', { fontFamily: FONT, fontSize: '26px', color: '#3a3f6b', fontStyle: 'bold' }).setOrigin(0, 0.5);
@@ -146,7 +162,7 @@ class NinjaScene extends Phaser.Scene {
 
     const toLocal = (p: Phaser.Input.Pointer): Pt => ({ x: p.x, y: p.y });
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
-      if (this.over) return;
+      if (this.over || !this.target || !this.pieces.some(p => p.alive && p.label === this.target && p.y < this.scale.height - p.r)) return;
       this.recTimer?.remove();
       this.recTimer = null;
       this.curStroke = [toLocal(p)];
@@ -231,12 +247,14 @@ class NinjaScene extends Phaser.Scene {
     this.bannerLetter.setPosition(20 + this.bannerText.width + 12, bh / 2 + (this.cursive ? 4 : 0));
     this.counter.setPosition(bw - 22, bh / 2);
     this.grav = this.gravity();
+    this.guide.setPosition(w / 2, this.topY + bh + 8).setWordWrapWidth(w - 48).setFontSize(h < 500 ? 15 : 18);
+    this.drawGuide();
   }
 
   gravity() {
     const h = this.scale.height;
     const H = h * 0.55;
-    const T = this.ctx.easy ? 7.5 : 5.2;
+    const T = this.good < 2 ? 14 : this.ctx.easy ? 11 : 9;
     return (8 * H) / (T * T);
   }
 
@@ -246,7 +264,7 @@ class NinjaScene extends Phaser.Scene {
 
   setBanner() {
     const shown = this.lv.syllables ? `${this.target}` : glyph(this.target);
-    this.bannerText.setText(this.lv.syllables ? 'Corta' : 'Corta la');
+    this.bannerText.setText('Dibuja');
     this.bannerLetter.setText(this.lv.syllables ? `${shown} → ${this.target[0]}` : shown);
     this.bannerLetter.setFontSize(this.lv.syllables ? 38 : /^[a-zñ]$/.test(shown) && !this.cursive ? 70 : 54);
     this.bannerLetter.setX(20 + this.bannerText.width + 12);
@@ -262,26 +280,49 @@ class NinjaScene extends Phaser.Scene {
     return say('ninja_corta', { letra: letterName(glyph(this.target)) });
   }
 
+  drawGuide() {
+    const g = this.guidePath;
+    if (!g) return;
+    g.clear();
+    if (!this.target || this.good >= 2) return;
+    const size = Math.min(this.scale.width * 0.55, this.scale.height * 0.34, 190);
+    const x = this.scale.width / 2 - size / 2;
+    const y = this.scale.height * 0.48 - size / 2;
+    for (const stroke of LETTERS[this.keyOf(this.target)] || []) {
+      g.lineStyle(9, 0xffffff, 0.22);
+      g.strokePoints(stroke.map(p => ({ x: x + p.x * size / 100, y: y + p.y * size / 100 })));
+    }
+  }
+
   nextRound() {
+    if (this.over) return;
+    this.round++;
+    this.strokes = [];
+    this.curStroke = null;
+    this.recTimer?.remove();
+    this.grav = this.gravity();
     const options = this.lv.pool.filter((p) => p !== this.prevTarget);
     this.target = options[Math.floor(Math.random() * options.length)];
     this.prevTarget = this.target;
     this.setBanner();
+    this.drawGuide();
+    this.guide.setText(this.good < 2 ? 'Practica con una sola letra: dibújala siguiendo la guía' : 'Dibuja la letra indicada · Las letras esperan mientras trazas');
     this.sayTarget();
     this.waves = 0;
     this.spawning = true;
-    this.time.delayedCall(700, () => this.spawnWave());
+    this.time.delayedCall(1500, () => this.spawnWave());
   }
 
   spawnWave() {
-    if (this.over) return;
+    if (this.over || !this.target) return;
     this.waves++;
-    const n = this.ctx.easy ? 2 + (Math.random() < 0.4 ? 1 : 0) : 3 + (Math.random() < 0.5 ? 1 : 0);
+    const n = this.good < 2 ? 1 : this.ctx.easy || this.good < 4 ? 2 : 3;
+    const round = this.round;
     const others = shuffle(this.lv.pool.filter((p) => this.keyOf(p) !== this.keyOf(this.target)));
     const labels = shuffle([this.target, ...others.slice(0, n - 1)]);
     this.spawning = true;
-    labels.forEach((l, i) => this.time.delayedCall(i * 380, () => this.spawn(l, i, labels.length)));
-    this.time.delayedCall(labels.length * 380 + 50, () => (this.spawning = false));
+    labels.forEach((l, i) => this.time.delayedCall(i * 800, () => { if (round === this.round && this.target) this.spawn(l, i, labels.length); }));
+    this.time.delayedCall(labels.length * 800 + 50, () => { if (round === this.round) this.spawning = false; });
   }
 
   spawn(label: string, i: number, n: number) {
@@ -310,7 +351,7 @@ class NinjaScene extends Phaser.Scene {
       .setOrigin(0.5);
     const c = this.add.container(x, h + r, [g, t]).setDepth(5);
     const piece: Piece = { c, label, key: this.keyOf(label), x, y: h + r, vx, vy, vr: (Math.random() - 0.5) * 0.3, r, color, alive: true };
-    if (this.ctx.easy && label === this.target) {
+    if ((this.ctx.easy || this.good < 2) && label === this.target) {
       piece.ring = this.add.circle(0, 0, r + 8).setStrokeStyle(6, 0xfff27a, 0.9);
       c.addAt(piece.ring, 0);
       this.tweens.add({ targets: piece.ring, scale: 1.12, yoyo: true, repeat: -1, duration: 450 });
@@ -322,7 +363,7 @@ class NinjaScene extends Phaser.Scene {
     this.recTimer = null;
     const strokes = this.strokes;
     this.strokes = [];
-    if (this.over) return;
+    if (this.over || !this.target) return;
     const alive = this.pieces.filter((p) => p.alive && p.y < this.scale.height + p.r);
     const cand = [...new Set(alive.map((p) => p.key))];
     if (!cand.length) return;
@@ -400,7 +441,10 @@ class NinjaScene extends Phaser.Scene {
     this.splitPiece(p, p.color);
     this.floatText(p.x, p.y, '+1', '#ffe066');
     this.good++;
+    this.mastered.add(p.key);
+    this.round++;
     this.target = '';
+    this.drawGuide();
     this.updateCounter();
     // el resto de la ola se va volando
     this.pieces.forEach((o) => o.alive && (o.vy = Math.min(o.vy, -200)));
@@ -433,12 +477,12 @@ class NinjaScene extends Phaser.Scene {
     this.over = true;
     sfx.win();
     const stars = this.errors <= 1 ? 3 : this.errors <= 3 ? 2 : 1;
-    const letters = this.lv.syllables ? [] : [...new Set(this.lv.pool)];
+    const letters = this.lv.syllables ? [] : [...this.mastered];
     this.time.delayedCall(1000, () => this.ctx.complete(stars, stars >= 2 ? letters : []));
   }
 
   update(_t: number, dtMs: number) {
-    const dt = Math.min(0.05, dtMs / 1000);
+    const dt = this.curStroke || this.recTimer ? 0 : Math.min(0.05, dtMs / 1000);
     const h = this.scale.height;
     for (const p of this.pieces) {
       if (!p.alive) continue;

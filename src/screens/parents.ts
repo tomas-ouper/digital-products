@@ -45,7 +45,7 @@ export function parentsScreen(root: HTMLElement) {
       h('div', { class: 'keypad' }, ...['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', 'OK'].map((k) => h('button', { onTap: () => press(k) }, k)))
     )
   );
-  setTimeout(() => say('padres'), 200);
+  setTimeout(() => root.isConnected && say('padres'), 200);
 }
 
 function minutesLastDays(p: Profile, days: number) {

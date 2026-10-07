@@ -39,5 +39,5 @@ export function deviceScreen(root: HTMLElement) {
       )
     )
   );
-  setTimeout(() => say('desde_donde'), 300);
+  setTimeout(() => root.isConnected && say('desde_donde'), 300);
 }

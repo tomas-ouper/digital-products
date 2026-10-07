@@ -30,7 +30,15 @@ interface Particle {
 export function start(ctx: GameContext): GameInstance {
   const lv = CRAFT_LEVELS[ctx.level] || CRAFT_LEVELS[0];
   const host = ctx.host;
-  const coarse = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+  const coarse = window.matchMedia('(pointer: coarse)').matches;
+  let dead = false;
+  let paused = false;
+  const timers = new Set<number>();
+  const later = (fn: () => void, ms: number) => {
+    const id = window.setTimeout(() => { timers.delete(id); if (!dead) fn(); }, ms);
+    timers.add(id);
+    return id;
+  };
 
   // ---------- Three ----------
   const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
@@ -247,7 +255,7 @@ export function start(ctx: GameContext): GameInstance {
   };
 
   // ---------- Jugador ----------
-  const player = { pos: new THREE.Vector3(16.5, 4, 24.5), vy: 0, onGround: false, yaw: 0, pitch: -0.12 };
+  const player = { pos: new THREE.Vector3(16.5, 4, 24.5), vy: 0, onGround: false, flying: false, yaw: 0, pitch: -0.12 };
   const keys = new Set<string>();
   const joy = { x: 0, y: 0 };
   let jumpReq = false;
@@ -286,15 +294,17 @@ export function start(ctx: GameContext): GameInstance {
     hit?: [number, number, number];
     prev?: [number, number, number];
   }
+  const rayOrigin = new THREE.Vector3();
+  const rayDirection = new THREE.Vector3();
   const ray = (): Hit | null => {
-    const o = camera.getWorldPosition(new THREE.Vector3());
-    const d = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+    const o = camera.getWorldPosition(rayOrigin);
+    const d = rayDirection.set(0, 0, -1).applyQuaternion(camera.quaternion);
     let x = Math.floor(o.x), y = Math.floor(o.y), z = Math.floor(o.z);
     const sx = Math.sign(d.x), sy = Math.sign(d.y), sz = Math.sign(d.z);
     const tdx = Math.abs(1 / d.x), tdy = Math.abs(1 / d.y), tdz = Math.abs(1 / d.z);
-    let tx = (sx > 0 ? x + 1 - o.x : o.x - x) * tdx;
-    let ty = (sy > 0 ? y + 1 - o.y : o.y - y) * tdy;
-    let tz = (sz > 0 ? z + 1 - o.z : o.z - z) * tdz;
+    let tx = sx === 0 ? Infinity : (sx > 0 ? x + 1 - o.x : o.x - x) * tdx;
+    let ty = sy === 0 ? Infinity : (sy > 0 ? y + 1 - o.y : o.y - y) * tdy;
+    let tz = sz === 0 ? Infinity : (sz > 0 ? z + 1 - o.z : o.z - z) * tdz;
     let prev: [number, number, number] | undefined;
     let t = 0;
     const reach = 7.5;
@@ -317,7 +327,7 @@ export function start(ctx: GameContext): GameInstance {
         t = tz;
         tz += tdz;
       }
-      if (y < 0 || y >= SY + 2) break;
+      if (y < 0 && d.y <= 0) break;
     }
     return null;
   };
@@ -327,12 +337,14 @@ export function start(ctx: GameContext): GameInstance {
   ui.className = 'mc-ui';
   ui.innerHTML = `
     <div class="mc-cross"></div>
+    <button class="mc-flight" aria-pressed="false">Volar</button>
+    <button class="mc-down" aria-label="Bajar" hidden>↓</button>
     <div class="mc-goal" hidden></div>
     <div class="mc-toast" hidden></div>
     <div class="mc-bar"></div>
     <button class="mc-inv-btn" aria-label="Inventario">▦</button>
     <div class="mc-inv" hidden><div class="mc-inv-box"><div class="mc-inv-title">Bloques</div><div class="mc-inv-grid"></div><button class="mc-inv-close">Listo</button></div></div>
-    ${coarse ? '<div class="mc-joy"><div class="mc-knob"></div></div><button class="mc-jump" aria-label="Saltar">⤒</button>' : '<div class="mc-keys">Camina: W A S D o flechas · Salta: espacio · Mira: arrastra · Poner: clic · Quitar: mantener o clic derecho</div>'}
+    ${coarse ? '<div class="mc-joy"><div class="mc-knob"></div></div><button class="mc-jump" aria-label="Saltar">⤒</button>' : '<div class="mc-keys">Clic para controlar el mouse · WASD: caminar · Doble espacio o doble clic: volar · E: bloques · Esc: liberar</div>'}
   `;
   host.append(ui);
   const goalEl = ui.querySelector('.mc-goal') as HTMLElement;
@@ -385,10 +397,16 @@ export function start(ctx: GameContext): GameInstance {
   (ui.querySelector('.mc-inv-btn') as HTMLElement).addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     sfx.tap();
-    invEl.hidden = !invEl.hidden;
+    setInventory(invEl.hidden);
   });
   (ui.querySelector('.mc-inv-close') as HTMLElement).addEventListener('click', () => (invEl.hidden = true));
   invEl.addEventListener('pointerdown', (e) => e.stopPropagation());
+
+  function setInventory(open: boolean) {
+    invEl.hidden = !open;
+    clearInput();
+    if (open && document.pointerLockElement === renderer.domElement) document.exitPointerLock();
+  }
 
   let toastT: number | undefined;
   function showToast(text: string) {
@@ -419,10 +437,10 @@ export function start(ctx: GameContext): GameInstance {
       done = true;
       sfx.win();
       const c = ghosts.reduce((a, g) => a.add(new THREE.Vector3(g.x, g.y, g.z)), new THREE.Vector3()).divideScalar(total);
-      for (let i = 0; i < 5; i++) setTimeout(() => burst(c.x, c.y + 1, c.z, [B.ROJO, B.AMARILLO, B.AZUL, B.VERDE, B.ROSA][i], 14, 6), i * 180);
-      setTimeout(() => say(lv.kind === 'nombre' ? 'nivel_superado_3' : 'nivel_superado'), lv.kind === 'apilar' ? 900 : 100);
+      for (let i = 0; i < 5; i++) later(() => burst(c.x, c.y + 1, c.z, [B.ROJO, B.AMARILLO, B.AZUL, B.VERDE, B.ROSA][i], 14, 6), i * 180);
+      later(() => say(lv.kind === 'nombre' ? 'nivel_superado_3' : 'nivel_superado'), lv.kind === 'apilar' ? 900 : 100);
       const stars = lv.kind === 'colores' ? Math.max(1, 3 - Math.floor(mistakes / 2)) : 3;
-      setTimeout(() => ctx.complete(stars, lv.kind === 'letra' ? [lv.letter!] : lv.kind === 'inicial' ? [name[0]] : []), 2200);
+      later(() => ctx.complete(stars, lv.kind === 'letra' ? [lv.letter!] : lv.kind === 'inicial' ? [name[0]] : []), 2200);
     }
   };
 
@@ -432,6 +450,7 @@ export function start(ctx: GameContext): GameInstance {
     return x + 1 > p.x - HALF_W && x < p.x + HALF_W && z + 1 > p.z - HALF_W && z < p.z + HALF_W && y + 1 > p.y && y < p.y + HEIGHT;
   };
   const place = () => {
+    if (dead || paused || done) return;
     const h = ray();
     if (!h) return;
     const cell = h.ghost ? [h.ghost.x, h.ghost.y, h.ghost.z] : h.prev;
@@ -454,6 +473,7 @@ export function start(ctx: GameContext): GameInstance {
     updateGoal();
   };
   const breakBlock = () => {
+    if (dead || paused || done) return;
     const h = ray();
     if (!h?.hit) return;
     const [x, y, z] = h.hit;
@@ -471,17 +491,95 @@ export function start(ctx: GameContext): GameInstance {
   // ---------- Entrada ----------
   const el = renderer.domElement;
   const ptrs = new Map<number, { kind: 'joy' | 'look'; sx: number; sy: number; lx: number; ly: number; t0: number; moved: boolean; used: boolean; timer?: number }>();
+  let lockUnavailable = !el.requestPointerLock;
+  let clickTimer: number | undefined;
+  let lastJump = -Infinity;
+  const flightBtn = ui.querySelector('.mc-flight') as HTMLButtonElement;
+  const downBtn = ui.querySelector('.mc-down') as HTMLButtonElement;
+  const toggleFlight = () => {
+    if (paused || done) return;
+    player.flying = !player.flying;
+    player.vy = 0;
+    jumpReq = false;
+    flightBtn.textContent = player.flying ? 'Volar: sí' : 'Volar';
+    flightBtn.setAttribute('aria-pressed', String(player.flying));
+    downBtn.hidden = !player.flying || !coarse;
+    showToast(player.flying ? coarse ? '¡A volar! Mantén ↑ para subir y ↓ para bajar' : '¡A volar! Espacio: subir · Shift: bajar' : 'Vuelo desactivado');
+  };
+  const jump = () => {
+    const now = performance.now();
+    if (now - lastJump < 320) { toggleFlight(); lastJump = -Infinity; }
+    else { jumpReq = true; lastJump = now; }
+  };
+  const onDoubleClick = (e: MouseEvent) => {
+    e.preventDefault();
+    clearTimeout(clickTimer);
+    if (invEl.hidden) toggleFlight();
+  };
+  const onLockError = () => {
+    if (dead) return;
+    lockUnavailable = true;
+    ui.querySelector('.mc-keys')?.replaceChildren(document.createTextNode('Arrastra: mirar · Clic: quitar · Clic derecho: poner · Doble clic/espacio: volar · E: bloques'));
+    showToast('Arrastra para mirar · Doble clic: volar');
+  };
+  function clearInput() {
+    keys.clear();
+    joy.x = joy.y = 0;
+    jumpReq = false;
+    clearTimeout(clickTimer);
+    ptrs.forEach(p => clearTimeout(p.timer));
+    ptrs.clear();
+    if (knob) knob.style.transform = '';
+    joyEl?.classList.remove('on');
+  }
+  const onLockChange = () => {
+    clearInput();
+    if (dead) return;
+    const locked = document.pointerLockElement === el;
+    ui.querySelector('.mc-keys')?.replaceChildren(document.createTextNode(locked
+      ? 'Mouse: mirar · Clic: quitar · Clic derecho: poner · Doble clic/espacio: volar · Shift: bajar · E: bloques · Esc: salir'
+      : 'Clic para controlar el mouse · WASD: caminar · Doble espacio o doble clic: volar · E: bloques'));
+  };
+  const onMouseMove = (e: MouseEvent) => {
+    if (paused || !invEl.hidden || document.pointerLockElement !== el) return;
+    player.yaw -= e.movementX * 0.0025;
+    player.pitch = Math.max(-1.45, Math.min(1.45, player.pitch - e.movementY * 0.0025));
+  };
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('pointerlockchange', onLockChange);
+  document.addEventListener('pointerlockerror', onLockError);
+  window.addEventListener('blur', clearInput);
+  el.addEventListener('dblclick', onDoubleClick);
+  flightBtn.addEventListener('click', toggleFlight);
+  downBtn.addEventListener('pointerdown', e => { downBtn.setPointerCapture(e.pointerId); keys.add('shift'); });
+  downBtn.addEventListener('pointerup', () => keys.delete('shift'));
+  downBtn.addEventListener('pointercancel', () => keys.delete('shift'));
   const JOY_R = 56;
   const longMs = ctx.easy ? 450 : 380;
   const onDown = (e: PointerEvent) => {
     e.preventDefault();
-    if (!invEl.hidden) return;
+    if (!invEl.hidden || paused || done) return;
+    if (e.pointerType === 'mouse' && !lockUnavailable && document.pointerLockElement !== el) {
+      try {
+        const request = el.requestPointerLock();
+        request?.catch(onLockError);
+      } catch { onLockError(); }
+      return;
+    }
+    if (e.pointerType === 'mouse' && document.pointerLockElement === el) {
+      if (e.button === 2) place();
+      else if (e.button === 0) {
+        clearTimeout(clickTimer);
+        clickTimer = window.setTimeout(() => breakBlock(), 300);
+      }
+      return;
+    }
     el.setPointerCapture(e.pointerId);
     const r = el.getBoundingClientRect();
     const x = e.clientX - r.left;
     const y = e.clientY - r.top;
     if (e.button === 2) {
-      breakBlock();
+      place();
       return;
     }
     const isJoy = coarse && e.pointerType !== 'mouse' && x < r.width * 0.42 && y > r.height * 0.45 && ![...ptrs.values()].some((p) => p.kind === 'joy');
@@ -532,6 +630,7 @@ export function start(ctx: GameContext): GameInstance {
   const onUp = (e: PointerEvent) => {
     const p = ptrs.get(e.pointerId);
     if (!p) return;
+    if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId);
     ptrs.delete(e.pointerId);
     clearTimeout(p.timer);
     if (p.kind === 'joy') {
@@ -540,7 +639,10 @@ export function start(ctx: GameContext): GameInstance {
       joyEl?.classList.remove('on');
       return;
     }
-    if (!p.moved && !p.used && performance.now() - p.t0 < longMs) place();
+    if (e.type !== 'pointercancel' && !p.moved && !p.used && performance.now() - p.t0 < longMs) {
+      if (e.pointerType === 'mouse') { clearTimeout(clickTimer); clickTimer = window.setTimeout(breakBlock, 300); }
+      else place();
+    }
   };
   el.addEventListener('pointerdown', onDown);
   el.addEventListener('pointermove', onMove);
@@ -555,18 +657,25 @@ export function start(ctx: GameContext): GameInstance {
   const jumpBtn = ui.querySelector('.mc-jump') as HTMLElement | null;
   jumpBtn?.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
-    jumpReq = true;
+    jumpBtn!.setPointerCapture(e.pointerId);
+    keys.add(' ');
+    jump();
   });
+  jumpBtn?.addEventListener('pointerup', () => keys.delete(' '));
+  jumpBtn?.addEventListener('pointercancel', () => keys.delete(' '));
   const onKey = (e: KeyboardEvent) => {
     const k = e.key.toLowerCase();
     if (e.type === 'keydown') {
+      if (paused || done || e.target instanceof HTMLInputElement) return;
+      if (k === 'e' && !e.repeat) { e.preventDefault(); setInventory(invEl.hidden); return; }
+      if (k === 'escape') { setInventory(false); return; }
+      if (!invEl.hidden) return;
       keys.add(k);
-      if (k === ' ') jumpReq = true;
+      if (k === ' ' && !e.repeat) jump();
       if (/^[1-9]$/.test(k)) {
         sel = Number(k) - 1;
         drawBar();
       }
-      if (k === 'e') invEl.hidden = !invEl.hidden;
       if (['arrowup', 'arrowdown', ' '].includes(k)) e.preventDefault();
     } else keys.delete(k);
   };
@@ -591,6 +700,7 @@ export function start(ctx: GameContext): GameInstance {
     raf = requestAnimationFrame(loop);
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
+    if (paused || !invEl.hidden) return;
     t += dt;
     // movimiento
     let fx = 0, fz = 0;
@@ -611,6 +721,14 @@ export function start(ctx: GameContext): GameInstance {
     if (mx) tryMove('x', mx);
     if (mz) tryMove('z', mz);
     if (len > 0.1 && player.onGround) bob += dt * 9;
+    // Vuelo creativo: sin gravedad, con colisiones y techo de seguridad.
+    if (player.flying) {
+      player.onGround = false;
+      player.vy = 0;
+      const y = player.pos.y;
+      player.pos.y = Math.min(SY + 20, player.pos.y + ((keys.has(' ') ? 1 : 0) - (keys.has('shift') ? 1 : 0)) * 5 * dt);
+      if (collides(player.pos)) player.pos.y = y;
+    } else {
     // gravedad y salto
     if (jumpReq && player.onGround) player.vy = 7.6;
     jumpReq = false;
@@ -625,6 +743,8 @@ export function start(ctx: GameContext): GameInstance {
       player.vy = 0;
       if (collides(player.pos)) player.pos.y += 1; // desatascar
     }
+    }
+    jumpReq = false;
     if (player.pos.y < -4) player.pos.set(16.5, 8, 24.5);
     camera.position.set(player.pos.x, player.pos.y + EYE + Math.sin(bob) * 0.04, player.pos.z);
     camera.rotation.set(player.pitch, player.yaw, 0);
@@ -685,13 +805,14 @@ export function start(ctx: GameContext): GameInstance {
   updateGoal();
   ctx.setTitle(lv.title);
   const intro = async () => {
+    if (dead) return;
     if (lv.kind === 'letra') await say('craft_intro_letra', { letra: letterName(lv.letter!) });
     else if (lv.kind === 'inicial') await say('craft_intro_letra', { letra: letterName(name[0]) });
     else if (lv.kind === 'nombre') await say('craft_intro_nombre', { nombre: ctx.profile.name });
     else if (lv.kind === 'apilar') await say('craft_intro_apilar');
     else if (lv.kind === 'colores') await say('craft_intro_colores');
     else await say('craft_intro_libre');
-    if (ctx.level <= 1 || ctx.easy) await say('craft_ayuda');
+    if (!dead && (ctx.level <= 1 || ctx.easy)) await say('craft_ayuda');
   };
   ctx.setRepeat(() => intro());
   intro();
@@ -699,17 +820,41 @@ export function start(ctx: GameContext): GameInstance {
   raf = requestAnimationFrame(loop);
 
   return {
+    setPaused(value: boolean) {
+      paused = value;
+      if (value) { clearInput(); if (document.pointerLockElement === el) document.exitPointerLock(); }
+    },
     destroy() {
+      dead = true;
+      clearInput();
+      timers.forEach(clearTimeout);
+      if (document.pointerLockElement === el) document.exitPointerLock();
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('pointerlockchange', onLockChange);
+      document.removeEventListener('pointerlockerror', onLockError);
+      window.removeEventListener('blur', clearInput);
+      if (location.search.includes('debug')) delete (window as any).__craft;
       cancelAnimationFrame(raf);
       ro.disconnect();
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('keyup', onKey);
       clearTimeout(toastT);
       ptrs.forEach((p) => clearTimeout(p.timer));
-      scene.traverse((o) => {
+      const geometries = new Set<THREE.BufferGeometry>([...handGeoms.values(), ...partGeoms.values()]);
+      const materials = new Set<THREE.Material>([partMat]);
+      const textures = new Set<THREE.Texture>([atlas, ghostTex]);
+      scene.traverse(o => {
         const m = o as THREE.Mesh;
-        m.geometry?.dispose?.();
+        if (m.geometry) geometries.add(m.geometry);
+        if (m.material) (Array.isArray(m.material) ? m.material : [m.material]).forEach(mat => materials.add(mat));
+        if (o instanceof THREE.InstancedMesh) o.dispose();
       });
+      materials.forEach(mat => {
+        Object.values(mat).forEach(v => { if (v instanceof THREE.Texture) textures.add(v); });
+        mat.dispose();
+      });
+      geometries.forEach(g => g.dispose());
+      textures.forEach(t => t.dispose());
       renderer.dispose();
       renderer.domElement.remove();
       ui.remove();

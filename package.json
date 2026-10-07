@@ -11,7 +11,10 @@
     "voces": "node scripts/gen-voces.mjs",
     "planos": "node scripts/clips/planos.mjs",
     "trailer": "node scripts/clips/trailer.mjs",
-    "galeria": "node scripts/clips/galeria.mjs media/galeria"
+    "galeria": "node scripts/clips/galeria.mjs media/galeria",
+    "qa:core": "node scripts/qa-core.mjs",
+    "qa:interactions": "node scripts/qa-interactions.mjs",
+    "qa:touch": "node scripts/qa-touch.mjs"
   },
   "dependencies": {
     "phaser": "^3.90.0",

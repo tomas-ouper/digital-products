@@ -16,10 +16,20 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(req)
       .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+        if (res.ok && res.type === 'basic') {
+          const copy = res.clone();
+          e.waitUntil(caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {}));
+        }
         return res;
       })
-      .catch(() => caches.match(req).then((r) => r || caches.match('./index.html')))
+      .catch(async () => {
+        const cached = await caches.match(req);
+        if (cached) return cached;
+        if (req.mode === 'navigate') {
+          const shell = await caches.match('./index.html');
+          if (shell) return shell;
+        }
+        return Response.error();
+      })
   );
 });

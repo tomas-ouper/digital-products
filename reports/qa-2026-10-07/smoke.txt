@@ -1,0 +1,10 @@
+
+> montessori-play@0.1.0 smoke
+> node scripts/smoke.mjs
+
+✓ 390x844 recorrido
+✓ 844x390 recorrido
+✓ 1024x768 recorrido
+✓ 1440x900 recorrido
+
+Sin errores.
