@@ -24,7 +24,7 @@ export function levelsScreen(root: HTMLElement, params: { game: string }) {
           'button',
           {
             class: 'level' + (unlocked(i) ? '' : ' locked'),
-            onTap: () => unlocked(i) && go('play', { game: g.id, level: i }),
+            onTap: () => unlocked(i) && go('play', { game: g.id, level: i, tutorial: true }),
           },
           h('span', { class: 'num' }, unlocked(i) ? String(i + 1) : '🔒'),
           h('span', { class: 'lt' }, title),

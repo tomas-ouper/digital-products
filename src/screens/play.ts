@@ -6,11 +6,15 @@ import { sfx } from '../core/sound';
 import { gameById } from '../games/registry';
 import type { GameInstance } from '../games/types';
 import { soundToggle } from './common';
+import { TUTORIALS } from '../games/tutorials';
+import { sayText } from '../core/voice';
 
-export function playScreen(root: HTMLElement, params: { game: string; level: number }) {
-  const p = activeProfile();
-  const g = gameById(params.game);
-  if (!p || !g) return go('hub');
+export function playScreen(root: HTMLElement, params: { game: string; level: number; tutorial?: boolean }) {
+  const p0 = activeProfile();
+  const g0 = gameById(params.game);
+  if (!p0 || !g0) return go('hub');
+  const p = p0;
+  const g = g0;
   root.className = 'game-wrap';
   const host = h('div', { class: 'game-host' });
   const title = h('div', { class: 'title' }, g.levels[params.level] || g.name);
@@ -24,6 +28,7 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
     title,
     h('div', { class: 'spacer' }),
     repeatBtn,
+    h('button', { class: 'icon-btn help-btn', 'aria-label': 'Cómo se juega', onTap: () => showTutorial(false) }, '?'),
     soundToggle()
   );
   root.append(host, hud);
@@ -69,7 +74,51 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
     setTimeout(() => say(key), 250);
   };
 
-  g.load()
+  const levelBanner = () => {
+    const b = h('div', { class: 'level-banner' }, h('small', {}, `Nivel ${params.level + 1}`), h('span', {}, g.levels[params.level] || ''));
+    root.append(b);
+    setTimeout(() => b.remove(), 2200);
+  };
+
+  const tut = TUTORIALS[g.id];
+  let started = false;
+  function showTutorial(first: boolean) {
+    if (!tut) return startGame();
+    const ov = h(
+      'div',
+      { class: 'overlay tutorial' },
+      h(
+        'div',
+        { class: 'card' },
+        h('div', { class: 'tut-head', style: { background: g.color }, html: g.art }),
+        h('div', { class: 'tut-kicker' }, 'Cómo se juega'),
+        h('h1', {}, g.name),
+        h('p', { class: 'tut-goal' }, tut.goal),
+        h('ol', { class: 'tut-steps' }, ...tut.steps.map(([ic, tx]) => h('li', {}, h('span', { class: 'ic' }, ic), h('span', {}, tx)))),
+        h('p', { class: 'tut-levels' }, '🗺️ ' + tut.levels),
+        h(
+          'button',
+          {
+            class: 'btn green tut-go',
+            onTap: () => {
+              ov.remove();
+              stopVoice();
+              if (first) startGame();
+            },
+          },
+          first ? '¡A jugar! ▶' : 'Seguir jugando'
+        )
+      )
+    );
+    root.append(ov);
+    sayText(tut.goal);
+  }
+
+  function startGame() {
+  if (started) return;
+  started = true;
+  levelBanner();
+  g!.load()
     .then((mod) => {
       if (dead) return;
       inst = mod.start({
@@ -98,6 +147,10 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
       console.error(e);
       host.append(h('div', { style: { color: '#fff', padding: '120px 20px', textAlign: 'center' } }, 'No se pudo cargar el juego. Revisa tu conexión a internet.'));
     });
+  }
+
+  if (params.tutorial) showTutorial(true);
+  else startGame();
 
   return () => {
     window.removeEventListener('resize', updRot);
