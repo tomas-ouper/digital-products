@@ -100,6 +100,18 @@ function parentPanel(root: HTMLElement) {
         h('div', { class: 'row' }, toggle('Voz', 'voice'), toggle('Sonidos', 'sound'))
       )
     );
+    body.append(
+      h('section', { class: 'card parent-section', 'aria-labelledby': 'support-title' },
+        h('h2', { id: 'support-title' }, 'Soporte y sugerencias'),
+        h('p', { class: 'sub' }, '¿Tienes una duda, un problema con el juego o una idea para mejorarlo? Escríbele a Tomás por WhatsApp.'),
+        h('a', {
+          class: 'btn green support-link',
+          href: 'https://wa.me/5493424221634?text=' + encodeURIComponent('Hola Tomás, te escribo por Montessori Play. Mi consulta o sugerencia es: '),
+          target: '_blank', rel: 'noopener noreferrer',
+        }, 'Hablar con Tomás por WhatsApp'),
+        h('p', { class: 'small-note' }, '+54 9 342 422 1634 · Atención para madres, padres y adultos responsables.')
+      )
+    );
     if (!profiles.length) return;
     // ---- Selector de perfil ----
     body.append(

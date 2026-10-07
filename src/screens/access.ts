@@ -26,7 +26,7 @@ export function accessScreen(root: HTMLElement) {
       go(settings.device ? 'profiles' : 'device');
     } else {
       sfx.bad();
-      err.textContent = 'Ese código no es correcto. Revísalo en tu correo de compra.';
+      err.textContent = 'Esa palabra clave no es correcta. Revisa la que te compartimos e intenta otra vez.';
     }
   };
   input.addEventListener('keydown', (e) => {
@@ -38,11 +38,11 @@ export function accessScreen(root: HTMLElement) {
       { class: 'card col', style: { maxWidth: '520px', width: '100%' } },
       h('div', { class: 'logo' }, ...['#ff8a5b', '#ffd166', '#4cc38a', '#5b8def'].map((c) => h('span', { class: 'dot', style: { background: c } }))),
       h('h1', {}, 'Montessori Play'),
-      h('p', { class: 'sub' }, 'Escribe el código de acceso que recibiste con tu compra.'),
+      h('p', { class: 'sub' }, 'Escribe la palabra clave que te compartimos para empezar a jugar.'),
       input,
       err,
       h('button', { class: 'btn green', onTap: submit }, 'Entrar'),
-      h('p', { class: 'small-note' }, 'Para mamá o papá: el código llegó en el correo del Kit Caligrafía Montessori.')
+      h('p', { class: 'small-note' }, 'Sin registro. Mamá o papá pueden crear hasta 3 perfiles en este dispositivo.')
     )
   );
   setTimeout(() => root.isConnected && say('codigo'), 300);

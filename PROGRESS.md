@@ -29,7 +29,14 @@
 - Los 29 planos y el tráiler existentes son anteriores a estos cambios; no se regrabaron.
 
 ## Siguiente paso exacto
-Revisar con Tomás los cambios de controles y claridad de esta iteración en preview. Probar captura nativa del mouse en navegador normal y voz/táctil/rendimiento en tablet y celular reales. Mergear a `main` solo con aprobación de Tomás. Para regrabar planos: `npm run build && npm run preview` y `node scripts/clips/planos.mjs [filtro]`; tráiler: `node scripts/clips/trailer.mjs`.
+Publicar y comprobar el MVP en Vercel: Tomás autorizó la publicación y el uso del repo existente el 07/10/2026. Proyecto `montessoriplay`, equipo `tomas-ouper-s-projects`, plan Hobby; repositorio GitHub conectado. Mantener palabra clave `CALIGRAFIA`, sin registro de cuentas. Luego probar captura nativa del mouse en navegador normal y voz/táctil/rendimiento en tablet y celular reales. Para regrabar planos: `npm run build && npm run preview` y `node scripts/clips/planos.mjs [filtro]`; tráiler: `node scripts/clips/trailer.mjs`.
+
+## Publicación del MVP y soporte · Codex (07/10/2026)
+- Tomás pidió ofrecer el MVP gratis por ahora, con una palabra clave compartida y sin cuentas. La pantalla de entrada ya no presupone una compra; conserva `CALIGRAFIA` y los perfiles locales.
+- Panel de padres: sección «Soporte y sugerencias», enlace a WhatsApp de Tomás `+54 9 342 422 1634`, con mensaje editable para consultas, problemas o propuestas. Visible también sin perfiles creados.
+- Cuenta Vercel autenticada y plan Hobby confirmado. Creado el proyecto `montessoriplay` y conectado al repositorio existente `tomas-ouper/digital-products`.
+- Build aprobado. Acceso con palabra clave, suma parental, enlace de WhatsApp y ausencia de desborde a 390 px verificados en Chromium; captura móvil revisada.
+- No se contrató un plan pago ni se agregó autenticación de usuarios. El progreso sigue guardándose en cada navegador/dispositivo.
 
 ## Esfuerzo restante (estimado)
 - H2-H6: hecho · H7: S (prueba en dispositivos reales)

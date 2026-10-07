@@ -186,6 +186,7 @@ input.big:focus { border-color: var(--blue); }
 .letters-done span.cur { font-family: 'Playwrite MX', cursive; font-weight: 400; }
 input[type=range] { width: 100%; max-width: 420px; height: 40px; accent-color: var(--blue); }
 .parent-section { width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.support-link { text-decoration: none; text-align: center; max-width: 100%; }
 .small-note { font-size: 14px; color: var(--ink2); text-align: center; max-width: 560px; }
 .rotate-hint { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,.92); padding: 8px 16px; border-radius: 999px; font-size: 15px; z-index: 6; pointer-events: none; color: var(--ink); white-space: nowrap; }
 
