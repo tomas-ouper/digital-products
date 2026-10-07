@@ -53,7 +53,7 @@ export class Shot {
     if (finger) await p.addInitScript(FINGER);
     await p.addInitScript(
       ([age, name, stars]) => {
-        localStorage.setItem('mp:settings', JSON.stringify({ unlocked: true, sound: false, voice: false, device: 'tablet', dailyLimitMin: 0, activeProfile: 'p1' }));
+        localStorage.setItem('mp:settings', JSON.stringify({ unlocked: true, sound: true, voice: false, device: 'tablet', dailyLimitMin: 0, activeProfile: 'p1' }));
         localStorage.setItem('mp:profiles', JSON.stringify([{ id: 'p1', name, avatar: 1, age, createdAt: 1 }, { id: 'p2', name: 'Mateo', avatar: 4, age: '3-5', createdAt: 2 }]));
         if (stars) localStorage.setItem('mp:data:p1', JSON.stringify({ stars, playLog: {}, letters: { a: 2, e: 1, m: 1, L: 1, O: 1, s: 1, 'c:a': 1, 'c:e': 1 }, missionsDone: {}, bonusMin: {} }));
       },
