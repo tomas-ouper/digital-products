@@ -571,7 +571,7 @@ async function angryShot(sh, { target = 0, follow = false, recordFromImpact = fa
       }
     return { from: [s.proj.x, s.proj.y], to: [best.px, best.py], anchor: [a.x, a.y], structX: s.structX, U, w: s.scale.width, h: s.scale.height, gy: s.groundY };
   }, target);
-  const z0 = 1.9;
+  const z0 = 2.1;
   if (follow && !recordFromImpact) {
     // tensión: primer plano de la gomera mientras se jala
     sh.cam = () => ({ z: z0, x: st.anchor[0] + st.U, y: st.anchor[1], lerp: 1 });
@@ -594,7 +594,7 @@ async function angryShot(sh, { target = 0, follow = false, recordFromImpact = fa
   if (follow) {
     // seguimiento del proyectil, abriendo el plano de a poco
     sh.cam = () => {
-      zf += (1.6 - zf) * 0.04;
+      zf += (2.0 - zf) * 0.04;
       return { z: zf, follow: 'proj', lerp: 0.25 };
     };
   }
@@ -609,8 +609,8 @@ async function angryShot(sh, { target = 0, follow = false, recordFromImpact = fa
       sh.speed = 1;
       if (follow) {
         sh.cam = () => {
-          zf += (1.4 - zf) * 0.05;
-          return { z: zf, x: st.structX - st.U * 0.5, y: st.gy - st.U * 2.5, lerp: 0.06 };
+          zf += (1.85 - zf) * 0.05;
+          return { z: zf, x: st.structX - st.U * 0.3, y: st.gy - st.U * 1.7, lerp: 0.06 };
         };
       }
       for (let k = 0; k < (recordFromImpact ? 75 : 60); k++) await sh.frame();
