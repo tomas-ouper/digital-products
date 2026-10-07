@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=540, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet" />
+<title>Placas del tráiler</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 540px; height: 960px; overflow: hidden; font-family: Fredoka, sans-serif; color: #3a3f6b; background: transparent; }
+  .full { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; padding: 30px; }
+  .bg { background: radial-gradient(circle at 30% 20%, #fff 0, transparent 45%), linear-gradient(160deg, #ffe9c7, #ffd0e0 55%, #d9cbff); }
+  .float span { position: absolute; font-weight: 700; opacity: .22; animation: fl 4s ease-in-out infinite; }
+  @keyframes fl { 50% { transform: translateY(-30px) rotate(10deg); } }
+  .logo { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .wm { font-size: 76px; font-weight: 700; letter-spacing: -.01em; }
+  .wm b { display: inline-block; -webkit-text-stroke: 4px #fff; paint-order: stroke fill; animation: pop .5s cubic-bezier(.2,1.6,.4,1) both; filter: drop-shadow(0 6px 0 rgba(58,63,107,.18)); }
+  .wm2 { font-size: 72px; font-weight: 700; color: #fff; background: #3a3f6b; padding: 0 30px 8px; border-radius: 26px; transform: rotate(-4deg); animation: pop .6s .75s cubic-bezier(.2,1.6,.4,1) both; box-shadow: 0 10px 0 rgba(0,0,0,.15); }
+  @keyframes pop { from { transform: scale(0) rotate(-20deg); opacity: 0; } }
+  .tag { font-size: 30px; font-weight: 600; animation: up .6s 1.2s both; max-width: 460px; }
+  @keyframes up { from { transform: translateY(30px); opacity: 0; } }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; animation: up .6s 1.6s both; }
+  .chip { background: #fff; border-radius: 999px; padding: 10px 18px; font-size: 22px; font-weight: 600; box-shadow: 0 6px 0 rgba(58,63,107,.12); }
+  .big { font-size: 46px; font-weight: 700; line-height: 1.1; }
+  /* rótulo superpuesto por juego */
+  .super { position: absolute; left: 0; right: 0; top: 120px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .super .name { font-size: 30px; font-weight: 700; color: #fff; padding: 6px 22px 8px; border-radius: 999px; box-shadow: 0 6px 0 rgba(0,0,0,.2); letter-spacing: .02em; text-transform: uppercase; }
+  .super .line { font-size: 44px; font-weight: 700; color: #fff; text-align: center; line-height: 1.08; padding: 0 26px; -webkit-text-stroke: 9px #3a3f6b; paint-order: stroke fill; text-shadow: 0 8px 0 rgba(0,0,0,.25); }
+  .super .sub { font-size: 24px; font-weight: 600; color: #3a3f6b; background: #fff; border-radius: 999px; padding: 6px 18px; box-shadow: 0 5px 0 rgba(0,0,0,.18); }
+  .cta { font-size: 30px; font-weight: 700; color: #fff; background: #4cc38a; border-radius: 999px; padding: 16px 34px; box-shadow: 0 8px 0 #2f8f5f; animation: up .6s 2s both, pulse 1s 2.6s ease-in-out infinite; }
+  @keyframes pulse { 50% { transform: scale(1.06); } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  const COLS = ['#ff8a5b', '#5b8def', '#4cc38a', '#f5b82e', '#a98bff', '#ff8fb1'];
+  const q = new URLSearchParams(location.hash.slice(1));
+  const kind = q.get('k');
+  const root = document.getElementById('root');
+  const wm = () => '<div class="wm">' + [...'Montessori'].map((c, i) => `<b style="color:${COLS[i % 6]};animation-delay:${i * 0.06}s">${c}</b>`).join('') + '</div><div class="wm2">Play</div>';
+  const floaters = () => '<div class="float">' + ['A', 'm', '★', 'o', '▲', 'S', '●', 'e', '◆', 'L', '■', 'u', 'ñ', 'b'].map((t, i) => `<span style="left:${(i * 37) % 95}%;top:${(i * 53) % 92}%;color:${COLS[i % 6]};font-size:${40 + (i * 17) % 60}px;animation-delay:-${i * 0.7}s">${t}</span>`).join('') + '</div>';
+  if (kind === 'intro') {
+    document.body.style.background = '#fff';
+    root.innerHTML = `<div class="full bg">${floaters()}<div class="logo">${wm()}</div><div class="tag">Juegos para aprender a escribir, leer y contar</div><div class="chips"><span class="chip">3 a 8 años</span><span class="chip">Montessori</span><span class="chip">Sin descargas</span></div></div>`;
+  } else if (kind === 'fin') {
+    document.body.style.background = '#fff';
+    root.innerHTML = `<div class="full bg">${floaters()}<div class="logo">${wm()}</div><div class="big" style="animation:up .6s 1.1s both">5 juegos hoy<br><span style="font-size:32px;color:#6b6f99">+15 para fin de año</span></div><div class="chips"><span class="chip">📱 Celular</span><span class="chip">📲 Tablet</span><span class="chip">💻 Compu</span></div><div class="cta">¡Juega desde el navegador!</div></div>`;
+  } else if (kind === 'super') {
+    root.innerHTML = `<div class="super"><div class="name" style="background:${q.get('c') || '#5b8def'}">${q.get('n')}</div><div class="line">${q.get('t')}</div>${q.get('s') ? `<div class="sub">${q.get('s')}</div>` : ''}</div>`;
+  }
+</script>
+</body>
+</html>

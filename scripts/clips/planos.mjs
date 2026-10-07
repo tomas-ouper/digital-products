@@ -36,10 +36,17 @@ const PHASER_CAM = () => {
     const s = window.__scene;
     if (!s || !s.cameras) return;
     const cm = s.cameras.main;
+    if (!cm.__b) {
+      cm.setBounds(0, 0, s.scale.width, s.scale.height);
+      cm.__b = 1;
+    }
     let tx = c.x, ty = c.y;
     if (c.follow === 'snake') {
       tx = s.sx(s.head);
       ty = s.sy(s.head);
+    } else if (c.follow === 'ninja' && window.__ninja && window.__ninja.piece) {
+      tx = window.__ninja.piece.x;
+      ty = window.__ninja.piece.y;
     } else if (c.follow === 'proj' && s.proj) {
       tx = s.proj.x;
       ty = s.proj.y;
@@ -266,14 +273,15 @@ const SHOTS = {
     await ready(sh, () => window.__scene && window.__scene.target);
     await sh.clean();
     await sh.skip(900);
+    await sh.page.evaluate(PHASER_CAM);
     await sh.page.evaluate(NINJA_DRIVER, { speed: 4, max: 1 });
     await sh.until(() => window.__ninja.phase === 'draw');
+    sh.cam = kf([{ f: 0, z: 1.15, follow: 'ninja', lerp: 0.12 }, { f: 70, z: 1.9, follow: 'ninja', lerp: 0.12 }, { f: 150, z: 1.3, follow: 'ninja', lerp: 0.08 }]);
     sh.record();
-    sh.speed = 0.35;
-    await sh.roll(3200);
+    sh.speed = 0.3;
+    await sh.roll(3300);
     sh.speed = 1;
     await sh.roll(1500);
-    return { zoom: [{ t: 0, z: 1.05, x: 0.5, y: 0.55 }, { t: 0.55, z: 1.5, x: 0.5, y: 0.5 }, { t: 1, z: 1.15, x: 0.5, y: 0.5 }] };
   },
   'ninja-3-error-resta': async (sh) => {
     await sh.go('play', { game: 'ninja', level: 1 });
@@ -324,7 +332,7 @@ const SHOTS = {
     sh.speed = 1;
     await crashSwipe(sh, true);
     await sh.roll(1600);
-    return { zoom: [{ t: 0, z: 1.0, x: 0.5, y: 0.5 }, { t: 0.5, z: 1.35, x: 0.5, y: 0.52 }, { t: 1, z: 1.15, x: 0.5, y: 0.5 }] };
+    return { zoom: [{ t: 0, z: 1.0, x: 0.5, y: 0.5 }, { t: 0.5, z: 1.12, x: 0.5, y: 0.52 }, { t: 1, z: 1.05, x: 0.5, y: 0.5 }] };
   },
   'calicrash-3-forma-SOL': async (sh) => {
     await sh.go('play', { game: 'crash', level: 2 });
@@ -393,9 +401,9 @@ const SHOTS = {
     await sh.page.evaluate(CRAFT_CAM);
     await craftBuildCastle(sh);
     sh.cam = (i) => {
-      const a = -0.9 + i * 0.012;
-      const r = 21 - i * 0.03;
-      return { pos: [16 + Math.sin(a) * r, 15 - i * 0.025, 16 + Math.cos(a) * r], look: [16, 6, 15], fov: 70 };
+      const a = -0.75 + i * 0.011;
+      const r = 14 - i * 0.02;
+      return { pos: [16 + Math.sin(a) * r, 13.5 - i * 0.022, 15 + Math.cos(a) * r], look: [16, 5.5, 13.5], fov: 72 };
     };
     sh.record();
     await sh.roll(5000);
@@ -590,7 +598,7 @@ async function angryShot(sh, { target = 0, follow = false, recordFromImpact = fa
   if (follow) {
     // seguimiento del proyectil, abriendo el plano de a poco
     sh.cam = () => {
-      zf += (1.45 - zf) * 0.04;
+      zf += (1.6 - zf) * 0.04;
       return { z: zf, follow: 'proj', lerp: 0.25 };
     };
   }
@@ -605,8 +613,8 @@ async function angryShot(sh, { target = 0, follow = false, recordFromImpact = fa
       sh.speed = 1;
       if (follow) {
         sh.cam = () => {
-          zf += (1 - zf) * 0.05;
-          return { z: zf, x: st.structX - st.U * 0.5, y: st.gy - st.U * 3, lerp: 0.06 };
+          zf += (1.4 - zf) * 0.05;
+          return { z: zf, x: st.structX - st.U * 0.5, y: st.gy - st.U * 2.5, lerp: 0.06 };
         };
       }
       for (let k = 0; k < (recordFromImpact ? 75 : 60); k++) await sh.frame();

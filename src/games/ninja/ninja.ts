@@ -289,7 +289,7 @@ class NinjaScene extends Phaser.Scene {
     const w = this.scale.width;
     const h = this.scale.height;
     const minSide = Math.min(w, h);
-    const r = Phaser.Math.Clamp(minSide * (this.ctx.easy ? 0.11 : 0.095), 40, 78);
+    const r = Phaser.Math.Clamp(minSide * (w < h ? 0.125 : this.ctx.easy ? 0.11 : 0.095), 40, 78);
     const lane = (i + 0.5) / n;
     const x = w * (0.12 + lane * 0.76) + (Math.random() - 0.5) * w * 0.05;
     const apex = Math.min(h * 0.55, this.topY + 80 + r + Math.random() * (h * 0.18));
