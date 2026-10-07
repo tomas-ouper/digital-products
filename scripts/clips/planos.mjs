@@ -409,12 +409,13 @@ const SHOTS = {
     await ready(sh, () => window.__craft);
     await sh.page.evaluate(() => {
       const p = window.__craft.player;
-      p.pos.z = 19.5;
+      p.pos.z = 24.5;
     });
     await sh.skip(1500);
     sh.record();
     await craftFillGhosts(sh, 11, 6);
-    await sh.roll(1200);
+    await craftAim(sh, 16, 7, 14, 14);
+    await sh.roll(900);
   },
   'montecraft-3-torre-timelapse': async (sh) => {
     await sh.go('play', { game: 'craft', level: 1 });
@@ -468,11 +469,12 @@ const SHOTS = {
   'montecraft-5-colores': async (sh) => {
     await sh.go('play', { game: 'craft', level: 2 });
     await ready(sh, () => window.__craft);
-    await sh.page.evaluate(() => (window.__craft.player.pos.z = 20.5));
+    await sh.page.evaluate(() => (window.__craft.player.pos.z = 25.5));
     await sh.skip(1500);
     sh.record();
     await craftFillGhosts(sh, 9, 5);
-    await sh.roll(1000);
+    await craftAim(sh, 16, 4, 14, 14);
+    await sh.roll(900);
   },
   'montecraft-6-romper-bloques': async (sh) => {
     await sh.go('play', { game: 'craft', level: 6 });
