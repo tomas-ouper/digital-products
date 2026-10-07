@@ -41,7 +41,7 @@ export const GAMES: GameDef[] = [
     name: 'CaliCrash',
     desc: 'Junta letras iguales y forma palabras.',
     color: '#a98bff',
-    ready: false,
+    ready: true,
     levels: CRASH_LEVELS.map((l) => l.title),
     art: `<svg viewBox="0 0 160 120"><rect width="160" height="120" fill="#e6ddff"/>
       ${[0, 1, 2]
