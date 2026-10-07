@@ -319,7 +319,12 @@ class SnakeScene extends Phaser.Scene {
         // comer puntos en orden
         const s = this.dots[this.si];
         const eatR = this.ctx.easy ? 7 : 5.5;
-        let ate = false;
+        let ate = false as boolean;
+        // si corta una esquina y queda junto al punto siguiente, se perdona el atajo
+        if (this.di + 1 < s.length && Math.hypot(this.head.x - s[this.di + 1].x, this.head.y - s[this.di + 1].y) < eatR && Math.hypot(this.head.x - s[this.di].x, this.head.y - s[this.di].y) < eatR * 2.4) {
+          this.di++;
+          ate = true;
+        }
         while (this.di < s.length && Math.hypot(this.head.x - s[this.di].x, this.head.y - s[this.di].y) < eatR) {
           this.spark(s[this.di], 0xffb347, 4);
           this.di++;

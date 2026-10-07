@@ -72,7 +72,7 @@ const SNAKE_DRIVER = () => {
     if (s.tapDot) return s.finishStroke();
     const d = s.dots[s.si];
     if (!d) return;
-    s.target = { ...d[Math.min(s.di + 1, d.length - 1)] };
+    s.target = { ...d[Math.min(s.di, d.length - 1)] };
   };
 };
 
