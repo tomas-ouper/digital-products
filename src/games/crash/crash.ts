@@ -46,6 +46,7 @@ class CrashScene extends Phaser.Scene {
   slots: Phaser.GameObjects.Text[] = [];
   chainG!: Phaser.GameObjects.Graphics;
   board!: Phaser.GameObjects.Graphics;
+  bgG!: Phaser.GameObjects.Graphics;
   idle = 0;
   hintTiles: Tile[] = [];
 
@@ -81,6 +82,7 @@ class CrashScene extends Phaser.Scene {
   create() {
     if (location.search.includes('debug')) (window as any).__scene = this;
     this.makeTextures();
+    this.bgG = this.add.graphics();
     this.board = this.add.graphics();
     this.chainG = this.add.graphics().setDepth(8);
     this.panelBg = this.add.graphics();
@@ -201,43 +203,81 @@ class CrashScene extends Phaser.Scene {
   layout(snap: boolean) {
     const w = this.scale.width;
     const h = this.scale.height;
-    const panelH = this.lv.kind === 'palabra' ? 110 : 70;
-    const top = HUD_TOP + panelH + 14;
-    this.cell = Math.floor(Math.min((w - 24) / N, (h - top - 16) / N, 96));
-    this.x0 = Math.round((w - this.cell * N) / 2);
-    this.y0 = Math.round(top + (h - top - 16 - this.cell * N) / 2);
-    // fondo del tablero
+    const word = this.lv.kind === 'palabra';
+    // celular acostado: panel a la izquierda y tablero a toda la altura
+    const sideCell = Math.floor(Math.min((h - 24) / N, 96));
+    const side = h < 600 && w > h * 1.3 && (w - sideCell * N) / 2 - 24 >= 170;
+    let pw: number, panelH: number;
+    if (side) {
+      this.cell = sideCell;
+      this.x0 = Math.round((w - this.cell * N) / 2);
+      this.y0 = Math.round((h - this.cell * N) / 2);
+      pw = Math.min(260, this.x0 - 24);
+      panelH = word ? 170 : 110;
+      this.panel.setPosition(12, HUD_TOP + 4);
+    } else {
+      panelH = word ? 110 : 70;
+      const top = HUD_TOP + panelH + 14;
+      this.cell = Math.floor(Math.min((w - 24) / N, (h - top - 16) / N, 96));
+      this.x0 = Math.round((w - this.cell * N) / 2);
+      this.y0 = Math.round(top + (h - top - 16 - this.cell * N) / 2);
+      pw = Math.min(w - 24, 520);
+      this.panel.setPosition((w - pw) / 2, HUD_TOP + 2);
+    }
+    // fondo con brillos
+    const bg = this.bgG;
+    bg.clear();
+    bg.fillGradientStyle(0xb79cff, 0xffa8d5, 0x8f7cf0, 0xff9fc0, 1);
+    bg.fillRect(0, 0, w, h);
+    let sd = 5;
+    const rnd = () => ((sd = (sd * 9301 + 49297) % 233280) / 233280);
+    for (let i = 0; i < 18; i++) {
+      bg.fillStyle(0xffffff, 0.06 + rnd() * 0.1);
+      bg.fillCircle(rnd() * w, rnd() * h, 20 + rnd() * 70);
+    }
+    // marco del tablero
     const b = this.board;
     b.clear();
-    b.fillStyle(0xffffff, 0.55);
-    b.fillRoundedRect(this.x0 - 8, this.y0 - 8, this.cell * N + 16, this.cell * N + 16, 22);
+    const bw = this.cell * N;
+    b.fillStyle(0x3a2a7a, 0.35);
+    b.fillRoundedRect(this.x0 - 12, this.y0 - 6, bw + 24, bw + 24, 26);
+    b.fillStyle(0xffffff, 0.85);
+    b.fillRoundedRect(this.x0 - 12, this.y0 - 12, bw + 24, bw + 24, 26);
+    b.fillStyle(0xe9e0ff, 1);
+    b.fillRoundedRect(this.x0 - 4, this.y0 - 4, bw + 8, bw + 8, 18);
     for (let r = 0; r < N; r++)
       for (let c = 0; c < N; c++) {
-        b.fillStyle((r + c) % 2 ? 0xefe7ff : 0xf7f2ff, 1);
+        b.fillStyle((r + c) % 2 ? 0xdcd0ff : 0xf3eeff, 1);
         b.fillRoundedRect(this.x0 + c * this.cell + 2, this.y0 + r * this.cell + 2, this.cell - 4, this.cell - 4, 12);
       }
     // panel de objetivo
-    const pw = Math.min(w - 24, 520);
-    this.panel.setPosition((w - pw) / 2, HUD_TOP + 2);
     const pg = this.panelBg;
     pg.clear();
-    pg.fillStyle(0xffffff, 0.96);
+    pg.fillStyle(0x000000, 0.12);
+    pg.fillRoundedRect(0, 5, pw, panelH, 22);
+    pg.fillStyle(0xffffff, 0.97);
     pg.fillRoundedRect(0, 0, pw, panelH, 22);
-    pg.fillStyle(0x3a3f6b, 1);
-    pg.fillRoundedRect(pw - 118, 12, 106, 44, 22);
-    this.goalText.setPosition(18, 34);
-    this.movesText.setPosition(pw - 65, 34);
-    this.slots.forEach((s, i) => {
-      const sw = 48;
-      const sx = (pw - this.slots.length * sw) / 2 + i * sw + sw / 2;
-      s.setPosition(sx, 82);
-    });
-    if (this.lv.kind === 'palabra') {
-      const sw = 48;
-      const sx0 = (pw - this.slots.length * sw) / 2;
+    const sw = Math.min(48, (pw - 16) / Math.max(1, this.slots.length));
+    let slotY: number;
+    if (side) {
+      this.goalText.setPosition(16, 30).setFontSize(19);
+      pg.fillStyle(0x3a3f6b, 1);
+      pg.fillRoundedRect(14, 54, 106, 40, 20);
+      this.movesText.setPosition(67, 74);
+      slotY = 132;
+    } else {
+      this.goalText.setPosition(18, 34).setFontSize(22);
+      pg.fillStyle(0x3a3f6b, 1);
+      pg.fillRoundedRect(pw - 118, 12, 106, 44, 22);
+      this.movesText.setPosition(pw - 65, 34);
+      slotY = 82;
+    }
+    const sx0 = (pw - this.slots.length * sw) / 2;
+    this.slots.forEach((s, i) => s.setPosition(sx0 + i * sw + sw / 2, slotY));
+    if (word) {
       for (let i = 0; i < this.slots.length; i++) {
         pg.lineStyle(3, 0xd9cdb8, 1);
-        pg.strokeRoundedRect(sx0 + i * sw + 4, 62, sw - 8, 40, 10);
+        pg.strokeRoundedRect(sx0 + i * sw + 4, slotY - 20, sw - 8, 40, 10);
       }
     }
     for (const row of this.grid)
@@ -483,6 +523,7 @@ class CrashScene extends Phaser.Scene {
       const m = this.findMatches();
       if (!m.length) break;
       sfx.pop();
+      if (guard >= 1 || m.length >= 4) this.combo(guard, m.length);
       await this.removeTiles(m, false);
       await this.collapse();
     }
@@ -535,9 +576,27 @@ class CrashScene extends Phaser.Scene {
     await Promise.all(anims);
   }
 
+  combo(level: number, n: number) {
+    const words = ['¡Bien!', '¡Genial!', '¡Súper!', '¡Increíble!', '¡Fantástico!'];
+    const txt = words[Math.min(words.length - 1, level + (n >= 5 ? 1 : 0))];
+    const t = this.add
+      .text(this.x0 + (this.cell * N) / 2, this.y0 + (this.cell * N) / 2, txt, {
+        fontFamily: FONT, fontSize: `${Math.round(this.cell * 0.9)}px`, color: '#ffffff', fontStyle: 'bold', stroke: '#7a3cff', strokeThickness: 10,
+        shadow: { offsetX: 0, offsetY: 6, color: '#00000055', blur: 6, fill: true, stroke: true },
+      })
+      .setOrigin(0.5)
+      .setDepth(30)
+      .setScale(0.3);
+    this.tweens.add({ targets: t, scale: 1, duration: 260, ease: 'Back.easeOut' });
+    this.tweens.add({ targets: t, alpha: 0, y: t.y - this.cell, delay: 650, duration: 400, onComplete: () => t.destroy() });
+    sfx.good();
+  }
+
   burst(x: number, y: number, color: number) {
-    for (let i = 0; i < 6; i++) {
-      const d = this.add.circle(x, y, this.cell * 0.07, color).setDepth(7);
+    const ring = this.add.circle(x, y, this.cell * 0.3).setStrokeStyle(4, 0xffffff, 0.9).setDepth(7);
+    this.tweens.add({ targets: ring, scale: 2, alpha: 0, duration: 350, onComplete: () => ring.destroy() });
+    for (let i = 0; i < 8; i++) {
+      const d = this.add.star(x, y, 5, this.cell * 0.04, this.cell * 0.09, i % 2 ? 0xffffff : color).setDepth(7);
       const a = Math.random() * Math.PI * 2;
       this.tweens.add({ targets: d, x: x + Math.cos(a) * this.cell * 0.8, y: y + Math.sin(a) * this.cell * 0.8, alpha: 0, duration: 420, onComplete: () => d.destroy() });
     }

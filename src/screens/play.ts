@@ -1,5 +1,5 @@
 import { h, ICONS } from '../core/ui';
-import { activeProfile, markLetter, setLevelStars } from '../core/state';
+import { activeProfile, markLetter, setLevelStars, settings } from '../core/state';
 import { go } from '../core/nav';
 import { say, stopVoice } from '../core/voice';
 import { sfx } from '../core/sound';
@@ -8,6 +8,18 @@ import type { GameInstance } from '../games/types';
 import { soundToggle } from './common';
 import { TUTORIALS } from '../games/tutorials';
 import { sayText } from '../core/voice';
+
+/** Pantalla completa + orientación horizontal (Android; en iOS no se puede forzar). */
+function tryLandscape() {
+  try {
+    const el = document.documentElement as any;
+    const lock = () => (screen.orientation as any)?.lock?.('landscape').catch(() => {});
+    if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).then(lock).catch(() => {});
+    else lock();
+  } catch {
+    /* no soportado */
+  }
+}
 
 export function playScreen(root: HTMLElement, params: { game: string; level: number; tutorial?: boolean }) {
   const p0 = activeProfile();
@@ -32,13 +44,26 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
     soundToggle()
   );
   root.append(host, hud);
-  // En celular vertical: sugerir girar (no bloquea)
-  const rot = h('div', { class: 'rotate-hint' }, '📱↻ Gira el teléfono para jugar mejor');
-  const updRot = () => (rot.style.display = window.innerWidth < 600 && window.innerHeight > window.innerWidth && g.id !== 'snake' ? 'block' : 'none');
+  // En celular: se juega en horizontal. Si está vertical, pantalla clara para girar.
+  const isPhone = () => settings.device === 'phone' || Math.min(window.screen.width, window.screen.height) < 600;
+  let rotDismissed = false;
+  const rot = h(
+    'div',
+    { class: 'rotate-overlay' },
+    h('div', { class: 'rot-phone', html: '<svg viewBox="0 0 60 100" width="70" height="116"><rect x="4" y="4" width="52" height="92" rx="10" fill="#fff" stroke="#3a3f6b" stroke-width="5"/><rect x="11" y="14" width="38" height="66" rx="3" fill="#5b8def"/><circle cx="30" cy="88" r="3.5" fill="#3a3f6b"/></svg>' }),
+    h('h1', {}, 'Gira tu teléfono'),
+    h('p', {}, 'Los juegos se juegan con el teléfono acostado (horizontal).'),
+    h('button', { class: 'btn green', onTap: () => tryLandscape() }, '↻ Girar pantalla'),
+    h('button', { class: 'btn ghost small', onTap: () => ((rotDismissed = true), updRot()) }, 'Jugar así igual')
+  );
+  const updRot = () => {
+    const show = isPhone() && window.innerHeight > window.innerWidth && !rotDismissed;
+    rot.style.display = show ? 'flex' : 'none';
+  };
   updRot();
   window.addEventListener('resize', updRot);
   root.append(rot);
-  setTimeout(() => (rot.style.display = 'none'), 6000);
+  if (rot.style.display === 'flex') setTimeout(() => sayText('Gira tu teléfono para jugar.'), 400);
 
   let inst: GameInstance | null = null;
   let dead = false;
@@ -117,6 +142,7 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
   function startGame() {
   if (started) return;
   started = true;
+  if (isPhone()) tryLandscape();
   levelBanner();
   g!.load()
     .then((mod) => {

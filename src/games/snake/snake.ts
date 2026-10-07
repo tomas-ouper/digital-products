@@ -28,6 +28,7 @@ class SnakeScene extends Phaser.Scene {
   bar!: Phaser.GameObjects.Graphics;
   sparks: { x: number; y: number; vx: number; vy: number; life: number; c: number }[] = [];
   eatenTotal = 0;
+  compact = false;
   totalDots = 0;
   model!: Phaser.GameObjects.Text;
   hint!: Phaser.GameObjects.Text;
@@ -90,11 +91,14 @@ class SnakeScene extends Phaser.Scene {
   layout() {
     const w = this.scale.width;
     const h = this.scale.height;
-    const availH = h - HUD_TOP - 24;
-    const size = Math.min(w * 0.9, availH * 0.95, 760);
+    // celular acostado: la letra usa toda la altura, entre los botones de las esquinas
+    this.compact = h < 600 && w > h * 1.3;
+    const top = this.compact ? 8 : HUD_TOP;
+    const availH = h - top - (this.compact ? 8 : 24);
+    const size = Math.min(w * 0.9, availH * 0.97, 760);
     this.f = size / 100;
     this.ox = (w - size) / 2;
-    this.oy = HUD_TOP + (availH - size) / 2;
+    this.oy = top + (availH - size) / 2;
     const small = Math.min(w, h) < 520;
     this.model.setFontSize(small ? 44 : 64).setPosition(small ? 44 : 66, h - (small ? 44 : 66));
     this.drawBg();
@@ -468,9 +472,9 @@ class SnakeScene extends Phaser.Scene {
   drawBar() {
     const b = this.bar;
     b.clear();
-    const w = Math.min(320, this.scale.width * 0.5);
-    const x = (this.scale.width - w) / 2;
-    const y = HUD_TOP - 64;
+    const w = this.compact ? Math.min(150, this.ox - 30) : Math.min(320, this.scale.width * 0.5);
+    const x = this.compact ? 16 : (this.scale.width - w) / 2;
+    const y = this.compact ? HUD_TOP + 6 : HUD_TOP - 64;
     const done = this.dots.slice(0, this.si).reduce((a, s) => a + s.length, 0) + (this.tapDot ? 0 : this.di);
     const k = this.totalDots ? Math.min(1, done / this.totalDots) : 0;
     b.fillStyle(0x000000, 0.18);

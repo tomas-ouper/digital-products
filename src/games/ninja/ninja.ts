@@ -48,6 +48,7 @@ class NinjaScene extends Phaser.Scene {
   bannerLetter!: Phaser.GameObjects.Text;
   counter!: Phaser.GameObjects.Text;
   blade: { x: number; y: number; t: number }[] = [];
+  topY = HUD_TOP;
   waveTimer = 0;
   waves = 0;
   over = false;
@@ -216,9 +217,11 @@ class NinjaScene extends Phaser.Scene {
     hills(h * 0.88, h * 0.14, 0x2a2360, 3);
     hills(h * 0.96, h * 0.08, 0x1d1847, 5);
     // banner de consigna
-    const bw = Math.min(w - 24, 460);
-    const bh = 76;
-    this.banner.setPosition((w - bw) / 2, HUD_TOP + 4);
+    const compact = h < 600 && w > h * 1.3 && w - 2 * 230 >= 330;
+    const bw = compact ? Math.min(w - 2 * 230, 460) : Math.min(w - 24, 460);
+    const bh = compact ? 68 : 76;
+    this.topY = compact ? 6 : HUD_TOP + 4;
+    this.banner.setPosition((w - bw) / 2, this.topY);
     this.bannerBox.clear();
     this.bannerBox.fillStyle(0xffffff, 0.95);
     this.bannerBox.fillRoundedRect(0, 0, bw, bh, 26);
@@ -289,7 +292,7 @@ class NinjaScene extends Phaser.Scene {
     const r = Phaser.Math.Clamp(minSide * (this.ctx.easy ? 0.11 : 0.095), 40, 78);
     const lane = (i + 0.5) / n;
     const x = w * (0.12 + lane * 0.76) + (Math.random() - 0.5) * w * 0.05;
-    const apex = HUD_TOP + 90 + r + Math.random() * (h * 0.18);
+    const apex = Math.min(h * 0.55, this.topY + 80 + r + Math.random() * (h * 0.18));
     const vy = -Math.sqrt(2 * this.grav * (h + r - apex));
     const vx = (Math.random() - 0.5) * w * 0.04;
     const color = COLORS[(Math.random() * COLORS.length) | 0];

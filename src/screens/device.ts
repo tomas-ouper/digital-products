@@ -13,7 +13,7 @@ export function deviceScreen(root: HTMLElement) {
   root.className = 'screen center';
   const opts: { id: Device; label: string; note: string }[] = [
     { id: 'tablet', label: 'Tablet', note: 'La mejor opción' },
-    { id: 'phone', label: 'Celular', note: 'Mejor en horizontal' },
+    { id: 'phone', label: 'Celular', note: 'Se juega en horizontal ↻' },
     { id: 'desktop', label: 'Computadora', note: 'Con mouse o touch' },
   ];
   const pick = (id: Device) => {

@@ -261,3 +261,12 @@ input[type=range] { width: 100%; max-width: 420px; height: 40px; accent-color: v
 @media (max-width: 480px) {
   .game-hud .title { display: none; }
 }
+.rotate-overlay { position: absolute; inset: 0; z-index: 60; background: linear-gradient(160deg, #5b8def, #a98bff); color: #fff; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; text-align: center; }
+.rotate-overlay h1 { color: #fff; }
+.rotate-overlay p { font-size: 20px; max-width: 320px; }
+.rot-phone { animation: rotphone 2s ease-in-out infinite; }
+@keyframes rotphone { 0%, 20% { transform: rotate(0); } 50%, 80% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }
+@media (max-height: 500px) {
+  .game-hud .title { display: none; }
+  .mc-goal { top: 10px; }
+}
