@@ -155,7 +155,6 @@ const SHOTS = {
     await sh.roll(700);
     const b = await sh.page.locator('.game-card >> nth=0').boundingBox();
     await sh.tap(b.x + b.width / 2, b.y + b.height * 0.4, 16);
-    await sh.page.click('.game-card >> nth=0');
     await sh.roll(1400);
   },
   'plataforma-2-tutorial': async (sh) => {
@@ -166,7 +165,6 @@ const SHOTS = {
     const b = await sh.page.locator('.tut-go').boundingBox();
     sh.last = [VW * 0.7, VH * 0.95];
     await sh.tap(b.x + b.width / 2, b.y + b.height / 2, 14);
-    await sh.page.click('.tut-go');
     await sh.roll(1500);
   },
   'plataforma-3-estrellas': async (sh) => {
@@ -185,7 +183,6 @@ const SHOTS = {
     const b = await sh.page.locator('text=¡Lo hice!').boundingBox();
     sh.last = [VW * 0.5, VH * 0.95];
     await sh.tap(b.x + b.width / 2, b.y + b.height / 2, 14);
-    await sh.page.click('text=¡Lo hice!');
     await sh.roll(2200);
   },
   'plataforma-5-perfiles': async (sh) => {
@@ -196,7 +193,6 @@ const SHOTS = {
     const b = await sh.page.locator('.profile-tile >> nth=0').boundingBox();
     sh.last = [VW * 0.5, VH * 0.95];
     await sh.tap(b.x + b.width / 2, b.y + b.height / 2, 16);
-    await sh.page.click('.profile-tile >> nth=0');
     await sh.roll(2400);
   },
 
