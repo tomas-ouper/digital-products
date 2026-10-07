@@ -14,7 +14,7 @@ export const GAMES: GameDef[] = [
     name: 'Snake Lecto',
     desc: 'Lleva a la viborita por el trazo de cada letra.',
     color: '#4cc38a',
-    ready: false,
+    ready: true,
     levels: SNAKE_LEVELS.map(letterTitle),
     art: `<svg viewBox="0 0 160 120"><rect width="160" height="120" fill="#c8f0d8"/>
       <text x="80" y="100" font-family="Fredoka" font-weight="700" font-size="104" text-anchor="middle" fill="#fff" stroke="#9fdcb8" stroke-width="3">a</text>

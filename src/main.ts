@@ -28,6 +28,8 @@ document.addEventListener('gesturestart', (e) => e.preventDefault());
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 
 startClock();
+// Atajo de prueba (consola / tests automáticos)
+(window as any).mpGo = go;
 
 if (!settings.unlocked) go('access');
 else if (!settings.device) go('device');
