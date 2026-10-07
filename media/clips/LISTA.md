@@ -1,0 +1,31 @@
+# Planos 9:16 (1080x1920, 30 fps)
+
+- `angry-1-tension-y-disparo.mp4`
+- `angry-2-impacto-camara-lenta.mp4`
+- `angry-3-elige-la-forma.mp4`
+- `angry-4-derriba-circulos.mp4`
+- `angry-5-cuenta-lados.mp4`
+- `calicrash-1-tablero.mp4`
+- `calicrash-2-combo-acercamiento.mp4`
+- `calicrash-3-forma-SOL.mp4`
+- `calicrash-4-cursiva-casa.mp4`
+- `montecraft-1-vuelo-aereo.mp4`
+- `montecraft-2-primera-persona-letra.mp4`
+- `montecraft-3-torre-timelapse.mp4`
+- `montecraft-4-contrapicado-nombre.mp4`
+- `montecraft-5-colores.mp4`
+- `montecraft-6-romper-bloques.mp4`
+- `ninja-1-vocales.mp4`
+- `ninja-2-corte-camara-lenta.mp4`
+- `ninja-3-error-resta.mp4`
+- `ninja-4-silabas.mp4`
+- `ninja-5-cursiva.mp4`
+- `plataforma-1-hub.mp4`
+- `plataforma-2-tutorial.mp4`
+- `plataforma-3-estrellas.mp4`
+- `plataforma-4-mision-del-dia.mp4`
+- `plataforma-5-perfiles.mp4`
+- `snake-1-cenital-letra-a.mp4`
+- `snake-2-seguimiento-M.mp4`
+- `snake-3-final-camara-lenta.mp4`
+- `snake-4-error-reintenta.mp4`

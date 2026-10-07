@@ -1,0 +1,5 @@
+media/
+reports/
+scripts/
+*.md
+.git/

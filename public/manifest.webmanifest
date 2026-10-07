@@ -1,0 +1,17 @@
+{
+  "name": "Montessori Play",
+  "short_name": "Montessori Play",
+  "description": "Juegos educativos de letras, formas y números para niños de 3 a 8 años.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#fff7ec",
+  "theme_color": "#5b8def",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

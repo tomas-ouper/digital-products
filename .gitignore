@@ -1,4 +1,11 @@
 .DS_Store
+.vercel/
 node_modules/
+dist/
 .env
 .env.*
+!.env.example
+media/clips/.tmp-*
+media/galeria/
+.vercel
+.env*

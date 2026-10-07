@@ -1,0 +1,57 @@
+import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
+import { writeFile } from 'node:fs/promises';
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
+const errors = [];
+page.on('pageerror', e => errors.push(e.message));
+await page.addInitScript(() => {
+  localStorage.setItem('mp:settings', JSON.stringify({ unlocked: true, voice: false, sound: false, dailyLimitMin: 0, device: 'tablet', activeProfile: 'touch' }));
+  localStorage.setItem('mp:profiles', JSON.stringify([{ id: 'touch', name: 'Ana', age: '3-5', avatar: 0, createdAt: 1 }]));
+});
+try {
+  await page.goto('http://localhost:4173/?debug');
+  await page.waitForFunction(() => window.mpGo);
+  await page.evaluate(() => window.mpGo('play', { game: 'craft', level: 6 }));
+  await page.waitForFunction(() => window.__craft);
+  await page.waitForTimeout(2400);
+  await page.getByRole('button', { name: 'Volar', exact: true }).tap();
+  assert.equal(await page.evaluate(() => window.__craft.player.flying), true);
+  assert.equal(await page.getByRole('button', { name: 'Bajar', exact: true }).isVisible(), true);
+  const cd = await page.context().newCDPSession(page);
+  const jump = await page.getByRole('button', { name: 'Saltar', exact: true }).boundingBox();
+  const y = await page.evaluate(() => window.__craft.player.pos.y);
+  await cd.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: jump.x + jump.width/2, y: jump.y + jump.height/2 }] });
+  await page.waitForTimeout(450);
+  await cd.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  assert.ok(await page.evaluate(y => window.__craft.player.pos.y > y + 0.5, y));
+  await page.screenshot({ path: 'reports/qa-2026-10-07/craft-touch.png' });
+  await page.evaluate(() => window.mpGo('play', { game: 'ninja', level: 0 }));
+  await page.waitForFunction(() => window.__scene?.sys?.settings?.key === 'ninja');
+  await page.waitForTimeout(2400);
+  assert.equal(await page.evaluate(() => window.__scene.pieces.filter(p => p.alive).length), 1);
+  await page.getByRole('button', { name: 'Cómo se juega', exact: true }).tap();
+  await page.waitForFunction(() => window.__scene.sys.isPaused());
+  await page.getByRole('button', { name: 'Seguir jugando' }).tap();
+  await page.waitForFunction(() => window.__scene.sys.isActive());
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForFunction(() => window.__scene.sys.isPaused());
+  await page.getByRole('button', { name: 'Jugar así igual' }).tap();
+  await page.waitForFunction(() => window.__scene.sys.isActive());
+  // Consigna y bandeja en niveles posteriores, con objetivos aún dentro de la partida.
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.evaluate(() => { window.__scene = null; window.mpGo('play', { game: 'angry', level: 7 }); });
+  await page.waitForFunction(() => window.__scene?.sys?.settings?.key === 'angry');
+  await page.waitForTimeout(2400);
+  await page.screenshot({ path: 'reports/qa-2026-10-07/angry-tray-touch.png' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'Jugar así igual' }).tap();
+  await page.evaluate(() => window.mpGo('play', { game: 'angry', level: 0 }));
+  await page.getByRole('button', { name: 'Jugar así igual' }).tap();
+  await page.waitForTimeout(2400);
+  await page.screenshot({ path: 'reports/qa-2026-10-07/angry-390x844.png' });
+  assert.deepEqual(errors, []);
+  const result = { results: ['Vuelo táctil: activar y ascender manteniendo salto', 'Ninja fácil: una sola letra', 'Ayuda y orientación: pausa y reanudación con toques'], errors };
+  await writeFile('reports/qa-2026-10-07/touch.json', JSON.stringify(result, null, 2));
+  console.log(result);
+} finally { await browser.close(); }
