@@ -259,7 +259,7 @@ const SHOTS = {
   'ninja-1-vocales': async (sh) => {
     await sh.go('play', { game: 'ninja', level: 0 });
     await ready(sh, () => window.__scene && window.__scene.target);
-    await sh.skip(900);
+    await sh.until(() => window.__scene.pieces.some((p) => p.alive && p.y < window.__scene.scale.height * 0.75));
     await sh.page.evaluate(NINJA_DRIVER, { speed: 5 });
     sh.record();
     await sh.roll(5000);
@@ -282,7 +282,7 @@ const SHOTS = {
   'ninja-3-error-resta': async (sh) => {
     await sh.go('play', { game: 'ninja', level: 1 });
     await ready(sh, () => window.__scene && window.__scene.target);
-    await sh.skip(900);
+    await sh.until(() => window.__scene.pieces.some((p) => p.alive && p.y < window.__scene.scale.height * 0.75));
     await sh.page.evaluate(NINJA_DRIVER, { speed: 5, wrong: 1 });
     sh.record();
     await sh.roll(5000);
@@ -290,7 +290,7 @@ const SHOTS = {
   'ninja-4-silabas': async (sh) => {
     await sh.go('play', { game: 'ninja', level: 4 });
     await ready(sh, () => window.__scene && window.__scene.target);
-    await sh.skip(900);
+    await sh.until(() => window.__scene.pieces.some((p) => p.alive && p.y < window.__scene.scale.height * 0.75));
     await sh.page.evaluate(NINJA_DRIVER, { speed: 5 });
     sh.record();
     await sh.roll(5000);
@@ -298,7 +298,7 @@ const SHOTS = {
   'ninja-5-cursiva': async (sh) => {
     await sh.go('play', { game: 'ninja', level: 5 });
     await ready(sh, () => window.__scene && window.__scene.target);
-    await sh.skip(900);
+    await sh.until(() => window.__scene.pieces.some((p) => p.alive && p.y < window.__scene.scale.height * 0.75));
     await sh.page.evaluate(NINJA_DRIVER, { speed: 6 });
     sh.record();
     await sh.roll(5000);
