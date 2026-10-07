@@ -3,6 +3,8 @@
 Plataforma web de juegos educativos (3 a 8 años) del Kit Caligrafía Montessori. Vite + TypeScript, Phaser 3 (2D) y Three.js (3D). Se abre desde el navegador (PWA), táctil primero.
 
 ## Correr en tu compu
+Guía completa para pasar el proyecto a tu compu y seguir con Claude Code: `PASAR-A-LOCAL.md`.
+
 ```bash
 npm install
 npm run dev        # abre http://localhost:5173

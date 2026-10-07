@@ -5,3 +5,4 @@ dist/
 .env.*
 !.env.example
 media/clips/.tmp-*
+media/galeria/

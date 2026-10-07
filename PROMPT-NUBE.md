@@ -71,8 +71,8 @@ Cloná el repo en `~/ads-caligrafia/montessori-play/repo`, abrí Claude Code ah�
 
 ```
 Estás en el repo de Montessori Play (~/ads-caligrafia/montessori-play/repo). Una sesión anterior en la nube lo construyó y se cortó.
-1. git pull (rama: la indicada en PROGRESS.md).
-2. Leé PROGRESS.md y PROMPT-NUBE.md (las reglas siguen valiendo, incluida la de propiedad intelectual).
+1. git pull (rama: claude/relaxed-galileo-a6yu86, o main si ya se mergeó).
+2. Leé CLAUDE.md, PROGRESS.md y PROMPT-NUBE.md (las reglas siguen valiendo, incluida la de propiedad intelectual).
 3. Corré npm install && npm run build y arreglá lo que esté roto antes de seguir.
 4. Seguí desde el "Siguiente paso exacto", hito por hito, con commit + push y PROGRESS.md actualizado en cada tarea.
 Trabajá en forma autónoma hasta terminar H7 sin pedirme confirmación, salvo que algo requiera una credencial o gastar dinero.

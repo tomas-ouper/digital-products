@@ -1,6 +1,6 @@
 # PROGRESS · Montessori Play
 
-> Para quien retoma: `git pull`, leé este archivo y seguí desde **Siguiente paso exacto**.
+> Para quien retoma: `git pull`, leé este archivo y `CLAUDE.md`, y seguí desde **Siguiente paso exacto**. Para pasar a una compu local: `PASAR-A-LOCAL.md`.
 > Rama de trabajo: `claude/relaxed-galileo-a6yu86` (PR draft hacia `main`). Ver "Decisiones".
 
 ## Hitos
