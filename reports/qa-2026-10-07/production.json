@@ -1,0 +1,15 @@
+{
+  "url": "https://montessoriplay.vercel.app",
+  "checks": [
+    "Acceso público sin sesión Vercel; rechazo de clave errónea; CALIGRAFIA y creación de perfil local",
+    "Suma parental, sección soporte, número y enlace WhatsApp, ancho móvil",
+    "Snake Lecto: tutorial y primer nivel cargados en producción",
+    "Trazo Ninja: tutorial y primer nivel cargados en producción",
+    "CaliCrash: tutorial y primer nivel cargados en producción",
+    "Angry Forms: tutorial y primer nivel cargados en producción",
+    "Montecraft: tutorial y primer nivel cargados en producción",
+    "Perfil y acceso persisten al recargar",
+    "Service worker activo, iconos y manifest servidos, sw.js sin caché persistente"
+  ],
+  "errors": []
+}

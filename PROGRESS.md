@@ -1,7 +1,7 @@
 # PROGRESS · Montessori Play
 
 > Para quien retoma: `git pull`, leé este archivo y `CLAUDE.md`, y seguí desde **Siguiente paso exacto**. Para pasar a una compu local: `PASAR-A-LOCAL.md`.
-> Rama de trabajo: `claude/relaxed-galileo-a6yu86` (PR draft hacia `main`). Ver "Decisiones".
+> Publicado: https://montessoriplay.vercel.app · `main` conectada a Vercel. PR #2 integrado con autorización de Tomás. Ver "Publicación del MVP y soporte".
 
 ## Hitos
 - [x] **H1 · Plataforma** — acceso con código, perfiles (3, 6 avatares, edad), "¿Desde dónde juegas?", hub con 5 tarjetas + contador, límite diario + Misión del día (30 misiones), panel de padres con suma, voz es-MX + `voces.csv`, estrellas/progreso/pantalla de nivel superado/sonido on-off.
@@ -29,13 +29,15 @@
 - Los 29 planos y el tráiler existentes son anteriores a estos cambios; no se regrabaron.
 
 ## Siguiente paso exacto
-Publicar y comprobar el MVP en Vercel: Tomás autorizó la publicación y el uso del repo existente el 07/10/2026. Proyecto `montessoriplay`, equipo `tomas-ouper-s-projects`, plan Hobby; repositorio GitHub conectado. Mantener palabra clave `CALIGRAFIA`, sin registro de cuentas. Luego probar captura nativa del mouse en navegador normal y voz/táctil/rendimiento en tablet y celular reales. Para regrabar planos: `npm run build && npm run preview` y `node scripts/clips/planos.mjs [filtro]`; tráiler: `node scripts/clips/trailer.mjs`.
+Compartir https://montessoriplay.vercel.app junto con la palabra clave `CALIGRAFIA`. Probar captura nativa del mouse en navegador normal y voz/táctil/rendimiento en tablet y celular reales. Para próximas mejoras, crear rama `codex/…`, validar y publicar integrando a `main`. Para regrabar planos: `npm run build && npm run preview` y `node scripts/clips/planos.mjs [filtro]`; tráiler: `node scripts/clips/trailer.mjs`.
 
 ## Publicación del MVP y soporte · Codex (07/10/2026)
 - Tomás pidió ofrecer el MVP gratis por ahora, con una palabra clave compartida y sin cuentas. La pantalla de entrada ya no presupone una compra; conserva `CALIGRAFIA` y los perfiles locales.
 - Panel de padres: sección «Soporte y sugerencias», enlace a WhatsApp de Tomás `+54 9 342 422 1634`, con mensaje editable para consultas, problemas o propuestas. Visible también sin perfiles creados.
 - Cuenta Vercel autenticada y plan Hobby confirmado. Creado el proyecto `montessoriplay` y conectado al repositorio existente `tomas-ouper/digital-products`.
+- Publicación autorizada por Tomás. PR #2 integrado a `main` (merge `8511fdd`). Despliegue automático de producción listo en https://montessoriplay.vercel.app; acceso HTTP 200 público, sin sesión Vercel. Las actualizaciones de `main` conservan la misma URL.
 - Build aprobado. Acceso con palabra clave, suma parental, enlace de WhatsApp y ausencia de desborde a 390 px verificados en Chromium; captura móvil revisada.
+- Verificación pública en Chromium limpio: clave incorrecta rechazada, `CALIGRAFIA` aceptada, creación y persistencia de perfil local, suma parental y WhatsApp, tutorial y primer nivel de los cinco juegos, service worker/manifest/iconos. Sin errores de consola ni HTTP de la aplicación. Resultado: `reports/qa-2026-10-07/production.json`.
 - No se contrató un plan pago ni se agregó autenticación de usuarios. El progreso sigue guardándose en cada navegador/dispositivo.
 
 ## Esfuerzo restante (estimado)
@@ -43,7 +45,7 @@ Publicar y comprobar el MVP en Vercel: Tomás autorizó la publicación y el uso
 
 ## Decisiones
 - **Proyecto en la raíz del repo** (el repo estaba vacío). Vercel lo detecta como Vite; `vercel.json` ya está listo.
-- **Rama**: la sesión en la nube solo puede pushear a `claude/relaxed-galileo-a6yu86`; se abre un PR draft a `main`. Al mergearlo, Vercel publica.
+- **Rama**: el trabajo inicial se realizó en `claude/relaxed-galileo-a6yu86`; PR #2 integrado a `main` el 07/10/2026. Vercel publica `main`; usar ramas de trabajo para próximas mejoras.
 - **Código de acceso**: `VITE_ACCESS_CODE` (en `.env` local o en Vercel → Environment Variables). Si no está definido, el código es `CALIGRAFIA`. Es una validación del lado del cliente (alcanza para un MVP; no es seguridad fuerte).
 - **Navegación**: TS plano con pantallas en `src/screens/*` y router simple `src/core/nav.ts`. Cada juego se carga con `import()` dinámico (Phaser/Three solo se descargan al entrar al juego).
 - **Interfaz de juego común**: `src/games/types.ts` (`start(ctx)` → `{destroy}`; `ctx.complete(estrellas, letras)`). Niveles de cada juego en `src/games/<juego>/levels.ts` (sin dependencias, los usa el hub).

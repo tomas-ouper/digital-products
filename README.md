@@ -2,6 +2,10 @@
 
 Plataforma web de juegos educativos (3 a 8 años) del Kit Caligrafía Montessori. Vite + TypeScript, Phaser 3 (2D) y Three.js (3D). Se abre desde el navegador (PWA), táctil primero.
 
+**Jugar online:** https://montessoriplay.vercel.app · Palabra clave: **CALIGRAFIA**.
+
+MVP gratuito, sin registro de cuentas. Los perfiles y el progreso se guardan en el navegador de cada dispositivo. En **Padres → Soporte y sugerencias** hay un enlace directo a WhatsApp de Tomás para dudas, problemas y propuestas.
+
 ## Correr en tu compu
 Guía completa para pasar el proyecto a tu compu y seguir con Claude Code: `PASAR-A-LOCAL.md`.
 
@@ -19,7 +23,7 @@ Código de acceso por defecto: **CALIGRAFIA**.
 El código no distingue mayúsculas/minúsculas. Quien ya entró en un dispositivo no lo vuelve a pedir.
 
 ## Deploy (Vercel)
-El repo tiene `vercel.json` (framework Vite, salida `dist/`). Si el proyecto ya está conectado a Vercel, cada push a `main` publica. Si no: vercel.com → Add New Project → importar el repo → Deploy (no hace falta tocar nada más).
+Proyecto `montessoriplay` en el equipo `tomas-ouper-s-projects`, plan **Hobby**. Conectado a `tomas-ouper/digital-products`: cada push a `main` publica automáticamente en la misma dirección. Las otras ramas generan vistas previas. El repo tiene `vercel.json` (Vite, salida `dist/`). Antes de subir cambios: `npm run build` y las pruebas que correspondan. No requiere servidor, base de datos ni plan pago para este MVP.
 
 ## Voces
 Las consignas usan la voz del dispositivo (Web Speech API, es-MX). `voces.csv` lista cada frase con el nombre de mp3 esperado (`npm run voces` lo regenera). Para reemplazar una frase por una grabación: guardar el mp3 en `public/audio/` y agregar su nombre a `public/audio/available.json`.
