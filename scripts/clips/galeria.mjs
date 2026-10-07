@@ -1,14 +1,17 @@
 // Genera una página HTML con el tráiler y todos los planos (para publicar o abrir local).
 // Uso: node scripts/clips/galeria.mjs <carpeta-salida>
-import { readdirSync, mkdirSync, writeFileSync, copyFileSync, existsSync } from 'node:fs';
+import { readdirSync, mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 
 const out = process.argv[2] || 'media/galeria';
 mkdirSync(join(out, 'clips'), { recursive: true });
 const files = readdirSync('media/clips').filter((f) => f.endsWith('.mp4')).sort();
-for (const f of files) copyFileSync(join('media/clips', f), join(out, 'clips', f));
+// versiones livianas para la web (los originales 1080x1920 quedan en media/)
+const web = (src, dst, crf) => execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', src, '-vf', 'scale=720:1280', '-c:v', 'libx264', '-crf', String(crf), '-preset', 'slow', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart', dst]);
+for (const f of files) web(join('media/clips', f), join(out, 'clips', f), 27);
 const trailer = existsSync('media/trailer-montessori-play-9x16.mp4');
-if (trailer) copyFileSync('media/trailer-montessori-play-9x16.mp4', join(out, 'trailer.mp4'));
+if (trailer) web('media/trailer-montessori-play-9x16.mp4', join(out, 'trailer.mp4'), 25);
 
 const GROUPS = [
   ['plataforma', 'Plataforma', 'Inicio, tutorial, perfiles, misión del día y estrellas'],

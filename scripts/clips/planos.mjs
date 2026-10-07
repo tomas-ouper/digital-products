@@ -69,6 +69,7 @@ const SNAKE_DRIVER = () => {
   window.__drive = () => {
     const s = window.__scene;
     if (!s || s.state !== 'play') return;
+    s.fails = 0; // en los planos siempre se ve el resultado perfecto
     if (s.tapDot) return s.finishStroke();
     const d = s.dots[s.si];
     if (!d) return;

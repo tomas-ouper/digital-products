@@ -20,7 +20,11 @@
 - `ninja-3-error-resta.mp4`
 - `ninja-4-silabas.mp4`
 - `ninja-5-cursiva.mp4`
+- `plataforma-1-hub.mp4`
+- `plataforma-2-tutorial.mp4`
 - `plataforma-3-estrellas.mp4`
+- `plataforma-4-mision-del-dia.mp4`
+- `plataforma-5-perfiles.mp4`
 - `snake-1-cenital-letra-a.mp4`
 - `snake-2-seguimiento-M.mp4`
 - `snake-3-final-camara-lenta.mp4`

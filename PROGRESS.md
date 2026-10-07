@@ -10,13 +10,13 @@
 - [x] **H4 · CaliCrash** — 10 niveles: tacha A/O/M/L, forma SOL/MESA/LUNA, y en cursiva: tacha a, forma sol y casa. Fichas con relieve (sombra, degradé, brillo). Intercambio deslizando (o tocando dos fichas); palabras tocando letras adyacentes (incluye diagonales) en orden. Las letras tachadas muestran una cruz. El tablero siempre tiene la palabra formable y algún movimiento posible. Sin movimientos: "Intentar otra vez". 3-5 años: +6 movimientos y pista a los 5 s.
 - [x] **H5 · Angry Forms** — 8 niveles con física Matter: lanza el círculo / el cuadrado, elige el triángulo / la estrella / el rombo (bandeja de formas; la equivocada se nombra en voz alta), derriba solo los círculos / triángulos, formas de 4 lados. Las 6 formas con carita. Gomera con línea de puntería (más larga en 3-5 años, +2 tiros). Sin tiros: "Intentar otra vez".
 - [x] **H6 · Montecraft** — 3D en **primera persona** (Three.js): mundo 32x32x16 con plaza, lomas, nieve y árboles; 20 bloques con texturas 16x16 propias; sombreado por cara + oclusión ambiental; nubes, sol, piso infinito con niebla. Mira central con contorno del bloque, mano con el bloque elegido, partículas al romper. Táctil: joystick (mitad izquierda), arrastrar para mirar, tocar = poner, mantener = quitar, botón saltar, subida automática de escalones. PC: WASD/flechas, espacio, 1-9, rueda, clic derecho = quitar, E = inventario. 6 niveles + modo libre: letra L, torre de 10 (cuenta en voz alta), colores (rojo/azul/amarillo; color equivocado no se pone), letra T, tu inicial, tu nombre (hasta 5 letras). Tocar una "sombra" la llena directamente (para los más chicos).
-- [ ] **H7 · Pulido y entrega** — hecho: tutorial "Cómo se juega" por juego, cartel "Nivel N", pasada visual de los 5 juegos y el hub, celular en horizontal (pantalla "Gira tu teléfono" + bloqueo de orientación en Android), diseño compacto para celular acostado. En curso: planos 9:16 para tráiler (`scripts/clips/planos.mjs` → `media/clips/`, guía en `media/PLANOS.md`). Falta: README final.
+- [ ] **H7 · Pulido y entrega** — hecho: tutorial "Cómo se juega" por juego, cartel "Nivel N", pasada visual de los 5 juegos y el hub, celular en horizontal (pantalla "Gira tu teléfono" + bloqueo de orientación en Android), diseño compacto para celular acostado. Hecho también: **29 planos 9:16** (1080x1920, 30 fps, 4-5 s) en `media/clips/` (5 de plataforma, 4 Snake, 5 Ninja, 4 CaliCrash, 5 Angry Forms, 6 Montecraft) y **tráiler 9:16 de 48 s** con música original en `media/trailer-montessori-play-9x16.mp4`. Guía de planos: `media/PLANOS.md`.
 
 ## Siguiente paso exacto
-Grabar los planos 9:16: `npm run build && npm run preview` y en otra terminal `node scripts/clips/planos.mjs` (todos) o con filtro (`node scripts/clips/planos.mjs angry`). Revisar `media/clips/*.mp4`, ajustar los que fallen y completar README.
+Probar en una tablet y un celular reales (voz es-MX, táctil, rendimiento de Montecraft) y mergear el PR a `main` para que Vercel publique. Para regrabar planos: `npm run build && npm run preview` y `node scripts/clips/planos.mjs [filtro]`; tráiler: `node scripts/clips/trailer.mjs`.
 
 ## Esfuerzo restante (estimado)
-- H2: hecho · H3: hecho · H4: hecho · H5: hecho · H6: hecho · H7: M
+- H2-H6: hecho · H7: S (prueba en dispositivos reales)
 
 ## Decisiones
 - **Proyecto en la raíz del repo** (el repo estaba vacío). Vercel lo detecta como Vite; `vercel.json` ya está listo.
@@ -38,6 +38,8 @@ Grabar los planos 9:16: `npm run build && npm run preview` y en otra terminal `n
 - **Guardado**: localStorage con fallback a memoria (`src/core/storage.ts`).
 
 ## Problemas abiertos
+- No se probó en dispositivos reales (solo Chromium automatizado a 390x844, 844x390, 1024x768, 1440x900 y 540x960). Montecraft corre a ~25 fps en el navegador de pruebas sin GPU; en una tablet con GPU debería ir mejor.
+- El aviso "Gira tu teléfono" en iOS no puede forzar la orientación (Safari no lo permite): solo lo pide.
 - La voz depende de las voces instaladas en el dispositivo (iOS/Android suelen tener es-MX; algunas PC solo es-ES).
 - Íconos PNG para PWA (192/512) pendientes; por ahora el SVG.
 
