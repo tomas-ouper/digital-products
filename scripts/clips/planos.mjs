@@ -454,8 +454,8 @@ const SHOTS = {
     });
     await sh.skip(1200);
     sh.cam = kf([
-      { f: 0, pos: [10, 4.3, 19], look: [16, 8.5, 14], fov: 75 },
-      { f: 150, pos: [22, 4.6, 19], look: [16, 8, 14], fov: 75 },
+      { f: 0, pos: [15, 4.4, 21], look: [16, 8.5, 14], fov: 78 },
+      { f: 150, pos: [16.5, 9.5, 37], look: [16, 7, 14], fov: 66 },
     ]);
     sh.record();
     const left = await sh.page.evaluate(() => window.__craft.ghosts.slice(-6).map((g) => [g.x, g.y, g.z]));
@@ -464,7 +464,7 @@ const SHOTS = {
       await sh.page.evaluate(([x, y, z]) => window.__craft.placeAt(x, y, z, 17), [x, y, z]);
       await sh.roll(330);
     }
-    await sh.roll(2400);
+    await sh.roll(1900);
   },
   'montecraft-5-colores': async (sh) => {
     await sh.go('play', { game: 'craft', level: 2 });
@@ -689,7 +689,7 @@ for (const name of names) {
   const sh = new Shot(browser, name);
   try {
     const stars = name.startsWith('plataforma') ? { snake: [3, 2, 3, 1], ninja: [3, 3], crash: [2, 3, 3], angry: [3], craft: [3, 3] } : null;
-    await sh.open({ stars });
+    await sh.open({ stars, name: name.includes('nombre') ? 'Ana' : 'Sofía' });
     const res = (await SHOTS[name](sh)) || {};
     const n = sh.finish(`${OUT}/${name}.mp4`, res);
     console.log('OK', name, n, 'cuadros', ((Date.now() - t0) / 1000).toFixed(0) + 's', sh.errs.length ? sh.errs.slice(0, 2) : '');
