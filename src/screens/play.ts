@@ -27,6 +27,13 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
     soundToggle()
   );
   root.append(host, hud);
+  // En celular vertical: sugerir girar (no bloquea)
+  const rot = h('div', { class: 'rotate-hint' }, '📱↻ Gira el teléfono para jugar mejor');
+  const updRot = () => (rot.style.display = window.innerWidth < 600 && window.innerHeight > window.innerWidth && g.id !== 'snake' ? 'block' : 'none');
+  updRot();
+  window.addEventListener('resize', updRot);
+  root.append(rot);
+  setTimeout(() => (rot.style.display = 'none'), 6000);
 
   let inst: GameInstance | null = null;
   let dead = false;
@@ -93,6 +100,7 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
     });
 
   return () => {
+    window.removeEventListener('resize', updRot);
     dead = true;
     stopVoice();
     try {

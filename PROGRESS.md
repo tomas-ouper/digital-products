@@ -8,15 +8,15 @@
 - [x] **H2 · Snake Lecto** — 17 letras: l o i c a u m (minúscula) · L T O E M A (mayúscula) · l e o a (cursiva). La víbora sigue el dedo (o flechas del teclado), come los puntos en orden; si sale del camino, reinicia la letra. Estrellas según reintentos. 3-5 años: camino más ancho y víbora más lenta. Probado con trazado automático en 390/1024/1440.
 - [x] **H3 · Trazo Ninja** — 6 niveles: vocales mayúsculas, vocales minúsculas, consonantes mayúsculas, consonantes minúsculas, sílabas (se dibuja la primera letra) y cursiva. Burbujas con letras vuelan; la voz dice cuál cortar; se reconoce el gesto (uno o varios trazos) contra las plantillas de las letras que están en pantalla. Equivocada: −1. 3-5 años: más lento, menos burbujas, aro brillante en la correcta, más tolerancia.
 - [x] **H4 · CaliCrash** — 10 niveles: tacha A/O/M/L, forma SOL/MESA/LUNA, y en cursiva: tacha a, forma sol y casa. Fichas con relieve (sombra, degradé, brillo). Intercambio deslizando (o tocando dos fichas); palabras tocando letras adyacentes (incluye diagonales) en orden. Las letras tachadas muestran una cruz. El tablero siempre tiene la palabra formable y algún movimiento posible. Sin movimientos: "Intentar otra vez". 3-5 años: +6 movimientos y pista a los 5 s.
-- [ ] **H5 · Angry Forms**
+- [x] **H5 · Angry Forms** — 8 niveles con física Matter: lanza el círculo / el cuadrado, elige el triángulo / la estrella / el rombo (bandeja de formas; la equivocada se nombra en voz alta), derriba solo los círculos / triángulos, formas de 4 lados. Las 6 formas con carita. Gomera con línea de puntería (más larga en 3-5 años, +2 tiros). Sin tiros: "Intentar otra vez".
 - [ ] **H6 · Montecraft**
 - [ ] **H7 · Pulido y entrega**
 
 ## Siguiente paso exacto
-`src/games/angry/angry.ts`: implementar Angry Forms con Phaser + Matter (niveles ya definidos en `src/games/angry/levels.ts`). Después `ready: true` en `src/games/registry.ts`.
+`src/games/craft/craft.ts`: Montecraft en Three.js, **primera persona** (pedido de Tomás: como Minecraft): mira en el centro, barra de bloques, joystick táctil + arrastrar para mirar, tocar = poner, mantener = romper; en PC WASD + mouse con pointer lock. Niveles en `src/games/craft/levels.ts`.
 
 ## Esfuerzo restante (estimado)
-- H2: hecho · H3: hecho · H4: hecho · H5: M · H6: L · H7: M
+- H2: hecho · H3: hecho · H4: hecho · H5: hecho · H6: L · H7: M
 
 ## Decisiones
 - **Proyecto en la raíz del repo** (el repo estaba vacío). Vercel lo detecta como Vite; `vercel.json` ya está listo.

@@ -64,7 +64,7 @@ export const GAMES: GameDef[] = [
     name: 'Angry Forms',
     desc: 'Lanza formas y derriba torres.',
     color: '#5b8def',
-    ready: false,
+    ready: true,
     levels: ANGRY_LEVELS.map((l) => l.title),
     art: `<svg viewBox="0 0 160 120"><rect width="160" height="120" fill="#d4e6ff"/><rect y="100" width="160" height="20" fill="#7fcf8f"/>
       <path d="M26 100 L32 64 M40 100 L34 64" stroke="#9a6a45" stroke-width="6" stroke-linecap="round"/>

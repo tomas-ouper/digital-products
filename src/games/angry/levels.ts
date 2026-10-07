@@ -25,7 +25,8 @@ export interface AngryLevel {
   only?: boolean;
 }
 
-// Unidad de mundo = 1 cuadrado chico (aprox. 44px a escala 1).
+// Unidad de mundo = 1 cuadrado chico. x: centro horizontal relativo a la estructura; y: base del bloque desde el piso.
+// Rectángulo: s = largo (por defecto 2), grosor 0.5; angle 90 = vertical.
 export const ANGRY_LEVELS: AngryLevel[] = [
   {
     title: 'Lanza el círculo',
@@ -46,11 +47,11 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     say: { key: 'angry_lanza', vars: { forma: 'cuadrado' } },
     shots: 4,
     blocks: [
-      { k: 'rectangulo', x: -1, y: 0, s: 1, angle: 90 },
-      { k: 'rectangulo', x: 1, y: 0, s: 1, angle: 90 },
-      { k: 'rectangulo', x: 0, y: 2.25, s: 3 },
+      { k: 'rectangulo', x: -1, y: 0, s: 2, angle: 90 },
+      { k: 'rectangulo', x: 1, y: 0, s: 2, angle: 90 },
+      { k: 'rectangulo', x: 0, y: 2, s: 3 },
       { k: 'circulo', x: 0, y: 0, target: true },
-      { k: 'triangulo', x: 0, y: 2.75, target: true },
+      { k: 'triangulo', x: 0, y: 2.5, target: true },
     ],
   },
   {
@@ -74,14 +75,14 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     shots: 5,
     only: true,
     blocks: [
-      { k: 'rectangulo', x: -1.5, y: 0, s: 1, angle: 90 },
-      { k: 'rectangulo', x: 1.5, y: 0, s: 1, angle: 90 },
-      { k: 'rectangulo', x: 0, y: 2.25, s: 4 },
-      { k: 'circulo', x: -1, y: 2.75, target: true },
-      { k: 'circulo', x: 1, y: 2.75, target: true },
+      { k: 'rectangulo', x: -1.5, y: 0, s: 2, angle: 90 },
+      { k: 'rectangulo', x: 1.5, y: 0, s: 2, angle: 90 },
+      { k: 'rectangulo', x: 0, y: 2, s: 4 },
+      { k: 'circulo', x: -1, y: 2.5, target: true },
+      { k: 'circulo', x: 1, y: 2.5, target: true },
       { k: 'triangulo', x: 0, y: 0 },
-      { k: 'cuadrado', x: 4.5, y: 0 },
-      { k: 'circulo', x: 4.5, y: 1, target: true },
+      { k: 'cuadrado', x: 4, y: 0 },
+      { k: 'circulo', x: 4, y: 1, target: true },
     ],
   },
   {
@@ -92,10 +93,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     shots: 4,
     blocks: [
       { k: 'rectangulo', x: 0, y: 0, s: 2, angle: 90 },
-      { k: 'rectangulo', x: 0, y: 2.25, s: 3 },
-      { k: 'rombo', x: -1, y: 2.75, target: true },
-      { k: 'rombo', x: 1, y: 2.75, target: true },
-      { k: 'cuadrado', x: 0, y: 2.75, target: true },
+      { k: 'rectangulo', x: 0, y: 2, s: 3 },
+      { k: 'rombo', x: -1, y: 2.5, target: true },
+      { k: 'rombo', x: 1, y: 2.5, target: true },
+      { k: 'cuadrado', x: 0, y: 2.5, target: true },
     ],
   },
   {
@@ -110,9 +111,9 @@ export const ANGRY_LEVELS: AngryLevel[] = [
       { k: 'cuadrado', x: 1, y: 0 },
       { k: 'triangulo', x: -1, y: 1, target: true },
       { k: 'triangulo', x: 1, y: 1, target: true },
-      { k: 'rectangulo', x: 4, y: 0, s: 2, angle: 90 },
-      { k: 'triangulo', x: 4, y: 2.5, target: true },
       { k: 'circulo', x: 2.5, y: 0 },
+      { k: 'rectangulo', x: 4, y: 0, s: 2, angle: 90 },
+      { k: 'triangulo', x: 4, y: 2, target: true },
     ],
   },
   {
@@ -127,9 +128,9 @@ export const ANGRY_LEVELS: AngryLevel[] = [
       { k: 'cuadrado', x: -0.5, y: 0, target: true },
       { k: 'triangulo', x: 0.5, y: 0 },
       { k: 'rombo', x: 1.5, y: 0, target: true },
-      { k: 'rectangulo', x: 0, y: 1.25, s: 4, target: true },
-      { k: 'estrella', x: -1, y: 1.75 },
-      { k: 'circulo', x: 1, y: 1.75 },
+      { k: 'rectangulo', x: 0, y: 1.3, s: 4, target: true },
+      { k: 'estrella', x: -1, y: 1.8 },
+      { k: 'circulo', x: 1, y: 1.8 },
     ],
   },
   {
@@ -141,11 +142,11 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     blocks: [
       { k: 'rectangulo', x: -1.5, y: 0, s: 2, angle: 90 },
       { k: 'rectangulo', x: 1.5, y: 0, s: 2, angle: 90 },
-      { k: 'rectangulo', x: 0, y: 2.25, s: 4 },
+      { k: 'rectangulo', x: 0, y: 2, s: 4 },
       { k: 'cuadrado', x: 0, y: 0, target: true },
-      { k: 'cuadrado', x: -1, y: 2.75, target: true },
-      { k: 'cuadrado', x: 1, y: 2.75, target: true },
-      { k: 'triangulo', x: 0, y: 3.75, target: true },
+      { k: 'cuadrado', x: -1, y: 2.5, target: true },
+      { k: 'cuadrado', x: 1, y: 2.5, target: true },
+      { k: 'triangulo', x: 0, y: 2.5, target: true },
     ],
   },
 ];
