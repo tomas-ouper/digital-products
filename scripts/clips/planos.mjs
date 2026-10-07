@@ -483,7 +483,7 @@ const SHOTS = {
       const c = window.__craft;
       for (let x = 13; x <= 19; x++) for (let y = 4; y <= 6; y++) c.world.set(x, y, 17, [11, 13, 15][y - 4]);
       c.placeAt(13, 4, 17, 11);
-      c.player.pos.set(16.5, 4, 21.5);
+      c.player.pos.set(16.5, 4, 23.5);
     });
     await sh.skip(1200);
     sh.record();
