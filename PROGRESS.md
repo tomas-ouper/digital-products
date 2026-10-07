@@ -6,17 +6,17 @@
 ## Hitos
 - [x] **H1 · Plataforma** — acceso con código, perfiles (3, 6 avatares, edad), "¿Desde dónde juegas?", hub con 5 tarjetas + contador, límite diario + Misión del día (30 misiones), panel de padres con suma, voz es-MX + `voces.csv`, estrellas/progreso/pantalla de nivel superado/sonido on-off.
 - [x] **H2 · Snake Lecto** — 17 letras: l o i c a u m (minúscula) · L T O E M A (mayúscula) · l e o a (cursiva). La víbora sigue el dedo (o flechas del teclado), come los puntos en orden; si sale del camino, reinicia la letra. Estrellas según reintentos. 3-5 años: camino más ancho y víbora más lenta. Probado con trazado automático en 390/1024/1440.
-- [ ] **H3 · Trazo Ninja**
+- [x] **H3 · Trazo Ninja** — 6 niveles: vocales mayúsculas, vocales minúsculas, consonantes mayúsculas, consonantes minúsculas, sílabas (se dibuja la primera letra) y cursiva. Burbujas con letras vuelan; la voz dice cuál cortar; se reconoce el gesto (uno o varios trazos) contra las plantillas de las letras que están en pantalla. Equivocada: −1. 3-5 años: más lento, menos burbujas, aro brillante en la correcta, más tolerancia.
 - [ ] **H4 · CaliCrash**
 - [ ] **H5 · Angry Forms**
 - [ ] **H6 · Montecraft**
 - [ ] **H7 · Pulido y entrega**
 
 ## Siguiente paso exacto
-`src/games/ninja/ninja.ts`: implementar Trazo Ninja con Phaser usando `src/core/recognizer.ts` (ya escrito y probado: ~85-92 % de acierto con trazos muy deformados). Después `ready: true` en `src/games/registry.ts`.
+`src/games/crash/crash.ts`: implementar CaliCrash (match-3 7x7 con Phaser, niveles en `src/games/crash/levels.ts`). Después `ready: true` en `src/games/registry.ts`.
 
 ## Esfuerzo restante (estimado)
-- H2: hecho · H3: M · H4: M · H5: M · H6: L · H7: M
+- H2: hecho · H3: hecho · H4: M · H5: M · H6: L · H7: M
 
 ## Decisiones
 - **Proyecto en la raíz del repo** (el repo estaba vacío). Vercel lo detecta como Vite; `vercel.json` ya está listo.
@@ -31,6 +31,8 @@
 - **Tiempo diario**: un solo valor de límite para todos los perfiles (panel de padres, 0 = sin límite), pero se cuenta por perfil. Cuenta en hub, selector de niveles y juego, solo con la pestaña visible. Los padres pueden dar "+10 min solo hoy".
 - **Letras dominadas**: se marcan cuando el niño completa una letra en Snake/Ninja con 2+ estrellas.
 - **Snake**: la víbora va hacia donde está el dedo y, al soltar, termina de llegar (más amable para chicos). "Salirse" = alejarse de cualquier trazo de la letra más que la tolerancia.
+- **Ninja**: el reconocedor ($P, `src/core/recognizer.ts`) solo compara contra las letras que están en pantalla → mucho más preciso. Un toque corto cuenta como punto (la i). En sílabas se dibuja la primera letra (dibujar la sílaba entera era demasiado para 6 años).
+- **Tests**: con `?debug` en la URL, la escena activa queda en `window.__scene` y `window.mpGo(pantalla, params)` navega (útil para pruebas automáticas con Playwright).
 - **Guardado**: localStorage con fallback a memoria (`src/core/storage.ts`).
 
 ## Problemas abiertos

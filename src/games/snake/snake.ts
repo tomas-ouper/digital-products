@@ -52,6 +52,7 @@ class SnakeScene extends Phaser.Scene {
   }
 
   create() {
+    if (location.search.includes('debug')) (window as any).__scene = this;
     this.road = this.add.graphics();
     this.g = this.add.graphics();
     const cur = isCursive(this.key);

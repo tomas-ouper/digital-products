@@ -28,7 +28,7 @@ export const GAMES: GameDef[] = [
     name: 'Trazo Ninja',
     desc: 'Dibuja la letra con tu dedo para cortarla.',
     color: '#ff8a5b',
-    ready: false,
+    ready: true,
     levels: NINJA_LEVELS.map((l) => l.title),
     art: `<svg viewBox="0 0 160 120"><rect width="160" height="120" fill="#ffe0cf"/>
       <circle cx="52" cy="58" r="26" fill="#ffd166"/><text x="52" y="70" font-family="Fredoka" font-weight="700" font-size="34" text-anchor="middle" fill="#3a3f6b">M</text>
