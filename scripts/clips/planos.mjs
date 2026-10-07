@@ -397,9 +397,9 @@ const SHOTS = {
     await sh.page.evaluate(CRAFT_CAM);
     await craftBuildCastle(sh);
     sh.cam = (i) => {
-      const a = -0.75 + i * 0.011;
-      const r = 14 - i * 0.02;
-      return { pos: [16 + Math.sin(a) * r, 13.5 - i * 0.022, 15 + Math.cos(a) * r], look: [16, 5.5, 13.5], fov: 72 };
+      const a = -0.55 + i * 0.008;
+      const r = 23 - i * 0.03;
+      return { pos: [16 + Math.sin(a) * r, 15 - i * 0.03, 12 + Math.cos(a) * r], look: [16, 5, 12], fov: 70 };
     };
     sh.record();
     await sh.roll(5000);
