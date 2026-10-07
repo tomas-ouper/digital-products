@@ -12,6 +12,11 @@
 - [x] **H6 · Montecraft** — 3D en **primera persona** (Three.js): mundo 32x32x16 con plaza, lomas, nieve y árboles; 20 bloques con texturas 16x16 propias; sombreado por cara + oclusión ambiental; nubes, sol, piso infinito con niebla. Mira central con contorno del bloque, mano con el bloque elegido, partículas al romper. Táctil: joystick (mitad izquierda), arrastrar para mirar, tocar = poner, mantener = quitar, botón saltar, subida automática de escalones. PC: WASD/flechas, espacio, 1-9, rueda, clic derecho = quitar, E = inventario. 6 niveles + modo libre: letra L, torre de 10 (cuenta en voz alta), colores (rojo/azul/amarillo; color equivocado no se pone), letra T, tu inicial, tu nombre (hasta 5 letras). Tocar una "sombra" la llena directamente (para los más chicos).
 - [ ] **H7 · Pulido y entrega** — hecho: tutorial "Cómo se juega" por juego, cartel "Nivel N", pasada visual de los 5 juegos y el hub, celular en horizontal (pantalla "Gira tu teléfono" + bloqueo de orientación en Android), diseño compacto para celular acostado. Hecho también: **29 planos 9:16** (1080x1920, 30 fps, 4-5 s) en `media/clips/` (5 de plataforma, 4 Snake, 5 Ninja, 4 CaliCrash, 5 Angry Forms, 6 Montecraft) y **tráiler 9:16 de 48 s** con música original en `media/trailer-montessori-play-9x16.mp4`. Guía de planos: `media/PLANOS.md`.
 
+## Retomado en local (07/10/2026)
+- Clonado en `~/ads-caligrafia/montessori-play/repo` (Mac M3, Node 25). `npm install && npm run build`: sin errores.
+- Nueva prueba de humo `npm run smoke` (`scripts/smoke.mjs`): 5 pantallas + 48 niveles × 4 tamaños → **0 errores, 0 desbordes, todos los juegos arrancan**.
+- Montecraft con GPU real (Apple M3, Chromium/Metal, 1024x768, modo libre): **60 fps**, reconstrucción del mundo 19 ms.
+
 ## Siguiente paso exacto
 Probar en una tablet y un celular reales (voz es-MX, táctil, rendimiento de Montecraft) y mergear el PR a `main` para que Vercel publique. Para regrabar planos: `npm run build && npm run preview` y `node scripts/clips/planos.mjs [filtro]`; tráiler: `node scripts/clips/trailer.mjs`.
 
@@ -38,10 +43,9 @@ Probar en una tablet y un celular reales (voz es-MX, táctil, rendimiento de Mon
 - **Guardado**: localStorage con fallback a memoria (`src/core/storage.ts`).
 
 ## Problemas abiertos
-- No se probó en dispositivos reales (solo Chromium automatizado a 390x844, 844x390, 1024x768, 1440x900 y 540x960). Montecraft corre a ~25 fps en el navegador de pruebas sin GPU; en una tablet con GPU debería ir mejor.
+- No se probó en dispositivos reales (solo Chromium automatizado a 390x844, 844x390, 1024x768, 1440x900 y 540x960). Montecraft: ~25 fps sin GPU (nube), 60 fps con GPU de una Mac M3; falta una tablet media.
 - El aviso "Gira tu teléfono" en iOS no puede forzar la orientación (Safari no lo permite): solo lo pide.
 - La voz depende de las voces instaladas en el dispositivo (iOS/Android suelen tener es-MX; algunas PC solo es-ES).
-- Íconos PNG para PWA (192/512) pendientes; por ahora el SVG.
 
 ## Cómo probar
 `npm install && npm run dev` → abrir la URL. Código: `CALIGRAFIA` (o el de `.env`).

@@ -16,6 +16,7 @@ npm install
 npm run dev        # http://localhost:5173 — código de acceso: CALIGRAFIA
 npm run build      # tsc --noEmit + vite build → dist/ (correrlo antes de cada commit)
 npm run preview    # sirve dist/ en :4173 (lo usan los scripts de clips)
+npm run smoke      # prueba de humo: todas las pantallas y niveles en 4 tamaños (necesita preview)
 npm run voces      # regenera voces.csv desde src/data/frases.json
 npm run planos     # graba los planos 9:16 en media/clips/ (necesita preview corriendo)
 npm run trailer    # monta media/trailer-montessori-play-9x16.mp4
@@ -31,6 +32,7 @@ npm run trailer    # monta media/trailer-montessori-play-9x16.mp4
 
 ## Pruebas
 No hay suite de tests: se prueba jugando con bots en Chromium (Playwright).
+- `npm run smoke` (`scripts/smoke.mjs`): recorre hub, perfiles, dispositivo, padres, misión y los 48 niveles en 390x844, 844x390, 1024x768 y 1440x900; falla si hay errores de consola, desborde horizontal o un juego que no arranca. `SMOKE_URL` cambia la dirección.
 - Con `?debug` en la URL: `window.mpGo(pantalla, params)` navega y la escena activa queda en `window.__scene` (Phaser) o `window.__craft` (Montecraft).
 - Tamaños a revisar: 390x844, 844x390, 1024x768, 1440x900.
 - Los bots de `scripts/clips/planos.mjs` muestran cómo jugar cada juego por código.

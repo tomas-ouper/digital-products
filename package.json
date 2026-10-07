@@ -7,6 +7,7 @@
     "dev": "vite --host",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
+    "smoke": "node scripts/smoke.mjs",
     "voces": "node scripts/gen-voces.mjs",
     "planos": "node scripts/clips/planos.mjs",
     "trailer": "node scripts/clips/trailer.mjs",
