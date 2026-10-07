@@ -79,7 +79,7 @@ export const GAMES: GameDef[] = [
     name: 'Montecraft',
     desc: 'Construye letras y torres con bloques en 3D.',
     color: '#ffc93c',
-    ready: false,
+    ready: true,
     levels: CRAFT_LEVELS.map((l) => l.title),
     art: `<svg viewBox="0 0 160 120"><rect width="160" height="120" fill="#fff0c2"/>
       ${[
