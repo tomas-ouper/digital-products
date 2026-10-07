@@ -233,7 +233,7 @@ const SHOTS = {
     await sh.roll(2400);
     sh.speed = 1;
     await sh.roll(1500);
-    return { zoom: [{ t: 0, z: 1.25, x: 0.5, y: 0.5 }, { t: 0.4, z: 1.45, x: 0.5, y: 0.52 }, { t: 1, z: 1.05, x: 0.5, y: 0.5 }] };
+    return { zoom: [{ t: 0, z: 1.25, x: 0.5, y: 0.5 }, { t: 0.4, z: 1.45, x: 0.5, y: 0.52 }, { t: 0.75, z: 1.0, x: 0.5, y: 0.5 }, { t: 1, z: 1.0, x: 0.5, y: 0.5 }] };
   },
   'snake-4-error-reintenta': async (sh) => {
     await sh.go('play', { game: 'snake', level: 9 });
