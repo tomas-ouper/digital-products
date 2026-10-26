@@ -2,6 +2,8 @@
 // Cada letra = lista de trazos en el orden y la dirección correctos de escritura.
 // Imprenta minúscula: zona media 42..88; ascendentes desde 10. Mayúscula: 12..88.
 // Claves: "a" (minúscula), "A" (mayúscula), "c:a" (cursiva).
+import { EN } from './i18n';
+
 export type Pt = { x: number; y: number };
 export type Stroke = Pt[];
 
@@ -114,7 +116,8 @@ export const LETTERS: Record<string, Stroke[]> = {
   'c:s': [S(bez(16, 84, 30, 72, 44, 56, 52, 44), bez(52, 44, 62, 60, 72, 74, 56, 84), bez(56, 84, 46, 90, 36, 84, 38, 78), bez(38, 78, 52, 86, 70, 86, 88, 76))],
 };
 
-export const CURSIVE_FONT = "'Playwrite MX', cursive";
+// Cursiva escolar: mexicana en español, tradicional de EE. UU. en inglés (Google Fonts, OFL).
+export const CURSIVE_FONT = EN ? "'Playwrite US Trad', cursive" : "'Playwrite MX', cursive";
 
 export function isCursive(key: string) {
   return key.startsWith('c:');

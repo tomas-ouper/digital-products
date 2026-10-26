@@ -5,6 +5,7 @@ import { go, onTick } from '../core/nav';
 import { say } from '../core/voice';
 import { GAMES } from '../games/registry';
 import { iconButton, soundToggle } from './common';
+import { tr } from '../core/i18n';
 
 export function hubScreen(root: HTMLElement) {
   const p = activeProfile();
@@ -16,13 +17,13 @@ export function hubScreen(root: HTMLElement) {
   const timeLabel = h('span');
   const updTime = (rem: number) => {
     if (!settings.dailyLimitMin) {
-      timeLabel.textContent = 'Sin límite de tiempo';
+      timeLabel.textContent = tr('Sin límite de tiempo', 'No time limit');
       timeFill.style.width = '100%';
       return;
     }
     const total = settings.dailyLimitMin * 60;
     const m = Math.max(0, Math.ceil(rem / 60));
-    timeLabel.textContent = `Te quedan ${m} min de juego hoy`;
+    timeLabel.textContent = tr(`Te quedan ${m} min de juego hoy`, `${m} min of play time left today`);
     timeFill.style.width = Math.max(0, Math.min(100, (rem / total) * 100)) + '%';
   };
   updTime(remainingTodaySec(p.id));
@@ -55,10 +56,10 @@ export function hubScreen(root: HTMLElement) {
       h('span', { class: 'pill' }, '⭐ ' + totalStars(p.id)),
       h('div', { class: 'spacer' }),
       soundToggle(),
-      iconButton(ICONS.lock, 'Padres', () => go('parents'))
+      iconButton(ICONS.lock, tr('Padres', 'Parents'), () => go('parents'))
     ),
     logo,
-    h('div', { class: 'counter' }, '🎮 5 juegos hoy · +15 para fin de año'),
+    h('div', { class: 'counter' }, tr('🎮 5 juegos hoy · +15 para fin de año', '🎮 5 games today · 15 more by year-end')),
     h('div', { class: 'col', style: { gap: '4px', marginBottom: '14px', width: '100%' } }, h('div', { class: 'timebar' }, timeFill), h('small', { class: 'sub' }, timeLabel)),
     h(
       'div',
@@ -79,7 +80,7 @@ export function hubScreen(root: HTMLElement) {
           },
           h('div', { class: 'art', html: g.art, style: { background: g.color } }),
           g.ready ? h('span', { class: 'play-badge' }, '▶') : null,
-          g.ready ? null : h('span', { class: 'soon-tag' }, 'Muy pronto'),
+          g.ready ? null : h('span', { class: 'soon-tag' }, tr('Muy pronto', 'Coming soon')),
           h('div', { class: 'info' }, h('div', { class: 't' }, g.name), h('div', { class: 'd' }, g.desc), g.ready ? h('div', { class: 'stars' }, `★ ${stars} / ${g.levels.length * 3}`) : null)
         );
       })

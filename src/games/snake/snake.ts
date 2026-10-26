@@ -6,6 +6,7 @@ import { SNAKE_LEVELS } from './levels';
 import { createGame, fontsReady, FONT, CURSIVE } from '../phaserHost';
 import { say, letterName } from '../../core/voice';
 import { sfx } from '../../core/sound';
+import { tr } from '../../core/i18n';
 
 const HUD_TOP = 84;
 
@@ -80,7 +81,7 @@ class SnakeScene extends Phaser.Scene {
     // al soltar, la víbora termina de llegar a donde estaba el dedo
     this.keys = this.input.keyboard!.createCursorKeys();
 
-    this.ctx.setTitle(cur ? `${glyph(this.key)} cursiva` : `Letra ${glyph(this.key)}`);
+    this.ctx.setTitle(cur ? tr(`${glyph(this.key)} cursiva`, `Cursive ${glyph(this.key)}`) : tr(`Letra ${glyph(this.key)}`, `Letter ${glyph(this.key)}`));
     const intro = () => say('snake_intro', { letra: letterName(glyph(this.key)) });
     this.ctx.setRepeat(intro);
     this.resetLetter(false);
@@ -214,10 +215,10 @@ class SnakeScene extends Phaser.Scene {
     this.tapDot = s.length === 1;
     this.target = null;
     if (this.tapDot) {
-      this.hint.setText('Toca el punto').setVisible(true);
+      this.hint.setText(tr('Toca el punto', 'Tap the dot')).setVisible(true);
       return;
     }
-    this.hint.setText(this.ctx.easy ? 'Arrastra a la viborita con tu dedo' : '').setVisible(this.ctx.easy && this.si === 0);
+    this.hint.setText(this.ctx.easy ? tr('Arrastra a la viborita con tu dedo', 'Drag the little snake with your finger') : '').setVisible(this.ctx.easy && this.si === 0);
     this.head = { ...s[0] };
     this.heading = Math.atan2(s[1].y - s[0].y, s[1].x - s[0].x);
     this.trail = [];

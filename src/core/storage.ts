@@ -1,4 +1,8 @@
 // Guardado local seguro: si localStorage no está disponible (modo privado, iframe), usa memoria.
+// Cada idioma guarda aparte (mp: español, mp-en: inglés): perfiles, progreso y palabra clave no se mezclan.
+import { EN } from './i18n';
+
+const PREFIX = EN ? 'mp-en:' : 'mp:';
 const mem = new Map<string, string>();
 
 function rawGet(key: string): string | null {
@@ -30,7 +34,7 @@ function rawDel(key: string) {
 }
 
 export function load<T>(key: string, fallback: T): T {
-  const v = rawGet('mp:' + key);
+  const v = rawGet(PREFIX + key);
   if (v === null) return fallback;
   try {
     return JSON.parse(v) as T;
@@ -40,9 +44,9 @@ export function load<T>(key: string, fallback: T): T {
 }
 
 export function save<T>(key: string, value: T) {
-  rawSet('mp:' + key, JSON.stringify(value));
+  rawSet(PREFIX + key, JSON.stringify(value));
 }
 
 export function remove(key: string) {
-  rawDel('mp:' + key);
+  rawDel(PREFIX + key);
 }

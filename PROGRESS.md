@@ -28,8 +28,21 @@
 - Limitación comprobada: el navegador headless rechaza captura nativa; el arrastre alternativo sí se prueba. No se atribuye este comportamiento a todos los navegadores normales.
 - Los 29 planos y el tráiler existentes son anteriores a estos cambios; no se regrabaron.
 
+## Versión en inglés `/en/` · Claude (26/10/2026)
+- Pedido de Tomás: replicar el post-pago del Kit en inglés (tienda Scale Kids, marca «Montessori Handwriting», EE. UU./GB/CA/AU/NZ/IE). Montessori Play es el OTO 2 (USD 97, downsell 48,50).
+- `/en/` = segunda entrada `en/index.html` con el mismo código. `src/core/i18n.ts` decide por `<html lang>`: `tr()` para la interfaz, `pick()` para datos. `/` en español no cambia (mismos textos, misma palabra clave, mismo `voces.csv`).
+- Palabra clave `HANDWRITING` (`VITE_ACCESS_CODE_EN`). Guardado separado `mp-en:`: quien juega en las dos versiones no mezcla perfiles.
+- Contenido adaptado, no solo traducido: CaliCrash forma SUN, STAR, LION, sun y cake; Ninja «First words» (CAT, DOG, SUN, HAT, PIG, TEN, MOP, FAN: se dibuja la primera letra); Angry Shapes con circle/square/triangle/rectangle/diamond/star; Montecraft con bloques y colores en inglés y «HELLO» de respaldo; 30 misiones y 5 tutoriales reescritos; avatares con nombre en inglés.
+- Nombres: Letter Snake, Trace Ninja, CaliCrash, Angry Shapes, Montecraft (avisados a los chats de VSL y páginas del OTO 2).
+- Voz: la del dispositivo en inglés (variante del navegador → en-US → en-GB/AU/CA). **Sin mp3 ni audio pago**: igual que el español. `voces-en.csv` (~227 frases con mp3 posible) queda listo por si Tomás aprueba ElevenLabs; los mp3 irían a `public/en/audio/`.
+- Cursiva: Playwrite US Trad (Google Fonts, OFL) en vez de Playwrite MX. Las plantillas de trazo de Snake y Ninja son las mismas.
+- Vercel: redirección `/en` → `/en/` en `vercel.json` (y en `vite.config.ts` para dev/preview, más un respaldo en el propio `en/index.html`). El service worker de la raíz cubre las dos rutas.
+- `npm run smoke` ahora recorre español e inglés y, en inglés, busca texto en español en el DOM y en los textos de Phaser.
+- Pruebas (26/10): `npm run build` sin errores; `npm run smoke` en español e inglés, 4 tamaños, 48 niveles cada uno → **0 errores, 0 desbordes, 0 textos en español en /en/** (dos corridas); `qa:core` (con prueba nueva de voz en inglés), `qa:touch` y `qa:interactions` aprobados en español.
+- Recorrido real en celular (390x844 y 844x390, Chromium): palabra clave ES rechazada en /en/, HANDWRITING aceptada en minúsculas, dispositivo, perfil, hub, tutorial y primer nivel de los 5 juegos, cursiva, «Gira tu teléfono», misión y panel de padres. Sin errores de consola.
+
 ## Siguiente paso exacto
-Compartir https://montessoriplay.vercel.app junto con la palabra clave `CALIGRAFIA`. Probar captura nativa del mouse en navegador normal y voz/táctil/rendimiento en tablet y celular reales. Para próximas mejoras, crear rama `codex/…`, validar y publicar integrando a `main`. Para regrabar planos: `npm run build && npm run preview` y `node scripts/clips/planos.mjs [filtro]`; tráiler: `node scripts/clips/trailer.mjs`.
+Inglés: con el OK de Tomás, mergear el PR de `/en/` (publica en producción) y verificar https://montessoriplay.vercel.app/en/ con `HANDWRITING`. Decidir si se graban voces en inglés (ElevenLabs con `voces-en.csv`). Español: compartir https://montessoriplay.vercel.app junto con la palabra clave `CALIGRAFIA`. Probar captura nativa del mouse en navegador normal y voz/táctil/rendimiento en tablet y celular reales. Para próximas mejoras, crear rama `codex/…`, validar y publicar integrando a `main`. Para regrabar planos: `npm run build && npm run preview` y `node scripts/clips/planos.mjs [filtro]`; tráiler: `node scripts/clips/trailer.mjs`.
 
 ## Publicación del MVP y soporte · Codex (07/10/2026)
 - Tomás pidió ofrecer el MVP gratis por ahora, con una palabra clave compartida y sin cuentas. La pantalla de entrada ya no presupone una compra; conserva `CALIGRAFIA` y los perfiles locales.
@@ -65,7 +78,8 @@ Compartir https://montessoriplay.vercel.app junto con la palabra clave `CALIGRAF
 ## Problemas abiertos
 - No se probó en dispositivos reales (solo Chromium automatizado a 390x844, 844x390, 1024x768, 1440x900 y 540x960). Montecraft: ~25 fps sin GPU (nube), 60 fps con GPU de una Mac M3; falta una tablet media.
 - El aviso "Gira tu teléfono" en iOS no puede forzar la orientación (Safari no lo permite): solo lo pide.
-- La voz depende de las voces instaladas en el dispositivo (iOS/Android suelen tener es-MX; algunas PC solo es-ES).
+- La voz depende de las voces instaladas en el dispositivo (iOS/Android suelen tener es-MX; algunas PC solo es-ES). En inglés casi todos los dispositivos traen en-US.
+- Inglés: el soporte sigue siendo el WhatsApp de Tomás (+54), con mensaje en inglés. No se probó en Safari/iOS real ni se escuchó la voz en inglés en un dispositivo.
 
 ## Cómo probar
 `npm install && npm run dev` → abrir la URL. Código: `CALIGRAFIA` (o el de `.env`).

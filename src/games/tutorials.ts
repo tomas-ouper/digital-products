@@ -1,11 +1,13 @@
 // Tutorial "Cómo se juega" que aparece al entrar a cada juego.
+import { pick } from '../core/i18n';
+
 export interface Tutorial {
   goal: string;
   steps: [string, string][];
   levels: string;
 }
 
-export const TUTORIALS: Record<string, Tutorial> = {
+const TUTORIALS_ES: Record<string, Tutorial> = {
   snake: {
     goal: 'Escribe letras llevando a la viborita por el trazo de cada letra.',
     steps: [
@@ -63,3 +65,64 @@ export const TUTORIALS: Record<string, Tutorial> = {
     levels: 'Letras con bloques, torre de 10, colores, tu inicial, tu nombre y modo libre.',
   },
 };
+
+const TUTORIALS_EN: Record<string, Tutorial> = {
+  snake: {
+    goal: 'Write letters by guiding the little snake along each letter.',
+    steps: [
+      ['👆', 'Drag the little snake with your finger. On a computer you can also use the arrow keys.'],
+      ['⭐', 'Always start at the star and follow the blue arrow.'],
+      ['🟠', 'Eat the orange dots in order: that is how you write the letter in the right direction.'],
+      ['⚠️', 'If you leave the white path, the letter starts over.'],
+      ['🏆', 'Stay on the path to win 3 stars.'],
+    ],
+    levels: '17 letters: lowercase → uppercase → cursive.',
+  },
+  ninja: {
+    goal: 'Cut the letter the voice says by drawing it with your finger.',
+    steps: [
+      ['🔊', 'Start with just one letter and a guide, so you can practice without rushing.'],
+      ['✍️', 'Draw the letter, not just a line over it. Letters wait while you trace.'],
+      ['🔪', 'If your stroke is the right letter, the bubble is cut: +1.'],
+      ['❌', 'If you cut a different letter, you lose a point.'],
+      ['🎯', 'Reach the goal number of cuts to finish the level.'],
+    ],
+    levels: 'Vowels, consonants, first words and cursive.',
+  },
+  crash: {
+    goal: 'Match letters to cross them out and make words.',
+    steps: [
+      ['↔️', 'Swap two neighboring tiles to get THREE matching letters in a row or column.'],
+      ['✖️', 'Three matching letters in a line get crossed out and new tiles fall in.'],
+      ['🔤', 'For words, tap or drag across neighboring letters in order: S → U → N.'],
+      ['👣', 'Watch your moves: they run out.'],
+      ['💡', 'If you get stuck, a tile will glow to help you.'],
+    ],
+    levels: '10 levels: cross out letters, make SUN, STAR, LION and words in cursive.',
+  },
+  angry: {
+    goal: 'Throw shapes with the slingshot and knock down the ones the voice asks for.',
+    steps: [
+      ['🔊', 'Knock down the shapes with a gold ring and an arrow. The counter shows how many are left.'],
+      ['🔺', 'If there are shapes at the bottom, pick the one you are asked for.'],
+      ['🎯', 'Pull the shape back and let go. The little dots show the path.'],
+      ['✅', 'Every shape you knock down gets a ✓.'],
+      ['🧠', 'In "knock down only…", try not to hit the other shapes.'],
+    ],
+    levels: '8 levels: circle, square, triangle, rectangle, diamond and star; counting sides.',
+  },
+  craft: {
+    goal: 'Build with blocks in a 3D world you explore in first person.',
+    steps: [
+      ['🕹️', 'Walk with the joystick (left half of the screen). On a computer: W A S D or the arrow keys.'],
+      ['👀', 'On a computer, click to capture the mouse and move it to look around. Escape releases the cursor. On touch screens, drag.'],
+      ['🕊️', 'Double click or double space turns on flying. Space goes up and Shift goes down. On touch screens, use Fly and the arrows.'],
+      ['🧱', 'With the mouse captured: click removes, right click places. On touch screens: tap to place, press and hold to remove.'],
+      ['👻', 'White shadows show where each block goes: tap them to fill them in.'],
+      ['🎨', 'Pick a block in the bar at the bottom. The ▦ button opens all the blocks.'],
+    ],
+    levels: 'Letters with blocks, a tower of 10, colors, your initial, your name and free mode.',
+  },
+};
+
+export const TUTORIALS: Record<string, Tutorial> = pick(TUTORIALS_ES, TUTORIALS_EN);

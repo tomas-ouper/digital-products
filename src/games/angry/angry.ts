@@ -5,17 +5,21 @@ import { ANGRY_LEVELS, type AngryLevel, type ShapeKind, type Block } from './lev
 import { createGame, FONT } from '../phaserHost';
 import { say, sayText } from '../../core/voice';
 import { sfx } from '../../core/sound';
+import { tr } from '../../core/i18n';
 
 const HUD_TOP = 84;
 
 export const SHAPE_NAME: Record<ShapeKind, { n: string; f: boolean }> = {
-  circulo: { n: 'círculo', f: false },
-  cuadrado: { n: 'cuadrado', f: false },
-  triangulo: { n: 'triángulo', f: false },
-  rectangulo: { n: 'rectángulo', f: false },
-  rombo: { n: 'rombo', f: false },
-  estrella: { n: 'estrella', f: true },
+  circulo: { n: tr('círculo', 'circle'), f: false },
+  cuadrado: { n: tr('cuadrado', 'square'), f: false },
+  triangulo: { n: tr('triángulo', 'triangle'), f: false },
+  rectangulo: { n: tr('rectángulo', 'rectangle'), f: false },
+  rombo: { n: tr('rombo', 'diamond'), f: false },
+  estrella: { n: tr('estrella', 'star'), f: true },
 };
+
+/** "Elige círculo" / "Pick the circle" */
+const pickLabel = (k: ShapeKind) => tr(`Elige ${SHAPE_NAME[k].n}`, `Pick the ${SHAPE_NAME[k].n}`);
 
 const SHAPE_COLOR: Record<ShapeKind, number> = {
   circulo: 0xff7a59,
@@ -163,7 +167,7 @@ class AngryScene extends Phaser.Scene {
     this.input.on('pointerup', () => this.onUp());
     this.input.on('pointerupoutside', () => this.onUp());
 
-    const instr = () => sayText(`${this.objective()} Elige ${SHAPE_NAME[this.lv.launch].n}, arrastra hacia atrás y suelta.`);
+    const instr = () => sayText(`${this.objective()} ${pickLabel(this.lv.launch)}` + tr(', arrastra hacia atrás y suelta.', ', pull it back and let go.'));
     this.ctx.setTitle(this.lv.title);
     this.ctx.setRepeat(instr);
     if (this.lv.tray.length === 1) {
@@ -418,7 +422,7 @@ class AngryScene extends Phaser.Scene {
     const y = this.groundY + (this.scale.height - this.groundY) / 2 - 4;
     const x0 = 12 + size / 2;
     const yy = Math.min(y, this.scale.height - size / 2 - 6);
-    const label = this.add.text(12, yy - size / 2 - 8, `Elige ${SHAPE_NAME[this.lv.launch].n}:`, { fontFamily: FONT, fontSize: '20px', color: '#3a3f6b', fontStyle: 'bold', backgroundColor: '#ffffffcc', padding: { x: 8, y: 3 } }).setOrigin(0, 1).setDepth(12);
+    const label = this.add.text(12, yy - size / 2 - 8, `${pickLabel(this.lv.launch)}:`, { fontFamily: FONT, fontSize: '20px', color: '#3a3f6b', fontStyle: 'bold', backgroundColor: '#ffffffcc', padding: { x: 8, y: 3 } }).setOrigin(0, 1).setDepth(12);
     this.trayObjs.push(label);
     this.lv.tray.forEach((k, i) => {
       const x = x0 + i * (size + gap);
@@ -475,7 +479,7 @@ class AngryScene extends Phaser.Scene {
     const d = Math.hypot(p.x - this.proj.x, p.y - this.proj.y);
     if (d < this.U * 2.2) {
       this.dragging = true;
-      this.hintText.setText('Apunta con los puntos blancos y suelta para lanzar');
+      this.hintText.setText(tr('Apunta con los puntos blancos y suelta para lanzar', 'Aim with the white dots and let go to throw'));
       sfx.tap();
     }
   }
@@ -519,7 +523,7 @@ class AngryScene extends Phaser.Scene {
     if (pull < 0.15) {
       // muy poquito: vuelve a su lugar
       this.proj.setPosition(this.anchor.x, this.anchor.y);
-      this.hintText.setText('Arrastra más hacia atrás y suelta');
+      this.hintText.setText(tr('Arrastra más hacia atrás y suelta', 'Pull back further and let go'));
       this.aim.clear();
       return;
     }
@@ -541,17 +545,17 @@ class AngryScene extends Phaser.Scene {
   }
 
   objective() {
-    if (this.lv.only) return `${this.lv.title}. Evita las formas sin aro.`;
-    return 'Derriba las formas con aro dorado';
+    if (this.lv.only) return `${this.lv.title}. ` + tr('Evita las formas sin aro.', 'Avoid the shapes without a ring.');
+    return tr('Derriba las formas con aro dorado', 'Knock down the shapes with a gold ring');
   }
 
   updateHud() {
     const total = this.lv.blocks.filter(b => b.target).length;
     const left = this.targetsLeft();
-    this.hudText.setText(`Tiros: ${this.shotsLeft}  ·  Objetivos: ${total - left}/${total}`);
-    this.objectiveText?.setText(`${this.objective()}\n${left} por derribar`);
+    this.hudText.setText(tr(`Tiros: ${this.shotsLeft}  ·  Objetivos: ${total - left}/${total}`, `Shots: ${this.shotsLeft}  ·  Targets: ${total - left}/${total}`));
+    this.objectiveText?.setText(`${this.objective()}\n${left} ` + tr('por derribar', 'left to knock down'));
     this.hintText?.setVisible(!!this.proj || this.lv.tray.length === 1);
-    this.hintText?.setText(this.flying ? '¡Mira cuáles derribas!' : !this.proj && this.lv.tray.length > 1 ? `Elige ${SHAPE_NAME[this.lv.launch].n} abajo` : 'Arrastra la forma hacia atrás ↙ y suelta');
+    this.hintText?.setText(this.flying ? tr('¡Mira cuáles derribas!', 'Watch what you knock down!') : !this.proj && this.lv.tray.length > 1 ? pickLabel(this.lv.launch) + tr(' abajo', ' below') : tr('Arrastra la forma hacia atrás ↙ y suelta', 'Pull the shape back ↙ and let go'));
   }
 
   puff(x: number, y: number, k: number) {
@@ -584,7 +588,7 @@ class AngryScene extends Phaser.Scene {
         this.tweens.add({ targets: m, y: m.y - U, alpha: 0, delay: 500, duration: 700, onComplete: () => m.destroy() });
       } else if (this.lv.only && t.block?.k !== 'rectangulo') {
         this.wrongDown++;
-        const m = this.add.text(t.img.x, t.img.y - U, '¡Cuida esta!', { fontFamily: FONT, fontSize: '18px', color: '#9f2843', backgroundColor: '#ffffff' }).setOrigin(0.5).setDepth(15);
+        const m = this.add.text(t.img.x, t.img.y - U, tr('¡Cuida esta!', 'Protect this one!'), { fontFamily: FONT, fontSize: '18px', color: '#9f2843', backgroundColor: '#ffffff' }).setOrigin(0.5).setDepth(15);
         this.tweens.add({ targets: m, y: m.y - U, alpha: 0, duration: 1500, onComplete: () => m.destroy() });
       }
       this.updateHud();
@@ -705,11 +709,11 @@ class AngryScene extends Phaser.Scene {
     const box = this.add.graphics().setDepth(41);
     box.fillStyle(0xffffff, 1);
     box.fillRoundedRect(w / 2 - 170, h / 2 - 100, 340, 200, 26);
-    this.add.text(w / 2, h / 2 - 45, '¡Casi!\nSe acabaron los tiros', { fontFamily: FONT, fontSize: '26px', color: '#3a3f6b', align: 'center', fontStyle: 'bold' }).setOrigin(0.5).setDepth(42);
+    this.add.text(w / 2, h / 2 - 45, tr('¡Casi!\nSe acabaron los tiros', "Almost!\nYou're out of shots"), { fontFamily: FONT, fontSize: '26px', color: '#3a3f6b', align: 'center', fontStyle: 'bold' }).setOrigin(0.5).setDepth(42);
     const btn = this.add.graphics().setDepth(42);
     btn.fillStyle(0x4cc38a, 1);
     btn.fillRoundedRect(w / 2 - 130, h / 2 + 15, 260, 66, 33);
-    this.add.text(w / 2, h / 2 + 48, 'Intentar otra vez', { fontFamily: FONT, fontSize: '24px', color: '#ffffff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(43);
+    this.add.text(w / 2, h / 2 + 48, tr('Intentar otra vez', 'Try again'), { fontFamily: FONT, fontSize: '24px', color: '#ffffff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(43);
     const zone = this.add.zone(w / 2, h / 2 + 48, 260, 66).setInteractive({ useHandCursor: true }).setDepth(44);
     zone.on('pointerup', () => {
       sfx.tap();

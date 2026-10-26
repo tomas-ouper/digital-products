@@ -28,6 +28,7 @@ console.log('✓ El tiempo pendiente se guarda en su perfil original');
 let queued = [];
 const voice = moduleAt('src/core/voice.ts', {
   '../data/frases.json': { default: {} }, '../data/letras.json': { default: {} }, './state': { settings: { voice: true } },
+  '../data/en/frases.json': { default: {} }, '../data/en/letras.json': { default: {} }, './i18n': { EN: false },
 }, {
   setTimeout, clearTimeout,
   fetch: async () => ({ ok: true, json: async () => ({ files: ['audio.mp3'] }) }),
@@ -41,6 +42,20 @@ voice.stopVoice(); await p; assert.ok(resolved);
 await new Promise(r => setTimeout(r, 0));
 const audio = voice.say('audio'); voice.stopVoice(); await audio;
 console.log('✓ Cancelar voz y MP3 resuelve sus promesas sin esperar eventos del navegador');
+// /en/: frases y nombres de letras en inglés, voz en-US por defecto.
+const voiceEn = moduleAt('src/core/voice.ts', {
+  '../data/frases.json': { default: { hola: 'Hola {letra}' } }, '../data/letras.json': { default: { m: 'eme' } }, './state': { settings: { voice: true } },
+  '../data/en/frases.json': { default: { hola: 'Hi {letra}' } }, '../data/en/letras.json': { default: { m: 'M' } }, './i18n': { EN: true },
+}, {
+  setTimeout, clearTimeout, navigator: { language: 'en-US' },
+  fetch: async () => ({ ok: true, json: async () => ({ files: [] }) }),
+  window: { speechSynthesis: { cancel() {}, getVoices: () => [], speak: u => queued.push(u) } },
+  SpeechSynthesisUtterance: class { constructor(text) { this.text = text; } },
+});
+assert.equal(voiceEn.phrase('hola', { letra: voiceEn.letterName('m') }), 'Hi M');
+queued = [];
+voiceEn.sayText('Hello'); assert.equal(queued[0].lang, 'en-US'); voiceEn.stopVoice();
+console.log('✓ En /en/ la voz usa las frases en inglés y en-US');
 const events = {};
 let cached = 0;
 let response;

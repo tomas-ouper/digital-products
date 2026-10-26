@@ -1,11 +1,12 @@
 // 6 avatares originales en SVG (formas simples, paleta propia).
+import { tr } from './i18n';
 const face = (eyesY = 52) => `
   <circle cx="40" cy="${eyesY}" r="5" fill="#3a3f6b"/><circle cx="60" cy="${eyesY}" r="5" fill="#3a3f6b"/>
   <circle cx="41.5" cy="${eyesY - 1.5}" r="1.6" fill="#fff"/><circle cx="61.5" cy="${eyesY - 1.5}" r="1.6" fill="#fff"/>`;
 
 export const AVATARS: { name: string; bg: string; svg: string }[] = [
   {
-    name: 'Zorrito',
+    name: tr('Zorrito', 'Little fox'),
     bg: '#ffe1cc',
     svg: `<path d="M18 22 L38 40 L22 52Z M82 22 L62 40 L78 52Z" fill="#f08a4b"/>
       <ellipse cx="50" cy="56" rx="32" ry="28" fill="#f08a4b"/>
@@ -13,7 +14,7 @@ export const AVATARS: { name: string; bg: string; svg: string }[] = [
       ${face(52)}<ellipse cx="50" cy="66" rx="5" ry="3.6" fill="#3a3f6b"/>`,
   },
   {
-    name: 'Búho',
+    name: tr('Búho', 'Owl'),
     bg: '#e3dcff',
     svg: `<path d="M24 26 L36 36 L28 44Z M76 26 L64 36 L72 44Z" fill="#8a6fd6"/>
       <ellipse cx="50" cy="58" rx="30" ry="32" fill="#9b82e8"/>
@@ -23,7 +24,7 @@ export const AVATARS: { name: string; bg: string; svg: string }[] = [
       <path d="M46 60 L54 60 L50 67Z" fill="#ffb84d"/>`,
   },
   {
-    name: 'Osito',
+    name: tr('Osito', 'Teddy bear'),
     bg: '#f3e2cf',
     svg: `<circle cx="27" cy="30" r="11" fill="#a9744f"/><circle cx="73" cy="30" r="11" fill="#a9744f"/>
       <circle cx="27" cy="30" r="5" fill="#e0b48c"/><circle cx="73" cy="30" r="5" fill="#e0b48c"/>
@@ -32,7 +33,7 @@ export const AVATARS: { name: string; bg: string; svg: string }[] = [
       ${face(50)}<ellipse cx="50" cy="63" rx="5" ry="3.6" fill="#3a3f6b"/>`,
   },
   {
-    name: 'Gatita',
+    name: tr('Gatita', 'Kitty'),
     bg: '#d6f2ff',
     svg: `<path d="M22 20 L40 36 L24 48Z M78 20 L60 36 L76 48Z" fill="#7e9cb8"/>
       <ellipse cx="50" cy="57" rx="31" ry="28" fill="#8fb0cf"/>
@@ -40,7 +41,7 @@ export const AVATARS: { name: string; bg: string; svg: string }[] = [
       <path d="M30 64 L16 61 M30 68 L16 70 M70 64 L84 61 M70 68 L84 70" stroke="#3a3f6b" stroke-width="2" stroke-linecap="round"/>`,
   },
   {
-    name: 'Ranita',
+    name: tr('Ranita', 'Froggy'),
     bg: '#dcf7e3',
     svg: `<circle cx="33" cy="34" r="13" fill="#4cc38a"/><circle cx="67" cy="34" r="13" fill="#4cc38a"/>
       <ellipse cx="50" cy="60" rx="34" ry="26" fill="#4cc38a"/>
@@ -50,7 +51,7 @@ export const AVATARS: { name: string; bg: string; svg: string }[] = [
       <circle cx="28" cy="62" r="4" fill="#ff9fb2" opacity=".7"/><circle cx="72" cy="62" r="4" fill="#ff9fb2" opacity=".7"/>`,
   },
   {
-    name: 'Conejita',
+    name: tr('Conejita', 'Bunny'),
     bg: '#ffe0ea',
     svg: `<ellipse cx="38" cy="22" rx="8" ry="20" fill="#f1f1f6"/><ellipse cx="62" cy="22" rx="8" ry="20" fill="#f1f1f6"/>
       <ellipse cx="38" cy="22" rx="4" ry="14" fill="#ffb3c6"/><ellipse cx="62" cy="22" rx="4" ry="14" fill="#ffb3c6"/>

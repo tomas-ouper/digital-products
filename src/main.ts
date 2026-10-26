@@ -10,6 +10,7 @@ import { levelsScreen } from './screens/levels';
 import { playScreen } from './screens/play';
 import { missionScreen } from './screens/mission';
 import { parentsScreen } from './screens/parents';
+import { EN } from './core/i18n';
 
 register('access', accessScreen);
 register('device', deviceScreen);
@@ -37,8 +38,9 @@ else if (activeProfile()) go('hub');
 else go('profiles');
 
 // PWA: service worker (solo en https/localhost y fuera de iframes sandbox).
+// Uno solo en la raíz: su alcance cubre / y /en/.
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker.register(EN ? '../sw.js' : './sw.js').catch(() => {});
   });
 }
