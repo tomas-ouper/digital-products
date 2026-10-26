@@ -2,6 +2,7 @@ import { h } from '../core/ui';
 import { settings, saveSettings, type Device } from '../core/state';
 import { go } from '../core/nav';
 import { say } from '../core/voice';
+import { tr } from '../core/i18n';
 
 const ICON = {
   phone: `<svg width="56" height="56" viewBox="0 0 48 48"><rect x="14" y="4" width="20" height="40" rx="4" fill="#5b8def"/><rect x="17" y="9" width="14" height="27" rx="1.5" fill="#d9e6ff"/><circle cx="24" cy="40" r="2" fill="#fff"/></svg>`,
@@ -12,9 +13,9 @@ const ICON = {
 export function deviceScreen(root: HTMLElement) {
   root.className = 'screen center';
   const opts: { id: Device; label: string; note: string }[] = [
-    { id: 'tablet', label: 'Tablet', note: 'La mejor opción' },
-    { id: 'phone', label: 'Celular', note: 'Se juega en horizontal ↻' },
-    { id: 'desktop', label: 'Computadora', note: 'Con mouse o touch' },
+    { id: 'tablet', label: 'Tablet', note: tr('La mejor opción', 'The best option') },
+    { id: 'phone', label: tr('Celular', 'Phone'), note: tr('Se juega en horizontal ↻', 'Played sideways ↻') },
+    { id: 'desktop', label: tr('Computadora', 'Computer'), note: tr('Con mouse o touch', 'With mouse or touch') },
   ];
   const pick = (id: Device) => {
     settings.device = id;
@@ -22,8 +23,8 @@ export function deviceScreen(root: HTMLElement) {
     go('profiles');
   };
   root.append(
-    h('h1', {}, '¿Desde dónde juegas?'),
-    h('p', { class: 'sub' }, 'Recomendamos tablet: la pantalla es grande y los dedos trazan mejor las letras.'),
+    h('h1', {}, tr('¿Desde dónde juegas?', 'Where are you playing from?')),
+    h('p', { class: 'sub' }, tr('Recomendamos tablet: la pantalla es grande y los dedos trazan mejor las letras.', 'We recommend a tablet: the big screen makes it easier for little fingers to trace letters.')),
     h(
       'div',
       { class: 'choice', style: { marginTop: '18px' } },
@@ -31,7 +32,7 @@ export function deviceScreen(root: HTMLElement) {
         h(
           'button',
           { class: 'opt' + (settings.device === o.id ? ' sel' : ''), onTap: () => pick(o.id) },
-          o.id === 'tablet' ? h('span', { class: 'tag' }, 'Recomendado') : null,
+          o.id === 'tablet' ? h('span', { class: 'tag' }, tr('Recomendado', 'Recommended')) : null,
           h('span', { html: ICON[o.id] }),
           o.label,
           h('small', {}, o.note)

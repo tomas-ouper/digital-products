@@ -8,6 +8,7 @@ import { createGame, fontsReady, FONT, CURSIVE } from '../phaserHost';
 import { say, letterName } from '../../core/voice';
 import { sfx } from '../../core/sound';
 import { shuffle } from '../../core/ui';
+import { tr } from '../../core/i18n';
 
 const HUD_TOP = 84;
 const COLORS = [0xff8a5b, 0xffc93c, 0x4cc38a, 0x5b8def, 0xa98bff, 0xff8fb1];
@@ -148,7 +149,7 @@ class NinjaScene extends Phaser.Scene {
     if (location.search.includes('debug')) Object.assign(window as any, { __scene: this, __LETTERS: LETTERS });
     this.bg = this.add.graphics();
     this.guidePath = this.add.graphics().setDepth(2);
-    this.guide = this.add.text(0, 0, 'Dibuja la letra · No basta con deslizar sobre ella', { fontFamily: FONT, fontSize: '18px', color: '#ffffff', backgroundColor: '#24204dcc', padding: { x: 14, y: 8 }, align: 'center' }).setOrigin(0.5, 0).setDepth(15);
+    this.guide = this.add.text(0, 0, tr('Dibuja la letra · No basta con deslizar sobre ella', 'Draw the letter · A quick swipe over it is not enough'), { fontFamily: FONT, fontSize: '18px', color: '#ffffff', backgroundColor: '#24204dcc', padding: { x: 14, y: 8 }, align: 'center' }).setOrigin(0.5, 0).setDepth(15);
     this.trail = this.add.graphics().setDepth(20);
     this.bannerBox = this.add.graphics();
     this.bannerText = this.add.text(0, 0, '', { fontFamily: FONT, fontSize: '26px', color: '#3a3f6b', fontStyle: 'bold' }).setOrigin(0, 0.5);
@@ -264,7 +265,7 @@ class NinjaScene extends Phaser.Scene {
 
   setBanner() {
     const shown = this.lv.syllables ? `${this.target}` : glyph(this.target);
-    this.bannerText.setText('Dibuja');
+    this.bannerText.setText(tr('Dibuja', 'Draw'));
     this.bannerLetter.setText(this.lv.syllables ? `${shown} → ${this.target[0]}` : shown);
     this.bannerLetter.setFontSize(this.lv.syllables ? 38 : /^[a-zñ]$/.test(shown) && !this.cursive ? 70 : 54);
     this.bannerLetter.setX(20 + this.bannerText.width + 12);
@@ -306,7 +307,7 @@ class NinjaScene extends Phaser.Scene {
     this.prevTarget = this.target;
     this.setBanner();
     this.drawGuide();
-    this.guide.setText(this.good < 2 ? 'Practica con una sola letra: dibújala siguiendo la guía' : 'Dibuja la letra indicada · Las letras esperan mientras trazas');
+    this.guide.setText(this.good < 2 ? tr('Practica con una sola letra: dibújala siguiendo la guía', 'Practice with one letter: draw it following the guide') : tr('Dibuja la letra indicada · Las letras esperan mientras trazas', 'Draw the letter you hear · Letters wait while you trace'));
     this.sayTarget();
     this.waves = 0;
     this.spawning = true;
@@ -342,7 +343,7 @@ class NinjaScene extends Phaser.Scene {
     const t = this.add
       .text(0, cur ? 4 : 2, this.lv.syllables ? label : glyph(label), {
         fontFamily: cur ? CURSIVE : FONT,
-        fontSize: `${Math.round(r * (this.lv.syllables ? 0.85 : cur ? 0.95 : /^[a-zñ]$/.test(label) ? 1.45 : 1.15))}px`,
+        fontSize: `${Math.round(r * (this.lv.syllables ? (label.length > 2 ? 0.62 : 0.85) : cur ? 0.95 : /^[a-zñ]$/.test(label) ? 1.45 : 1.15))}px`,
         color: '#ffffff',
         fontStyle: cur ? 'normal' : 'bold',
         stroke: '#3a3f6b',

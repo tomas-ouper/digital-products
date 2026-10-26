@@ -1,5 +1,6 @@
 // Mundo voxel de Montecraft: datos, texturas 16x16 procedurales (paleta propia) y mallado con oclusión ambiental.
 import * as THREE from 'three';
+import { tr } from '../../core/i18n';
 
 export const SX = 32;
 export const SY = 16;
@@ -20,27 +21,27 @@ const TILE_NAMES = [
 const TILE_INDEX = new Map<string, number>(TILE_NAMES.map((n, i) => [n, i]));
 
 export const BLOCKS: BlockDef[] = [
-  { id: 0, name: 'Aire', tiles: ['dirt', 'dirt', 'dirt'] },
-  { id: 1, name: 'Pasto', tiles: ['grass_top', 'grass_side', 'dirt'] },
-  { id: 2, name: 'Tierra', tiles: ['dirt', 'dirt', 'dirt'] },
-  { id: 3, name: 'Piedra', tiles: ['stone', 'stone', 'stone'] },
-  { id: 4, name: 'Tronco', tiles: ['log_top', 'log_side', 'log_top'] },
-  { id: 5, name: 'Madera', tiles: ['planks', 'planks', 'planks'] },
-  { id: 6, name: 'Hojas', tiles: ['leaves', 'leaves', 'leaves'] },
-  { id: 7, name: 'Arena', tiles: ['sand', 'sand', 'sand'] },
-  { id: 8, name: 'Cristal', tiles: ['glass', 'glass', 'glass'] },
-  { id: 9, name: 'Ladrillo', tiles: ['brick', 'brick', 'brick'] },
-  { id: 10, name: 'Roca', tiles: ['dark', 'dark', 'dark'] },
-  { id: 11, name: 'Rojo', tiles: ['c_rojo', 'c_rojo', 'c_rojo'] },
-  { id: 12, name: 'Naranja', tiles: ['c_naranja', 'c_naranja', 'c_naranja'] },
-  { id: 13, name: 'Amarillo', tiles: ['c_amarillo', 'c_amarillo', 'c_amarillo'] },
-  { id: 14, name: 'Verde', tiles: ['c_verde', 'c_verde', 'c_verde'] },
-  { id: 15, name: 'Azul', tiles: ['c_azul', 'c_azul', 'c_azul'] },
-  { id: 16, name: 'Morado', tiles: ['c_morado', 'c_morado', 'c_morado'] },
-  { id: 17, name: 'Rosa', tiles: ['c_rosa', 'c_rosa', 'c_rosa'] },
-  { id: 18, name: 'Blanco', tiles: ['c_blanco', 'c_blanco', 'c_blanco'] },
-  { id: 19, name: 'Nieve', tiles: ['snow', 'snow', 'snow'] },
-  { id: 20, name: 'Oro', tiles: ['gold', 'gold', 'gold'] },
+  { id: 0, name: tr('Aire', 'Air'), tiles: ['dirt', 'dirt', 'dirt'] },
+  { id: 1, name: tr('Pasto', 'Grass'), tiles: ['grass_top', 'grass_side', 'dirt'] },
+  { id: 2, name: tr('Tierra', 'Dirt'), tiles: ['dirt', 'dirt', 'dirt'] },
+  { id: 3, name: tr('Piedra', 'Stone'), tiles: ['stone', 'stone', 'stone'] },
+  { id: 4, name: tr('Tronco', 'Log'), tiles: ['log_top', 'log_side', 'log_top'] },
+  { id: 5, name: tr('Madera', 'Wood'), tiles: ['planks', 'planks', 'planks'] },
+  { id: 6, name: tr('Hojas', 'Leaves'), tiles: ['leaves', 'leaves', 'leaves'] },
+  { id: 7, name: tr('Arena', 'Sand'), tiles: ['sand', 'sand', 'sand'] },
+  { id: 8, name: tr('Cristal', 'Glass'), tiles: ['glass', 'glass', 'glass'] },
+  { id: 9, name: tr('Ladrillo', 'Brick'), tiles: ['brick', 'brick', 'brick'] },
+  { id: 10, name: tr('Roca', 'Rock'), tiles: ['dark', 'dark', 'dark'] },
+  { id: 11, name: tr('Rojo', 'Red'), tiles: ['c_rojo', 'c_rojo', 'c_rojo'] },
+  { id: 12, name: tr('Naranja', 'Orange'), tiles: ['c_naranja', 'c_naranja', 'c_naranja'] },
+  { id: 13, name: tr('Amarillo', 'Yellow'), tiles: ['c_amarillo', 'c_amarillo', 'c_amarillo'] },
+  { id: 14, name: tr('Verde', 'Green'), tiles: ['c_verde', 'c_verde', 'c_verde'] },
+  { id: 15, name: tr('Azul', 'Blue'), tiles: ['c_azul', 'c_azul', 'c_azul'] },
+  { id: 16, name: tr('Morado', 'Purple'), tiles: ['c_morado', 'c_morado', 'c_morado'] },
+  { id: 17, name: tr('Rosa', 'Pink'), tiles: ['c_rosa', 'c_rosa', 'c_rosa'] },
+  { id: 18, name: tr('Blanco', 'White'), tiles: ['c_blanco', 'c_blanco', 'c_blanco'] },
+  { id: 19, name: tr('Nieve', 'Snow'), tiles: ['snow', 'snow', 'snow'] },
+  { id: 20, name: tr('Oro', 'Gold'), tiles: ['gold', 'gold', 'gold'] },
 ];
 
 export const B = { AIR: 0, GRASS: 1, DIRT: 2, STONE: 3, LOG: 4, PLANKS: 5, LEAVES: 6, SAND: 7, GLASS: 8, BRICK: 9, DARK: 10, ROJO: 11, NARANJA: 12, AMARILLO: 13, VERDE: 14, AZUL: 15, MORADO: 16, ROSA: 17, BLANCO: 18, SNOW: 19, GOLD: 20 };

@@ -184,6 +184,7 @@ input.big:focus { border-color: var(--blue); }
 .letters-done { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .letters-done span { background: var(--green); color: #fff; border-radius: 10px; padding: 4px 10px; font-weight: 600; }
 .letters-done span.cur { font-family: 'Playwrite MX', cursive; font-weight: 400; }
+html[lang='en'] .letters-done span.cur { font-family: 'Playwrite US Trad', cursive; }
 input[type=range] { width: 100%; max-width: 420px; height: 40px; accent-color: var(--blue); }
 .parent-section { width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: center; }
 .support-link { text-decoration: none; text-align: center; max-width: 100%; }

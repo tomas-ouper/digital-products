@@ -1,4 +1,6 @@
 // Tipografía de bloques 5x7 (original) para las plantillas de letras de Montecraft.
+import { tr } from '../../core/i18n';
+
 const F: Record<string, string> = {
   A: '01110 10001 10001 11111 10001 10001 10001',
   B: '11110 10001 10001 11110 10001 10001 11110',
@@ -41,5 +43,5 @@ export function glyphCells(ch: string): [number, number][] {
 export function normalizeName(name: string, max = 5): string {
   const up = name.toUpperCase().replace(/Ñ/g, '\u0001');
   const clean = up.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\u0001/g, 'Ñ');
-  return [...clean].filter((c) => F[c]).slice(0, max).join('') || 'HOLA';
+  return [...clean].filter((c) => F[c]).slice(0, max).join('') || tr('HOLA', 'HELLO');
 }

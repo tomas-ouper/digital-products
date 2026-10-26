@@ -1,12 +1,16 @@
-// Voz: Web Speech API (es-MX preferido) + reemplazo opcional por mp3 grabados.
+// Voz: Web Speech API (es-MX preferido; en /en/, la voz en inglés del dispositivo) + reemplazo opcional por mp3 grabados.
 // Para reemplazar una frase por un mp3: poner public/audio/<clave>.mp3 y agregar el nombre en
 // public/audio/available.json ({"files":["bienvenida.mp3", ...]}). Ver voces.csv.
+// En inglés: public/en/audio/ y voces-en.csv (las rutas relativas ya apuntan ahí desde /en/).
 import frases from '../data/frases.json';
 import letras from '../data/letras.json';
+import frasesEn from '../data/en/frases.json';
+import letrasEn from '../data/en/letras.json';
 import { settings } from './state';
+import { EN } from './i18n';
 
-const F = frases as Record<string, string>;
-const LETRAS = letras as Record<string, string>;
+const F = (EN ? frasesEn : frases) as Record<string, string>;
+const LETRAS = (EN ? letrasEn : letras) as Record<string, string>;
 
 let available = new Set<string>();
 fetch('./audio/available.json')
@@ -20,7 +24,21 @@ function pickVoice() {
   const s = window.speechSynthesis;
   if (!s) return;
   const vs = s.getVoices();
+  // Inglés: primero la variante del navegador (en-GB, en-AU…), después en-US.
+  const nav = EN ? (navigator.language || '').toLowerCase() : '';
+  const scoreEn = (v: SpeechSynthesisVoice) => {
+    const l = v.lang.toLowerCase().replace('_', '-');
+    let n = 0;
+    if (!l.startsWith('en')) return -1;
+    if (nav.startsWith('en') && l === nav) n += 60;
+    else if (l === 'en-us') n += 50;
+    else if (l === 'en-gb' || l === 'en-au' || l === 'en-ca') n += 40;
+    else n += 20;
+    if (/google|natural|premium|enhanced|samantha|ava|allison|karen|serena|aria|jenny/i.test(v.name)) n += 5;
+    return n;
+  };
   const score = (v: SpeechSynthesisVoice) => {
+    if (EN) return scoreEn(v);
     const l = v.lang.toLowerCase().replace('_', '-');
     let n = 0;
     if (l === 'es-mx') n += 50;
@@ -39,7 +57,7 @@ if (typeof window !== 'undefined' && window.speechSynthesis) {
   window.speechSynthesis.onvoiceschanged = pickVoice;
 }
 
-/** Nombre de una letra para decirla en voz alta ("eme"). */
+/** Nombre de una letra para decirla en voz alta ("eme"; en inglés, la mayúscula: "M"). */
 export function letterName(l: string): string {
   return LETRAS[l.toLowerCase()] || l;
 }
@@ -111,7 +129,7 @@ function speakText(text: string, my: number): Promise<void> {
   return new Promise((res) => {
     if (my !== token) return res();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = voice?.lang || 'es-MX';
+    u.lang = voice?.lang || (EN ? 'en-US' : 'es-MX');
     if (voice) u.voice = voice;
     u.rate = 0.92;
     u.pitch = 1.1;

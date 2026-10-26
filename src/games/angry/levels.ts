@@ -1,3 +1,5 @@
+import { tr } from '../../core/i18n';
+
 export type ShapeKind = 'circulo' | 'cuadrado' | 'triangulo' | 'rectangulo' | 'rombo' | 'estrella';
 
 export interface Block {
@@ -29,10 +31,10 @@ export interface AngryLevel {
 // Rectángulo: s = largo (por defecto 2), grosor 0.5; angle 90 = vertical.
 export const ANGRY_LEVELS: AngryLevel[] = [
   {
-    title: 'Lanza el círculo',
+    title: tr('Lanza el círculo', 'Throw the circle'),
     tray: ['circulo'],
     launch: 'circulo',
-    say: { key: 'angry_lanza', vars: { forma: 'círculo' } },
+    say: { key: 'angry_lanza', vars: { forma: tr('círculo', 'circle') } },
     shots: 4,
     blocks: [
       { k: 'cuadrado', x: 0, y: 0, target: true },
@@ -41,10 +43,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: 'Lanza el cuadrado',
+    title: tr('Lanza el cuadrado', 'Throw the square'),
     tray: ['cuadrado'],
     launch: 'cuadrado',
-    say: { key: 'angry_lanza', vars: { forma: 'cuadrado' } },
+    say: { key: 'angry_lanza', vars: { forma: tr('cuadrado', 'square') } },
     shots: 4,
     blocks: [
       { k: 'rectangulo', x: -1, y: 0, s: 2, angle: 90 },
@@ -55,10 +57,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: 'Elige el triángulo',
+    title: tr('Elige el triángulo', 'Pick the triangle'),
     tray: ['circulo', 'cuadrado', 'triangulo'],
     launch: 'triangulo',
-    say: { key: 'angry_elige', vars: { forma: 'triángulo' } },
+    say: { key: 'angry_elige', vars: { forma: tr('triángulo', 'triangle') } },
     shots: 4,
     blocks: [
       { k: 'cuadrado', x: -0.5, y: 0, target: true },
@@ -68,10 +70,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: 'Derriba los círculos',
+    title: tr('Derriba los círculos', 'Knock down the circles'),
     tray: ['cuadrado'],
     launch: 'cuadrado',
-    say: { key: 'angry_derriba', vars: { formas: 'círculos' } },
+    say: { key: 'angry_derriba', vars: { formas: tr('círculos', 'circles') } },
     shots: 5,
     only: true,
     blocks: [
@@ -86,10 +88,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: 'Elige la estrella',
+    title: tr('Elige la estrella', 'Pick the star'),
     tray: ['triangulo', 'estrella', 'rombo', 'circulo'],
     launch: 'estrella',
-    say: { key: 'angry_elige_f', vars: { forma: 'estrella' } },
+    say: { key: 'angry_elige_f', vars: { forma: tr('estrella', 'star') } },
     shots: 4,
     blocks: [
       { k: 'rectangulo', x: 0, y: 0, s: 2, angle: 90 },
@@ -100,10 +102,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: 'Derriba los triángulos',
+    title: tr('Derriba los triángulos', 'Knock down the triangles'),
     tray: ['circulo'],
     launch: 'circulo',
-    say: { key: 'angry_derriba', vars: { formas: 'triángulos' } },
+    say: { key: 'angry_derriba', vars: { formas: tr('triángulos', 'triangles') } },
     shots: 5,
     only: true,
     blocks: [
@@ -117,7 +119,7 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: 'Formas de 4 lados',
+    title: tr('Formas de 4 lados', 'Shapes with 4 sides'),
     tray: ['estrella'],
     launch: 'estrella',
     say: { key: 'angry_derriba_lados', vars: { n: '4' } },
@@ -134,10 +136,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: 'Elige el rombo',
+    title: tr('Elige el rombo', 'Pick the diamond'),
     tray: ['cuadrado', 'rombo', 'rectangulo', 'triangulo', 'estrella'],
     launch: 'rombo',
-    say: { key: 'angry_elige', vars: { forma: 'rombo' } },
+    say: { key: 'angry_elige', vars: { forma: tr('rombo', 'diamond') } },
     shots: 5,
     blocks: [
       { k: 'rectangulo', x: -1.5, y: 0, s: 2, angle: 90 },

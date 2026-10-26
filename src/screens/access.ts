@@ -4,6 +4,7 @@ import { settings, saveSettings } from '../core/state';
 import { go } from '../core/nav';
 import { say } from '../core/voice';
 import { sfx } from '../core/sound';
+import { tr } from '../core/i18n';
 
 export function accessScreen(root: HTMLElement) {
   root.className = 'screen center';
@@ -13,8 +14,8 @@ export function accessScreen(root: HTMLElement) {
     autocomplete: 'off',
     autocapitalize: 'characters',
     spellcheck: 'false',
-    placeholder: 'Código',
-    'aria-label': 'Código de acceso',
+    placeholder: tr('Código', 'Keyword'),
+    'aria-label': tr('Código de acceso', 'Access keyword'),
   });
   const err = h('div', { class: 'err' });
   const submit = () => {
@@ -26,7 +27,7 @@ export function accessScreen(root: HTMLElement) {
       go(settings.device ? 'profiles' : 'device');
     } else {
       sfx.bad();
-      err.textContent = 'Esa palabra clave no es correcta. Revisa la que te compartimos e intenta otra vez.';
+      err.textContent = tr('Esa palabra clave no es correcta. Revisa la que te compartimos e intenta otra vez.', "That keyword isn't right. Check the one we sent you and try again.");
     }
   };
   input.addEventListener('keydown', (e) => {
@@ -38,11 +39,11 @@ export function accessScreen(root: HTMLElement) {
       { class: 'card col', style: { maxWidth: '520px', width: '100%' } },
       h('div', { class: 'logo' }, ...['#ff8a5b', '#ffd166', '#4cc38a', '#5b8def'].map((c) => h('span', { class: 'dot', style: { background: c } }))),
       h('h1', {}, 'Montessori Play'),
-      h('p', { class: 'sub' }, 'Escribe la palabra clave que te compartimos para empezar a jugar.'),
+      h('p', { class: 'sub' }, tr('Escribe la palabra clave que te compartimos para empezar a jugar.', 'Type the keyword we sent you to start playing.')),
       input,
       err,
-      h('button', { class: 'btn green', onTap: submit }, 'Entrar'),
-      h('p', { class: 'small-note' }, 'Sin registro. Mamá o papá pueden crear hasta 3 perfiles en este dispositivo.')
+      h('button', { class: 'btn green', onTap: submit }, tr('Entrar', 'Enter')),
+      h('p', { class: 'small-note' }, tr('Sin registro. Mamá o papá pueden crear hasta 3 perfiles en este dispositivo.', 'No sign-up needed. Mom or Dad can create up to 3 profiles on this device.'))
     )
   );
   setTimeout(() => root.isConnected && say('codigo'), 300);
