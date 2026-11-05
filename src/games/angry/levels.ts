@@ -31,10 +31,10 @@ export interface AngryLevel {
 // Rectángulo: s = largo (por defecto 2), grosor 0.5; angle 90 = vertical.
 export const ANGRY_LEVELS: AngryLevel[] = [
   {
-    title: tr('Lanza el círculo', 'Throw the circle'),
+    title: tr('Lanza el círculo', 'Throw the circle', 'Lance le cercle'),
     tray: ['circulo'],
     launch: 'circulo',
-    say: { key: 'angry_lanza', vars: { forma: tr('círculo', 'circle') } },
+    say: { key: 'angry_lanza', vars: { forma: tr('círculo', 'circle', 'cercle') } },
     shots: 4,
     blocks: [
       { k: 'cuadrado', x: 0, y: 0, target: true },
@@ -43,10 +43,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: tr('Lanza el cuadrado', 'Throw the square'),
+    title: tr('Lanza el cuadrado', 'Throw the square', 'Lance le carré'),
     tray: ['cuadrado'],
     launch: 'cuadrado',
-    say: { key: 'angry_lanza', vars: { forma: tr('cuadrado', 'square') } },
+    say: { key: 'angry_lanza', vars: { forma: tr('cuadrado', 'square', 'carré') } },
     shots: 4,
     blocks: [
       { k: 'rectangulo', x: -1, y: 0, s: 2, angle: 90 },
@@ -57,10 +57,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: tr('Elige el triángulo', 'Pick the triangle'),
+    title: tr('Elige el triángulo', 'Pick the triangle', 'Choisis le triangle'),
     tray: ['circulo', 'cuadrado', 'triangulo'],
     launch: 'triangulo',
-    say: { key: 'angry_elige', vars: { forma: tr('triángulo', 'triangle') } },
+    say: { key: 'angry_elige', vars: { forma: tr('triángulo', 'triangle', 'triangle') } },
     shots: 4,
     blocks: [
       { k: 'cuadrado', x: -0.5, y: 0, target: true },
@@ -70,10 +70,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: tr('Derriba los círculos', 'Knock down the circles'),
+    title: tr('Derriba los círculos', 'Knock down the circles', 'Fais tomber les cercles'),
     tray: ['cuadrado'],
     launch: 'cuadrado',
-    say: { key: 'angry_derriba', vars: { formas: tr('círculos', 'circles') } },
+    say: { key: 'angry_derriba', vars: { formas: tr('círculos', 'circles', 'cercles') } },
     shots: 5,
     only: true,
     blocks: [
@@ -88,10 +88,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: tr('Elige la estrella', 'Pick the star'),
+    title: tr('Elige la estrella', 'Pick the star', 'Choisis l’étoile'),
     tray: ['triangulo', 'estrella', 'rombo', 'circulo'],
     launch: 'estrella',
-    say: { key: 'angry_elige_f', vars: { forma: tr('estrella', 'star') } },
+    say: { key: 'angry_elige_f', vars: { forma: tr('estrella', 'star', 'étoile') } },
     shots: 4,
     blocks: [
       { k: 'rectangulo', x: 0, y: 0, s: 2, angle: 90 },
@@ -102,10 +102,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: tr('Derriba los triángulos', 'Knock down the triangles'),
+    title: tr('Derriba los triángulos', 'Knock down the triangles', 'Fais tomber les triangles'),
     tray: ['circulo'],
     launch: 'circulo',
-    say: { key: 'angry_derriba', vars: { formas: tr('triángulos', 'triangles') } },
+    say: { key: 'angry_derriba', vars: { formas: tr('triángulos', 'triangles', 'triangles') } },
     shots: 5,
     only: true,
     blocks: [
@@ -119,7 +119,7 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: tr('Formas de 4 lados', 'Shapes with 4 sides'),
+    title: tr('Formas de 4 lados', 'Shapes with 4 sides', 'Formes à 4 côtés'),
     tray: ['estrella'],
     launch: 'estrella',
     say: { key: 'angry_derriba_lados', vars: { n: '4' } },
@@ -136,10 +136,10 @@ export const ANGRY_LEVELS: AngryLevel[] = [
     ],
   },
   {
-    title: tr('Elige el rombo', 'Pick the diamond'),
+    title: tr('Elige el rombo', 'Pick the diamond', 'Choisis le losange'),
     tray: ['cuadrado', 'rombo', 'rectangulo', 'triangulo', 'estrella'],
     launch: 'rombo',
-    say: { key: 'angry_elige', vars: { forma: tr('rombo', 'diamond') } },
+    say: { key: 'angry_elige', vars: { forma: tr('rombo', 'diamond', 'losange') } },
     shots: 5,
     blocks: [
       { k: 'rectangulo', x: -1.5, y: 0, s: 2, angle: 90 },

@@ -130,7 +130,7 @@ class CrashScene extends Phaser.Scene {
   }
 
   explain(text?: string) {
-    this.helpText.setText(text || (this.lv.kind === 'tacha' ? tr('Cambia 2 vecinas para alinear 3 iguales', 'Swap 2 neighbors to line up 3 matching letters') : tr('Toca o arrastra: ', 'Tap or drag: ') + this.lv.word!.split('').join(' → ')));
+    this.helpText.setText(text || (this.lv.kind === 'tacha' ? tr('Cambia 2 vecinas para alinear 3 iguales', 'Swap 2 neighbors to line up 3 matching letters', 'Échange 2 tuiles voisines pour aligner 3 lettres identiques') : tr('Toca o arrastra: ', 'Tap or drag: ', 'Touche ou glisse : ') + this.lv.word!.split('').join(' → ')));
   }
 
   /** Texturas de ficha (relieve: sombra, cara con degradé, brillo) por color */
@@ -300,10 +300,10 @@ class CrashScene extends Phaser.Scene {
   }
 
   updatePanel() {
-    if (this.lv.kind === 'tacha') this.goalText.setText(`${tr('Tacha', 'Cross out')} ${this.lv.letter}: ${Math.min(this.progress, this.lv.count)}/${this.lv.count}`);
-    else this.goalText.setText(`${tr('Forma', 'Make')} ${this.lv.word}: ${this.progress}/${this.lv.count}`);
+    if (this.lv.kind === 'tacha') this.goalText.setText(`${tr('Tacha', 'Cross out', 'Barre')} ${this.lv.letter}${tr(':', ':', ' :')} ${Math.min(this.progress, this.lv.count)}/${this.lv.count}`);
+    else this.goalText.setText(`${tr('Forma', 'Make', 'Forme')} ${this.lv.word}${tr(':', ':', ' :')} ${this.progress}/${this.lv.count}`);
     if (this.lv.cursive) this.goalText.setFontFamily(FONT);
-    this.movesText.setText(`${this.moves} ${tr('mov.', 'moves')}`);
+    this.movesText.setText(`${this.moves} ${tr('mov.', 'moves', 'coups')}`);
     this.slots.forEach((s, i) => s.setText(this.lv.word![i]).setColor(i < this.chain.length ? '#19804e' : '#868baa'));
   }
 
@@ -398,7 +398,7 @@ class CrashScene extends Phaser.Scene {
       } else {
         sfx.bad();
         this.wiggle(t);
-        this.explain(tr('Elige una letra vecina de la última', 'Pick a letter next to the last one'));
+        this.explain(tr('Elige una letra vecina de la última', 'Pick a letter next to the last one', 'Choisis une lettre à côté de la dernière'));
       }
       this.afterChain();
       return;
@@ -406,7 +406,7 @@ class CrashScene extends Phaser.Scene {
     if (t.letter !== need) {
       sfx.bad();
       this.wiggle(t);
-      this.explain(tr(`Ahora busca la ${need}`, `Now find the ${need}`));
+      this.explain(tr(`Ahora busca la ${need}`, `Now find the ${need}`, `Maintenant, trouve le ${need}`));
       if (!last) say(letterName(word[0]), {}, { raw: true });
       return;
     }
@@ -475,7 +475,7 @@ class CrashScene extends Phaser.Scene {
     const matches = this.findMatches();
     if (!matches.length) {
       sfx.bad();
-      this.explain(tr('¡Falta una! Alinea 3 iguales, no solo 2', 'One more! Line up 3 matching letters, not just 2'));
+      this.explain(tr('¡Falta una! Alinea 3 iguales, no solo 2', 'One more! Line up 3 matching letters, not just 2', 'Encore une ! Aligne 3 lettres identiques, pas seulement 2'));
       await this.swapTiles(a, b);
       this.busy = false;
       return;
@@ -596,7 +596,7 @@ class CrashScene extends Phaser.Scene {
   }
 
   combo(level: number, n: number) {
-    const words = pick(['¡Bien!', '¡Genial!', '¡Súper!', '¡Increíble!', '¡Fantástico!'], ['Nice!', 'Great!', 'Super!', 'Amazing!', 'Fantastic!']);
+    const words = pick(['¡Bien!', '¡Genial!', '¡Súper!', '¡Increíble!', '¡Fantástico!'], ['Nice!', 'Great!', 'Super!', 'Amazing!', 'Fantastic!'], ['Bien !', 'Génial !', 'Super !', 'Bravo !', 'Fantastique !']);
     const txt = words[Math.min(words.length - 1, level + (n >= 5 ? 1 : 0))];
     const t = this.add
       .text(this.x0 + (this.cell * N) / 2, this.y0 + (this.cell * N) / 2, txt, {
@@ -776,11 +776,11 @@ class CrashScene extends Phaser.Scene {
     const box = this.add.graphics().setDepth(41);
     box.fillStyle(0xffffff, 1);
     box.fillRoundedRect(w / 2 - 170, h / 2 - 110, 340, 220, 26);
-    const t = this.add.text(w / 2, h / 2 - 50, tr('¡Se acabaron\nlos movimientos!', "You're out\nof moves!"), { fontFamily: FONT, fontSize: '28px', color: '#3a3f6b', align: 'center', fontStyle: 'bold' }).setOrigin(0.5).setDepth(42);
+    const t = this.add.text(w / 2, h / 2 - 50, tr('¡Se acabaron\nlos movimientos!', "You're out\nof moves!", 'Tu n’as plus\nde coups !'), { fontFamily: FONT, fontSize: '28px', color: '#3a3f6b', align: 'center', fontStyle: 'bold' }).setOrigin(0.5).setDepth(42);
     const btn = this.add.graphics().setDepth(42);
     btn.fillStyle(0x4cc38a, 1);
     btn.fillRoundedRect(w / 2 - 130, h / 2 + 20, 260, 66, 33);
-    const bt = this.add.text(w / 2, h / 2 + 53, tr('Intentar otra vez', 'Try again'), { fontFamily: FONT, fontSize: '24px', color: '#ffffff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(43);
+    const bt = this.add.text(w / 2, h / 2 + 53, tr('Intentar otra vez', 'Try again', 'Réessayer'), { fontFamily: FONT, fontSize: '24px', color: '#ffffff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(43);
     const zone = this.add.zone(w / 2, h / 2 + 53, 260, 66).setInteractive({ useHandCursor: true }).setDepth(44);
     zone.on('pointerup', () => {
       sfx.tap();

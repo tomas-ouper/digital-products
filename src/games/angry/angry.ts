@@ -10,16 +10,16 @@ import { tr } from '../../core/i18n';
 const HUD_TOP = 84;
 
 export const SHAPE_NAME: Record<ShapeKind, { n: string; f: boolean }> = {
-  circulo: { n: tr('círculo', 'circle'), f: false },
-  cuadrado: { n: tr('cuadrado', 'square'), f: false },
-  triangulo: { n: tr('triángulo', 'triangle'), f: false },
-  rectangulo: { n: tr('rectángulo', 'rectangle'), f: false },
-  rombo: { n: tr('rombo', 'diamond'), f: false },
-  estrella: { n: tr('estrella', 'star'), f: true },
+  circulo: { n: tr('círculo', 'circle', 'cercle'), f: false },
+  cuadrado: { n: tr('cuadrado', 'square', 'carré'), f: false },
+  triangulo: { n: tr('triángulo', 'triangle', 'triangle'), f: false },
+  rectangulo: { n: tr('rectángulo', 'rectangle', 'rectangle'), f: false },
+  rombo: { n: tr('rombo', 'diamond', 'losange'), f: false },
+  estrella: { n: tr('estrella', 'star', 'étoile'), f: true },
 };
 
 /** "Elige círculo" / "Pick the circle" */
-const pickLabel = (k: ShapeKind) => tr(`Elige ${SHAPE_NAME[k].n}`, `Pick the ${SHAPE_NAME[k].n}`);
+const pickLabel = (k: ShapeKind) => tr(`Elige ${SHAPE_NAME[k].n}`, `Pick the ${SHAPE_NAME[k].n}`, `Choisis ${SHAPE_NAME[k].f ? 'l’' : 'le '}${SHAPE_NAME[k].n}`);
 
 const SHAPE_COLOR: Record<ShapeKind, number> = {
   circulo: 0xff7a59,
@@ -167,7 +167,7 @@ class AngryScene extends Phaser.Scene {
     this.input.on('pointerup', () => this.onUp());
     this.input.on('pointerupoutside', () => this.onUp());
 
-    const instr = () => sayText(`${this.objective()} ${pickLabel(this.lv.launch)}` + tr(', arrastra hacia atrás y suelta.', ', pull it back and let go.'));
+    const instr = () => sayText(`${this.objective()} ${pickLabel(this.lv.launch)}` + tr(', arrastra hacia atrás y suelta.', ', pull it back and let go.', ', tire vers l’arrière et lâche.'));
     this.ctx.setTitle(this.lv.title);
     this.ctx.setRepeat(instr);
     if (this.lv.tray.length === 1) {
@@ -422,7 +422,7 @@ class AngryScene extends Phaser.Scene {
     const y = this.groundY + (this.scale.height - this.groundY) / 2 - 4;
     const x0 = 12 + size / 2;
     const yy = Math.min(y, this.scale.height - size / 2 - 6);
-    const label = this.add.text(12, yy - size / 2 - 8, `${pickLabel(this.lv.launch)}:`, { fontFamily: FONT, fontSize: '20px', color: '#3a3f6b', fontStyle: 'bold', backgroundColor: '#ffffffcc', padding: { x: 8, y: 3 } }).setOrigin(0, 1).setDepth(12);
+    const label = this.add.text(12, yy - size / 2 - 8, `${pickLabel(this.lv.launch)}${tr(':', ':', ' :')}`, { fontFamily: FONT, fontSize: '20px', color: '#3a3f6b', fontStyle: 'bold', backgroundColor: '#ffffffcc', padding: { x: 8, y: 3 } }).setOrigin(0, 1).setDepth(12);
     this.trayObjs.push(label);
     this.lv.tray.forEach((k, i) => {
       const x = x0 + i * (size + gap);
@@ -479,7 +479,7 @@ class AngryScene extends Phaser.Scene {
     const d = Math.hypot(p.x - this.proj.x, p.y - this.proj.y);
     if (d < this.U * 2.2) {
       this.dragging = true;
-      this.hintText.setText(tr('Apunta con los puntos blancos y suelta para lanzar', 'Aim with the white dots and let go to throw'));
+      this.hintText.setText(tr('Apunta con los puntos blancos y suelta para lanzar', 'Aim with the white dots and let go to throw', 'Vise avec les points blancs et lâche pour lancer'));
       sfx.tap();
     }
   }
@@ -523,7 +523,7 @@ class AngryScene extends Phaser.Scene {
     if (pull < 0.15) {
       // muy poquito: vuelve a su lugar
       this.proj.setPosition(this.anchor.x, this.anchor.y);
-      this.hintText.setText(tr('Arrastra más hacia atrás y suelta', 'Pull back further and let go'));
+      this.hintText.setText(tr('Arrastra más hacia atrás y suelta', 'Pull back further and let go', 'Tire plus loin en arrière et lâche'));
       this.aim.clear();
       return;
     }
@@ -545,17 +545,17 @@ class AngryScene extends Phaser.Scene {
   }
 
   objective() {
-    if (this.lv.only) return `${this.lv.title}. ` + tr('Evita las formas sin aro.', 'Avoid the shapes without a ring.');
-    return tr('Derriba las formas con aro dorado', 'Knock down the shapes with a gold ring');
+    if (this.lv.only) return `${this.lv.title}. ` + tr('Evita las formas sin aro.', 'Avoid the shapes without a ring.', 'Évite les formes sans anneau.');
+    return tr('Derriba las formas con aro dorado', 'Knock down the shapes with a gold ring', 'Fais tomber les formes avec un anneau doré');
   }
 
   updateHud() {
     const total = this.lv.blocks.filter(b => b.target).length;
     const left = this.targetsLeft();
-    this.hudText.setText(tr(`Tiros: ${this.shotsLeft}  ·  Objetivos: ${total - left}/${total}`, `Shots: ${this.shotsLeft}  ·  Targets: ${total - left}/${total}`));
-    this.objectiveText?.setText(`${this.objective()}\n${left} ` + tr('por derribar', 'left to knock down'));
+    this.hudText.setText(tr(`Tiros: ${this.shotsLeft}  ·  Objetivos: ${total - left}/${total}`, `Shots: ${this.shotsLeft}  ·  Targets: ${total - left}/${total}`, `Tirs : ${this.shotsLeft}  ·  Cibles : ${total - left}/${total}`));
+    this.objectiveText?.setText(`${this.objective()}\n${left} ` + tr('por derribar', 'left to knock down', 'à faire tomber'));
     this.hintText?.setVisible(!!this.proj || this.lv.tray.length === 1);
-    this.hintText?.setText(this.flying ? tr('¡Mira cuáles derribas!', 'Watch what you knock down!') : !this.proj && this.lv.tray.length > 1 ? pickLabel(this.lv.launch) + tr(' abajo', ' below') : tr('Arrastra la forma hacia atrás ↙ y suelta', 'Pull the shape back ↙ and let go'));
+    this.hintText?.setText(this.flying ? tr('¡Mira cuáles derribas!', 'Watch what you knock down!', 'Regarde ce que tu fais tomber !') : !this.proj && this.lv.tray.length > 1 ? pickLabel(this.lv.launch) + tr(' abajo', ' below', ' en bas') : tr('Arrastra la forma hacia atrás ↙ y suelta', 'Pull the shape back ↙ and let go', 'Tire la forme vers l’arrière ↙ et lâche'));
   }
 
   puff(x: number, y: number, k: number) {
@@ -588,7 +588,7 @@ class AngryScene extends Phaser.Scene {
         this.tweens.add({ targets: m, y: m.y - U, alpha: 0, delay: 500, duration: 700, onComplete: () => m.destroy() });
       } else if (this.lv.only && t.block?.k !== 'rectangulo') {
         this.wrongDown++;
-        const m = this.add.text(t.img.x, t.img.y - U, tr('¡Cuida esta!', 'Protect this one!'), { fontFamily: FONT, fontSize: '18px', color: '#9f2843', backgroundColor: '#ffffff' }).setOrigin(0.5).setDepth(15);
+        const m = this.add.text(t.img.x, t.img.y - U, tr('¡Cuida esta!', 'Protect this one!', 'Protège celle-ci !'), { fontFamily: FONT, fontSize: '18px', color: '#9f2843', backgroundColor: '#ffffff' }).setOrigin(0.5).setDepth(15);
         this.tweens.add({ targets: m, y: m.y - U, alpha: 0, duration: 1500, onComplete: () => m.destroy() });
       }
       this.updateHud();
@@ -709,11 +709,11 @@ class AngryScene extends Phaser.Scene {
     const box = this.add.graphics().setDepth(41);
     box.fillStyle(0xffffff, 1);
     box.fillRoundedRect(w / 2 - 170, h / 2 - 100, 340, 200, 26);
-    this.add.text(w / 2, h / 2 - 45, tr('¡Casi!\nSe acabaron los tiros', "Almost!\nYou're out of shots"), { fontFamily: FONT, fontSize: '26px', color: '#3a3f6b', align: 'center', fontStyle: 'bold' }).setOrigin(0.5).setDepth(42);
+    this.add.text(w / 2, h / 2 - 45, tr('¡Casi!\nSe acabaron los tiros', "Almost!\nYou're out of shots", 'Presque !\nTu n’as plus de tirs'), { fontFamily: FONT, fontSize: '26px', color: '#3a3f6b', align: 'center', fontStyle: 'bold' }).setOrigin(0.5).setDepth(42);
     const btn = this.add.graphics().setDepth(42);
     btn.fillStyle(0x4cc38a, 1);
     btn.fillRoundedRect(w / 2 - 130, h / 2 + 15, 260, 66, 33);
-    this.add.text(w / 2, h / 2 + 48, tr('Intentar otra vez', 'Try again'), { fontFamily: FONT, fontSize: '24px', color: '#ffffff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(43);
+    this.add.text(w / 2, h / 2 + 48, tr('Intentar otra vez', 'Try again', 'Réessayer'), { fontFamily: FONT, fontSize: '24px', color: '#ffffff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(43);
     const zone = this.add.zone(w / 2, h / 2 + 48, 260, 66).setInteractive({ useHandCursor: true }).setDepth(44);
     zone.on('pointerup', () => {
       sfx.tap();

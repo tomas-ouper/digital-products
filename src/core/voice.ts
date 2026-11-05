@@ -1,16 +1,18 @@
-// Voz: Web Speech API (es-MX preferido; en /en/, la voz en inglés del dispositivo) + reemplazo opcional por mp3 grabados.
+// Voz: Web Speech API (es-MX preferido; en /en/ y /fr/, la voz en inglés o en francés del dispositivo) + reemplazo opcional por mp3 grabados.
 // Para reemplazar una frase por un mp3: poner public/audio/<clave>.mp3 y agregar el nombre en
 // public/audio/available.json ({"files":["bienvenida.mp3", ...]}). Ver voces.csv.
-// En inglés: public/en/audio/ y voces-en.csv (las rutas relativas ya apuntan ahí desde /en/).
+// En inglés: public/en/audio/ y voces-en.csv; en francés: public/fr/audio/ y voces-fr.csv (las rutas relativas ya apuntan ahí).
 import frases from '../data/frases.json';
 import letras from '../data/letras.json';
 import frasesEn from '../data/en/frases.json';
 import letrasEn from '../data/en/letras.json';
+import frasesFr from '../data/fr/frases.json';
+import letrasFr from '../data/fr/letras.json';
 import { settings } from './state';
-import { EN } from './i18n';
+import { EN, FR, pick } from './i18n';
 
-const F = (EN ? frasesEn : frases) as Record<string, string>;
-const LETRAS = (EN ? letrasEn : letras) as Record<string, string>;
+const F = pick(frases, frasesEn, frasesFr) as Record<string, string>;
+const LETRAS = pick(letras, letrasEn, letrasFr) as Record<string, string>;
 
 let available = new Set<string>();
 fetch('./audio/available.json')
@@ -37,8 +39,22 @@ function pickVoice() {
     if (/google|natural|premium|enhanced|samantha|ava|allison|karen|serena|aria|jenny/i.test(v.name)) n += 5;
     return n;
   };
+  // Francés: primero fr-FR (Francia), después Bélgica/Suiza y por último Canadá.
+  const scoreFr = (v: SpeechSynthesisVoice) => {
+    const l = v.lang.toLowerCase().replace('_', '-');
+    let n = 0;
+    if (l === 'fr-fr') n += 50;
+    else if (l === 'fr-be' || l === 'fr-ch') n += 40;
+    else if (l === 'fr' ) n += 35;
+    else if (l === 'fr-ca') n += 25;
+    else if (l.startsWith('fr-')) n += 20;
+    else return -1;
+    if (/google|natural|premium|enhanced|amélie|amelie|audrey|aurélie|aurelie|marie|thomas|denise|julie/i.test(v.name)) n += 5;
+    return n;
+  };
   const score = (v: SpeechSynthesisVoice) => {
     if (EN) return scoreEn(v);
+    if (FR) return scoreFr(v);
     const l = v.lang.toLowerCase().replace('_', '-');
     let n = 0;
     if (l === 'es-mx') n += 50;
@@ -57,7 +73,7 @@ if (typeof window !== 'undefined' && window.speechSynthesis) {
   window.speechSynthesis.onvoiceschanged = pickVoice;
 }
 
-/** Nombre de una letra para decirla en voz alta ("eme"; en inglés, la mayúscula: "M"). */
+/** Nombre de una letra para decirla en voz alta ("eme"; en inglés, la mayúscula: "M"; en francés, "emme"). */
 export function letterName(l: string): string {
   return LETRAS[l.toLowerCase()] || l;
 }
@@ -129,7 +145,7 @@ function speakText(text: string, my: number): Promise<void> {
   return new Promise((res) => {
     if (my !== token) return res();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = voice?.lang || (EN ? 'en-US' : 'es-MX');
+    u.lang = voice?.lang || (FR ? 'fr-FR' : EN ? 'en-US' : 'es-MX');
     if (voice) u.voice = voice;
     u.rate = 0.92;
     u.pitch = 1.1;

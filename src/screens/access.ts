@@ -14,12 +14,12 @@ export function accessScreen(root: HTMLElement) {
     autocomplete: 'off',
     autocapitalize: 'characters',
     spellcheck: 'false',
-    placeholder: tr('Código', 'Keyword'),
-    'aria-label': tr('Código de acceso', 'Access keyword'),
+    placeholder: tr('Código', 'Keyword', 'Mot-clé'),
+    'aria-label': tr('Código de acceso', 'Access keyword', 'Mot-clé d’accès'),
   });
   const err = h('div', { class: 'err' });
   const submit = () => {
-    const v = input.value.trim().toUpperCase().replace(/\s+/g, '');
+    const v = input.value.trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '');
     if (v && v === ACCESS_CODE.replace(/\s+/g, '')) {
       settings.unlocked = true;
       saveSettings();
@@ -27,7 +27,7 @@ export function accessScreen(root: HTMLElement) {
       go(settings.device ? 'profiles' : 'device');
     } else {
       sfx.bad();
-      err.textContent = tr('Esa palabra clave no es correcta. Revisa la que te compartimos e intenta otra vez.', "That keyword isn't right. Check the one we sent you and try again.");
+      err.textContent = tr('Esa palabra clave no es correcta. Revisa la que te compartimos e intenta otra vez.', "That keyword isn't right. Check the one we sent you and try again.", 'Ce mot-clé n’est pas le bon. Vérifiez celui que nous vous avons envoyé et réessayez.');
     }
   };
   input.addEventListener('keydown', (e) => {
@@ -39,11 +39,11 @@ export function accessScreen(root: HTMLElement) {
       { class: 'card col', style: { maxWidth: '520px', width: '100%' } },
       h('div', { class: 'logo' }, ...['#ff8a5b', '#ffd166', '#4cc38a', '#5b8def'].map((c) => h('span', { class: 'dot', style: { background: c } }))),
       h('h1', {}, 'Montessori Play'),
-      h('p', { class: 'sub' }, tr('Escribe la palabra clave que te compartimos para empezar a jugar.', 'Type the keyword we sent you to start playing.')),
+      h('p', { class: 'sub' }, tr('Escribe la palabra clave que te compartimos para empezar a jugar.', 'Type the keyword we sent you to start playing.', 'Saisissez le mot-clé que nous vous avons envoyé pour commencer à jouer.')),
       input,
       err,
-      h('button', { class: 'btn green', onTap: submit }, tr('Entrar', 'Enter')),
-      h('p', { class: 'small-note' }, tr('Sin registro. Mamá o papá pueden crear hasta 3 perfiles en este dispositivo.', 'No sign-up needed. Mom or Dad can create up to 3 profiles on this device.'))
+      h('button', { class: 'btn green', onTap: submit }, tr('Entrar', 'Enter', 'Entrer')),
+      h('p', { class: 'small-note' }, tr('Sin registro. Mamá o papá pueden crear hasta 3 perfiles en este dispositivo.', 'No sign-up needed. Mom or Dad can create up to 3 profiles on this device.', 'Sans inscription. Papa ou maman peut créer jusqu’à 3 profils sur cet appareil.'))
     )
   );
   setTimeout(() => root.isConnected && say('codigo'), 300);

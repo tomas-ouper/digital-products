@@ -43,5 +43,5 @@ export function glyphCells(ch: string): [number, number][] {
 export function normalizeName(name: string, max = 5): string {
   const up = name.toUpperCase().replace(/Ñ/g, '\u0001');
   const clean = up.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\u0001/g, 'Ñ');
-  return [...clean].filter((c) => F[c]).slice(0, max).join('') || tr('HOLA', 'HELLO');
+  return [...clean].filter((c) => F[c]).slice(0, max).join('') || tr('HOLA', 'HELLO', 'SALUT');
 }

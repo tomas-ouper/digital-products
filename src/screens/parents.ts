@@ -18,7 +18,7 @@ export function parentsScreen(root: HTMLElement) {
   const a = 4 + Math.floor(Math.random() * 6);
   const b = 3 + Math.floor(Math.random() * 7);
   let val = '';
-  const show = h('input', { class: 'big', readonly: 'true', value: '', 'aria-label': tr('Respuesta', 'Answer'), style: { maxWidth: '220px' } }) as HTMLInputElement;
+  const show = h('input', { class: 'big', readonly: 'true', value: '', 'aria-label': tr('Respuesta', 'Answer', 'Répondre'), style: { maxWidth: '220px' } }) as HTMLInputElement;
   const err = h('div', { class: 'err' });
   const press = (k: string) => {
     if (k === '⌫') val = val.slice(0, -1);
@@ -28,19 +28,19 @@ export function parentsScreen(root: HTMLElement) {
         return parentPanel(root);
       }
       sfx.bad();
-      err.textContent = tr('No es correcto. Intenta otra vez.', "That's not right. Try again.");
+      err.textContent = tr('No es correcto. Intenta otra vez.', "That's not right. Try again.", 'Ce n’est pas ça. Réessayez.');
       val = '';
     } else if (val.length < 3) val += k;
     show.value = val;
   };
   const back = () => go(activeProfile() ? 'hub' : 'profiles');
   root.append(
-    h('div', { class: 'topbar' }, iconButton(ICONS.back, tr('Volver', 'Back'), back)),
+    h('div', { class: 'topbar' }, iconButton(ICONS.back, tr('Volver', 'Back', 'Retour'), back)),
     h(
       'div',
       { class: 'card col', style: { maxWidth: '440px', width: '100%' } },
-      h('h2', {}, tr('Solo para adultos', 'Grown-ups only')),
-      h('p', { class: 'sub' }, tr('Resuelve la suma para entrar:', 'Solve the sum to enter:')),
+      h('h2', {}, tr('Solo para adultos', 'Grown-ups only', 'Réservé aux adultes')),
+      h('p', { class: 'sub' }, tr('Resuelve la suma para entrar:', 'Solve the sum to enter:', 'Résolvez l’addition pour entrer :')),
       h('div', { style: { fontSize: '44px', fontWeight: '700' } }, `${a} + ${b} = ?`),
       show,
       err,
@@ -74,7 +74,7 @@ function parentPanel(root: HTMLElement) {
     // ---- Ajustes generales ----
     const limitLabel = h('div', { style: { fontSize: '24px', fontWeight: '600' } });
     const range = h('input', { type: 'range', min: '0', max: '60', step: '5', value: String(settings.dailyLimitMin) }) as HTMLInputElement;
-    const updL = () => (limitLabel.textContent = settings.dailyLimitMin ? tr(`${settings.dailyLimitMin} minutos por día`, `${settings.dailyLimitMin} minutes per day`) : tr('Sin límite', 'No limit'));
+    const updL = () => (limitLabel.textContent = settings.dailyLimitMin ? tr(`${settings.dailyLimitMin} minutos por día`, `${settings.dailyLimitMin} minutes per day`, `${settings.dailyLimitMin} minutes par jour`) : tr('Sin límite', 'No limit', 'Sans limite'));
     range.addEventListener('input', () => {
       settings.dailyLimitMin = Number(range.value);
       saveSettings();
@@ -82,7 +82,7 @@ function parentPanel(root: HTMLElement) {
     });
     updL();
     const toggle = (label: string, key: 'sound' | 'voice') => {
-      const btn = h('button', { class: 'btn small ' + (settings[key] ? 'green' : 'ghost') }, `${label}: ${settings[key] ? tr('sí', 'on') : tr('no', 'off')}`);
+      const btn = h('button', { class: 'btn small ' + (settings[key] ? 'green' : 'ghost') }, `${label}${tr(':', ':', ' :')} ${settings[key] ? tr('sí', 'on', 'activé') : tr('no', 'off', 'désactivé')}`);
       btn.addEventListener('click', () => {
         settings[key] = !settings[key];
         saveSettings();
@@ -91,27 +91,27 @@ function parentPanel(root: HTMLElement) {
       return btn;
     };
     body.append(
-      h('h1', {}, tr('Panel de padres', 'Parent panel')),
+      h('h1', {}, tr('Panel de padres', 'Parent panel', 'Espace parents')),
       h(
         'div',
         { class: 'card parent-section' },
-        h('h2', {}, tr('Tiempo de juego diario', 'Daily play time')),
+        h('h2', {}, tr('Tiempo de juego diario', 'Daily play time', 'Temps de jeu par jour')),
         limitLabel,
         range,
-        h('p', { class: 'small-note' }, tr('Cuando se termina el tiempo, aparece una "Misión del día" para hacer sin pantalla. El límite se cuenta por perfil.', 'When time is up, a screen-free "Mission of the day" appears. The limit is counted per profile.')),
-        h('div', { class: 'row' }, toggle(tr('Voz', 'Voice'), 'voice'), toggle(tr('Sonidos', 'Sounds'), 'sound'))
+        h('p', { class: 'small-note' }, tr('Cuando se termina el tiempo, aparece una "Misión del día" para hacer sin pantalla. El límite se cuenta por perfil.', 'When time is up, a screen-free "Mission of the day" appears. The limit is counted per profile.', 'Quand le temps est écoulé, une « Mission du jour » sans écran apparaît. La limite est comptée par profil.')),
+        h('div', { class: 'row' }, toggle(tr('Voz', 'Voice', 'Voix'), 'voice'), toggle(tr('Sonidos', 'Sounds', 'Sons'), 'sound'))
       )
     );
     body.append(
       h('section', { class: 'card parent-section', 'aria-labelledby': 'support-title' },
-        h('h2', { id: 'support-title' }, tr('Soporte y sugerencias', 'Support and suggestions')),
-        h('p', { class: 'sub' }, tr('¿Tienes una duda, un problema con el juego o una idea para mejorarlo? Escríbele a Tomás por WhatsApp.', 'Have a question, a problem with the game or an idea to make it better? Message Tomás on WhatsApp.')),
+        h('h2', { id: 'support-title' }, tr('Soporte y sugerencias', 'Support and suggestions', 'Aide et suggestions')),
+        h('p', { class: 'sub' }, tr('¿Tienes una duda, un problema con el juego o una idea para mejorarlo? Escríbele a Tomás por WhatsApp.', 'Have a question, a problem with the game or an idea to make it better? Message Tomás on WhatsApp.', 'Une question, un problème avec le jeu ou une idée pour l’améliorer ? Écrivez à Tomás sur WhatsApp.')),
         h('a', {
           class: 'btn green support-link',
-          href: 'https://wa.me/5493424221634?text=' + encodeURIComponent(tr('Hola Tomás, te escribo por Montessori Play. Mi consulta o sugerencia es: ', "Hi Tomás, I'm writing about Montessori Play. My question or suggestion is: ")),
+          href: 'https://wa.me/5493424221634?text=' + encodeURIComponent(tr('Hola Tomás, te escribo por Montessori Play. Mi consulta o sugerencia es: ', "Hi Tomás, I'm writing about Montessori Play. My question or suggestion is: ", 'Bonjour Tomás, je vous écris au sujet de Montessori Play. Ma question ou ma suggestion : ')),
           target: '_blank', rel: 'noopener noreferrer',
-        }, tr('Hablar con Tomás por WhatsApp', 'Chat with Tomás on WhatsApp')),
-        h('p', { class: 'small-note' }, tr('+54 9 342 422 1634 · Atención para madres, padres y adultos responsables.', '+54 9 342 422 1634 · Support for parents and caregivers.'))
+        }, tr('Hablar con Tomás por WhatsApp', 'Chat with Tomás on WhatsApp', 'Écrire à Tomás sur WhatsApp')),
+        h('p', { class: 'small-note' }, tr('+54 9 342 422 1634 · Atención para madres, padres y adultos responsables.', '+54 9 342 422 1634 · Support for parents and caregivers.', '+54 9 342 422 1634 · Assistance pour les parents.'))
       )
     );
     if (!profiles.length) return;
@@ -143,7 +143,7 @@ function parentPanel(root: HTMLElement) {
     const perGame = GAMES.map((g) => {
       const st = d.stars[g.id] || [];
       const done = st.filter((x) => x > 0).length;
-      return h('div', { class: 'stat' }, h('div', { class: 'v' }, `${done}/${g.levels.length}`), h('div', { class: 'l' }, g.name + tr(' (niveles)', ' (levels)')));
+      return h('div', { class: 'stat' }, h('div', { class: 'v' }, `${done}/${g.levels.length}`), h('div', { class: 'l' }, g.name + tr(' (niveles)', ' (levels)', ' (niveaux)')));
     });
     const ageBtn = (a: AgeGroup) =>
       h(
@@ -162,21 +162,21 @@ function parentPanel(root: HTMLElement) {
       h(
         'div',
         { class: 'card parent-section' },
-        h('h2', {}, tr(`Progreso de ${p.name}`, `${p.name}'s progress`)),
+        h('h2', {}, tr(`Progreso de ${p.name}`, `${p.name}'s progress`, `Progrès de ${p.name}`)),
         h(
           'div',
           { class: 'stat-grid' },
-          h('div', { class: 'stat' }, h('div', { class: 'v' }, String(Math.round(playedTodaySec(p.id) / 60))), h('div', { class: 'l' }, tr('minutos hoy', 'minutes today'))),
-          h('div', { class: 'stat' }, h('div', { class: 'v' }, String(minutesLastDays(p, 7))), h('div', { class: 'l' }, tr('minutos en 7 días', 'minutes in 7 days'))),
-          h('div', { class: 'stat' }, h('div', { class: 'v' }, '🔥 ' + streak(p.id)), h('div', { class: 'l' }, tr('días seguidos', 'days in a row'))),
-          h('div', { class: 'stat' }, h('div', { class: 'v' }, '⭐ ' + totalStars(p.id)), h('div', { class: 'l' }, tr('estrellas', 'stars'))),
+          h('div', { class: 'stat' }, h('div', { class: 'v' }, String(Math.round(playedTodaySec(p.id) / 60))), h('div', { class: 'l' }, tr('minutos hoy', 'minutes today', 'minutes aujourd’hui'))),
+          h('div', { class: 'stat' }, h('div', { class: 'v' }, String(minutesLastDays(p, 7))), h('div', { class: 'l' }, tr('minutos en 7 días', 'minutes in 7 days', 'minutes sur 7 jours'))),
+          h('div', { class: 'stat' }, h('div', { class: 'v' }, '🔥 ' + streak(p.id)), h('div', { class: 'l' }, tr('días seguidos', 'days in a row', 'jours d’affilée'))),
+          h('div', { class: 'stat' }, h('div', { class: 'v' }, '⭐ ' + totalStars(p.id)), h('div', { class: 'l' }, tr('estrellas', 'stars', 'étoiles'))),
           ...perGame
         ),
-        h('h2', {}, tr(`Letras dominadas (${letters.length})`, `Letters mastered (${letters.length})`)),
+        h('h2', {}, tr(`Letras dominadas (${letters.length})`, `Letters mastered (${letters.length})`, `Lettres maîtrisées (${letters.length})`)),
         letters.length
           ? h('div', { class: 'letters-done' }, ...letters.map((k) => h('span', { class: isCursive(k) ? 'cur' : '' }, glyph(k))))
-          : h('p', { class: 'small-note' }, tr('Todavía ninguna. Se marcan al trazar bien una letra en Snake Lecto o Trazo Ninja.', 'None yet. A letter is marked when it is traced well in Letter Snake or Trace Ninja.')),
-        h('h2', {}, tr('Dificultad', 'Difficulty')),
+          : h('p', { class: 'small-note' }, tr('Todavía ninguna. Se marcan al trazar bien una letra en Snake Lecto o Trazo Ninja.', 'None yet. A letter is marked when it is traced well in Letter Snake or Trace Ninja.', 'Aucune pour l’instant. Une lettre est validée quand elle est bien tracée dans Le Serpent des lettres ou Ninja du tracé.')),
+        h('h2', {}, tr('Dificultad', 'Difficulty', 'Difficulté')),
         h('div', { class: 'row' }, ageBtn('3-5'), ageBtn('6-8')),
         h(
           'div',
@@ -191,20 +191,20 @@ function parentPanel(root: HTMLElement) {
                 render();
               },
             },
-            tr('+10 min solo hoy', '+10 min today only')
+            tr('+10 min solo hoy', '+10 min today only', '+10 min aujourd’hui seulement')
           ),
           h(
             'button',
             {
               class: 'btn small coral',
               onTap: () => {
-                if (confirm(tr(`¿Borrar el perfil de ${p.name} y todo su progreso?`, `Delete ${p.name}'s profile and all their progress?`))) {
+                if (confirm(tr(`¿Borrar el perfil de ${p.name} y todo su progreso?`, `Delete ${p.name}'s profile and all their progress?`, `Supprimer le profil de ${p.name} et toute sa progression ?`))) {
                   deleteProfile(p.id);
                   go('parents');
                 }
               },
             },
-            tr('Borrar perfil', 'Delete profile')
+            tr('Borrar perfil', 'Delete profile', 'Supprimer le profil')
           )
         )
       )
@@ -215,9 +215,9 @@ function parentPanel(root: HTMLElement) {
     h(
       'div',
       { class: 'topbar' },
-      iconButton(ICONS.home, tr('Salir', 'Exit'), () => go(activeProfile() ? 'hub' : 'profiles')),
+      iconButton(ICONS.home, tr('Salir', 'Exit', 'Quitter'), () => go(activeProfile() ? 'hub' : 'profiles')),
       h('div', { class: 'spacer' }),
-      h('button', { class: 'btn ghost small', onTap: () => go('profiles') }, tr('Cambiar de jugador', 'Switch player'))
+      h('button', { class: 'btn ghost small', onTap: () => go('profiles') }, tr('Cambiar de jugador', 'Switch player', 'Changer de joueur'))
     ),
     body
   );

@@ -28,7 +28,8 @@ console.log('✓ El tiempo pendiente se guarda en su perfil original');
 let queued = [];
 const voice = moduleAt('src/core/voice.ts', {
   '../data/frases.json': { default: {} }, '../data/letras.json': { default: {} }, './state': { settings: { voice: true } },
-  '../data/en/frases.json': { default: {} }, '../data/en/letras.json': { default: {} }, './i18n': { EN: false },
+  '../data/en/frases.json': { default: {} }, '../data/en/letras.json': { default: {} },
+  '../data/fr/frases.json': { default: {} }, '../data/fr/letras.json': { default: {} }, './i18n': { EN: false, FR: false, pick: (es) => es },
 }, {
   setTimeout, clearTimeout,
   fetch: async () => ({ ok: true, json: async () => ({ files: ['audio.mp3'] }) }),
@@ -45,7 +46,8 @@ console.log('✓ Cancelar voz y MP3 resuelve sus promesas sin esperar eventos de
 // /en/: frases y nombres de letras en inglés, voz en-US por defecto.
 const voiceEn = moduleAt('src/core/voice.ts', {
   '../data/frases.json': { default: { hola: 'Hola {letra}' } }, '../data/letras.json': { default: { m: 'eme' } }, './state': { settings: { voice: true } },
-  '../data/en/frases.json': { default: { hola: 'Hi {letra}' } }, '../data/en/letras.json': { default: { m: 'M' } }, './i18n': { EN: true },
+  '../data/en/frases.json': { default: { hola: 'Hi {letra}' } }, '../data/en/letras.json': { default: { m: 'M' } },
+  '../data/fr/frases.json': { default: {} }, '../data/fr/letras.json': { default: {} }, './i18n': { EN: true, FR: false, pick: (es, en) => en },
 }, {
   setTimeout, clearTimeout, navigator: { language: 'en-US' },
   fetch: async () => ({ ok: true, json: async () => ({ files: [] }) }),
@@ -56,6 +58,21 @@ assert.equal(voiceEn.phrase('hola', { letra: voiceEn.letterName('m') }), 'Hi M')
 queued = [];
 voiceEn.sayText('Hello'); assert.equal(queued[0].lang, 'en-US'); voiceEn.stopVoice();
 console.log('✓ En /en/ la voz usa las frases en inglés y en-US');
+// /fr/: frases y nombres de letras en francés, voz fr-FR por defecto (aunque haya una voz de Canadá).
+const voiceFr = moduleAt('src/core/voice.ts', {
+  '../data/frases.json': { default: { hola: 'Hola {letra}' } }, '../data/letras.json': { default: { m: 'eme' } }, './state': { settings: { voice: true } },
+  '../data/en/frases.json': { default: { hola: 'Hi {letra}' } }, '../data/en/letras.json': { default: { m: 'M' } },
+  '../data/fr/frases.json': { default: { hola: 'Bonjour {letra}' } }, '../data/fr/letras.json': { default: { m: 'emme' } }, './i18n': { EN: false, FR: true, pick: (es, en, fr) => fr },
+}, {
+  setTimeout, clearTimeout, navigator: { language: 'fr-FR' },
+  fetch: async () => ({ ok: true, json: async () => ({ files: [] }) }),
+  window: { speechSynthesis: { cancel() {}, getVoices: () => [{ lang: 'fr-CA', name: 'Amélie' }, { lang: 'fr-FR', name: 'Thomas' }, { lang: 'en-US', name: 'Samantha' }], speak: u => queued.push(u) } },
+  SpeechSynthesisUtterance: class { constructor(text) { this.text = text; } },
+});
+assert.equal(voiceFr.phrase('hola', { letra: voiceFr.letterName('m') }), 'Bonjour emme');
+queued = [];
+voiceFr.sayText('Bonjour'); assert.equal(queued[0].lang, 'fr-FR'); assert.equal(queued[0].voice.name, 'Thomas'); voiceFr.stopVoice();
+console.log('✓ En /fr/ la voz usa las frases en francés y prefiere fr-FR');
 const events = {};
 let cached = 0;
 let response;

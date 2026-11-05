@@ -32,16 +32,16 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
   const host = h('div', { class: 'game-host' });
   const title = h('div', { class: 'title' }, g.levels[params.level] || g.name);
   let repeatFn: (() => void) | null = null;
-  const repeatBtn = h('button', { class: 'icon-btn', 'aria-label': tr('Repetir consigna', 'Repeat instructions'), html: ICONS.speak, onTap: () => repeatFn?.() });
+  const repeatBtn = h('button', { class: 'icon-btn', 'aria-label': tr('Repetir consigna', 'Repeat instructions', 'Répéter les consignes'), html: ICONS.speak, onTap: () => repeatFn?.() });
   repeatBtn.style.visibility = 'hidden';
   const hud = h(
     'div',
     { class: 'game-hud' },
-    h('button', { class: 'icon-btn', 'aria-label': tr('Volver', 'Back'), html: ICONS.back, onTap: () => go('levels', { game: g.id }) }),
+    h('button', { class: 'icon-btn', 'aria-label': tr('Volver', 'Back', 'Retour'), html: ICONS.back, onTap: () => go('levels', { game: g.id }) }),
     title,
     h('div', { class: 'spacer' }),
     repeatBtn,
-    h('button', { class: 'icon-btn help-btn', 'aria-label': tr('Cómo se juega', 'How to play'), onTap: () => showTutorial(false) }, '?'),
+    h('button', { class: 'icon-btn help-btn', 'aria-label': tr('Cómo se juega', 'How to play', 'Comment jouer'), onTap: () => showTutorial(false) }, '?'),
     soundToggle()
   );
   root.append(host, hud);
@@ -68,10 +68,10 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
     'div',
     { class: 'rotate-overlay' },
     h('div', { class: 'rot-phone', html: '<svg viewBox="0 0 60 100" width="70" height="116"><rect x="4" y="4" width="52" height="92" rx="10" fill="#fff" stroke="#3a3f6b" stroke-width="5"/><rect x="11" y="14" width="38" height="66" rx="3" fill="#5b8def"/><circle cx="30" cy="88" r="3.5" fill="#3a3f6b"/></svg>' }),
-    h('h1', {}, tr('Gira tu teléfono', 'Turn your phone')),
-    h('p', {}, tr('Los juegos se juegan con el teléfono acostado (horizontal).', 'The games are played with the phone sideways (landscape).')),
-    h('button', { class: 'btn green', onTap: () => tryLandscape() }, tr('↻ Girar pantalla', '↻ Rotate screen')),
-    h('button', { class: 'btn ghost small', onTap: () => ((rotDismissed = true), updRot()) }, tr('Jugar así igual', 'Play like this anyway'))
+    h('h1', {}, tr('Gira tu teléfono', 'Turn your phone', 'Tourne ton téléphone')),
+    h('p', {}, tr('Los juegos se juegan con el teléfono acostado (horizontal).', 'The games are played with the phone sideways (landscape).', 'Les jeux se jouent avec le téléphone à l’horizontale.')),
+    h('button', { class: 'btn green', onTap: () => tryLandscape() }, tr('↻ Girar pantalla', '↻ Rotate screen', '↻ Tourner l’écran')),
+    h('button', { class: 'btn ghost small', onTap: () => ((rotDismissed = true), updRot()) }, tr('Jugar así igual', 'Play like this anyway', 'Jouer comme ça quand même'))
   );
   const updRot = () => {
     const show = isPhone() && window.innerHeight > window.innerWidth && !rotDismissed;
@@ -81,7 +81,7 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
   updRot();
   window.addEventListener('resize', updRot);
   root.append(rot);
-  if (rot.style.display === 'flex') later(() => sayText(tr('Gira tu teléfono para jugar.', 'Turn your phone sideways to play.')), 400);
+  if (rot.style.display === 'flex') later(() => sayText(tr('Gira tu teléfono para jugar.', 'Turn your phone sideways to play.', 'Tourne ton téléphone à l’horizontale pour jouer.')), 400);
 
   const showComplete = (stars: number) => {
     const last = params.level >= g.levels.length - 1;
@@ -92,7 +92,7 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
       h(
         'div',
         { class: 'card' },
-        h('h1', {}, tr('¡Nivel superado!', 'Level complete!')),
+        h('h1', {}, tr('¡Nivel superado!', 'Level complete!', 'Niveau réussi !')),
         h('div', { class: 'big-stars' }, ...[0, 1, 2].map((i) => {
           const s = h('span', { html: ICONS.star(i < stars) });
           (s.firstChild as HTMLElement).style.animationDelay = i * 0.25 + 's';
@@ -101,9 +101,9 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
         h(
           'div',
           { class: 'row' },
-          h('button', { class: 'btn ghost', onTap: () => go('levels', { game: g.id }) }, tr('Niveles', 'Levels')),
-          h('button', { class: 'btn yellow', onTap: () => go('play', { game: g.id, level: params.level }) }, tr('Repetir', 'Replay')),
-          last ? null : h('button', { class: 'btn green', onTap: () => go('play', { game: g.id, level: params.level + 1 }) }, tr('Siguiente ▶', 'Next ▶'))
+          h('button', { class: 'btn ghost', onTap: () => go('levels', { game: g.id }) }, tr('Niveles', 'Levels', 'Niveaux')),
+          h('button', { class: 'btn yellow', onTap: () => go('play', { game: g.id, level: params.level }) }, tr('Repetir', 'Replay', 'Rejouer')),
+          last ? null : h('button', { class: 'btn green', onTap: () => go('play', { game: g.id, level: params.level + 1 }) }, tr('Siguiente ▶', 'Next ▶', 'Suivant ▶'))
         )
       )
     );
@@ -114,7 +114,7 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
   };
 
   const levelBanner = () => {
-    const b = h('div', { class: 'level-banner' }, h('small', {}, tr(`Nivel ${params.level + 1}`, `Level ${params.level + 1}`)), h('span', {}, g.levels[params.level] || ''));
+    const b = h('div', { class: 'level-banner' }, h('small', {}, tr(`Nivel ${params.level + 1}`, `Level ${params.level + 1}`, `Niveau ${params.level + 1}`)), h('span', {}, g.levels[params.level] || ''));
     root.append(b);
     later(() => b.remove(), 2200);
   };
@@ -133,7 +133,7 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
         'div',
         { class: 'card' },
         h('div', { class: 'tut-head', style: { background: g.color }, html: g.art }),
-        h('div', { class: 'tut-kicker' }, tr('Cómo se juega', 'How to play')),
+        h('div', { class: 'tut-kicker' }, tr('Cómo se juega', 'How to play', 'Comment jouer')),
         h('h1', {}, g.name),
         h('p', { class: 'tut-goal' }, tut.goal),
         h('ol', { class: 'tut-steps' }, ...tut.steps.map(([ic, tx]) => h('li', {}, h('span', { class: 'ic' }, ic), h('span', {}, tx)))),
@@ -150,7 +150,7 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
               if (first) startGame();
             },
           },
-          first ? tr('¡A jugar! ▶', "Let's play! ▶") : tr('Seguir jugando', 'Keep playing')
+          first ? tr('¡A jugar! ▶', "Let's play! ▶", 'On joue ! ▶') : tr('Seguir jugando', 'Keep playing', 'Continuer à jouer')
         )
       )
     );
@@ -193,7 +193,7 @@ export function playScreen(root: HTMLElement, params: { game: string; level: num
     .catch((e) => {
       if (dead) return;
       console.error(e);
-      host.append(h('div', { style: { color: '#fff', padding: '120px 20px', textAlign: 'center' } }, tr('No se pudo cargar el juego. Revisa tu conexión a internet.', "The game couldn't load. Check your internet connection.")));
+      host.append(h('div', { style: { color: '#fff', padding: '120px 20px', textAlign: 'center' } }, tr('No se pudo cargar el juego. Revisa tu conexión a internet.', "The game couldn't load. Check your internet connection.", 'Le jeu n’a pas pu se charger. Vérifiez votre connexion internet.')));
     });
   }
 

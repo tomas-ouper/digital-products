@@ -41,6 +41,19 @@
 - Pruebas (26/10): `npm run build` sin errores; `npm run smoke` en español e inglés, 4 tamaños, 48 niveles cada uno → **0 errores, 0 desbordes, 0 textos en español en /en/** (dos corridas); `qa:core` (con prueba nueva de voz en inglés), `qa:touch` y `qa:interactions` aprobados en español.
 - Recorrido real en celular (390x844 y 844x390, Chromium): palabra clave ES rechazada en /en/, HANDWRITING aceptada en minúsculas, dispositivo, perfil, hub, tutorial y primer nivel de los 5 juegos, cursiva, «Gira tu teléfono», misión y panel de padres. Sin errores de consola.
 
+## Versión en francés `/fr/` · Claude (05/11/2026)
+- Pedido de Tomás: post-compra del Kit en francés (tienda Impultienda «Écriture Montessori®», Francia). Montessori Play es el OTO 2. Se copió cómo se hizo `/en/`.
+- `/fr/` = tercera entrada `fr/index.html`. `tr()` y `pick()` pasan a recibir tres valores (es, en, fr): TypeScript obliga a escribir el francés de cada texto. `/` y `/en/` no cambian.
+- Palabra clave `ECRITURE` (`VITE_ACCESS_CODE_FR`); la pantalla de acceso ahora ignora tildes (ÉCRITURE también entra, en los tres idiomas). Guardado separado `mp-fr:`.
+- Nombres: Le Serpent des lettres, Ninja du tracé, CaliCrash, Lance-formes, Montecraft (los que dice la VSL del OTO 2).
+- Contenido adaptado: CaliCrash forma AMI, ROSE, LUNE, ami y chat; Ninja «Syllabes» (MA, LO, LU, PA, NI, SA, LI, TO: método silábico francés, sin ME/TE); formas con artículo («Choisis le cercle», «Choisis l’étoile»); bloques y colores en francés y «SALUT» de respaldo; 30 misiones, 5 tutoriales, frases de voz y nombres de letras («emme», «esse»…). «Tú» al chico y «vous» a los padres; tipografía francesa (espacio fino antes de : ; ! ?).
+- Montecraft: en `/fr/` también camina con Z y Q (teclados AZERTY).
+- Contador del inicio sin promesa de fecha: «5 jeux · d’autres arrivent bientôt».
+- Voz: la del dispositivo en francés (fr-FR → fr-BE/CH → fr-CA). Sin mp3, igual que el español y el inglés.
+- Cursiva: Playwrite FR Moderne (Google Fonts, OFL).
+- Vercel y Vite: redirección `/fr` → `/fr/`; el service worker sirve `fr/index.html` sin conexión.
+- `npm run smoke` recorre los tres idiomas y en francés busca texto en español o en inglés. `qa:core` suma una prueba de voz francesa.
+
 ## Siguiente paso exacto
 Inglés: con el OK de Tomás, mergear el PR de `/en/` (publica en producción) y verificar https://montessoriplay.vercel.app/en/ con `HANDWRITING`. Decidir si se graban voces en inglés (ElevenLabs con `voces-en.csv`). Español: compartir https://montessoriplay.vercel.app junto con la palabra clave `CALIGRAFIA`. Probar captura nativa del mouse en navegador normal y voz/táctil/rendimiento en tablet y celular reales. Para próximas mejoras, crear rama `codex/…`, validar y publicar integrando a `main`. Para regrabar planos: `npm run build && npm run preview` y `node scripts/clips/planos.mjs [filtro]`; tráiler: `node scripts/clips/trailer.mjs`.
 
@@ -80,6 +93,7 @@ Inglés: con el OK de Tomás, mergear el PR de `/en/` (publica en producción) y
 - El aviso "Gira tu teléfono" en iOS no puede forzar la orientación (Safari no lo permite): solo lo pide.
 - La voz depende de las voces instaladas en el dispositivo (iOS/Android suelen tener es-MX; algunas PC solo es-ES). En inglés casi todos los dispositivos traen en-US.
 - Inglés: el soporte sigue siendo el WhatsApp de Tomás (+54), con mensaje en inglés. No se probó en Safari/iOS real ni se escuchó la voz en inglés en un dispositivo.
+- Francés: soporte por el mismo WhatsApp, con mensaje en francés. No se probó en Safari/iOS real ni se escuchó la voz francesa en un dispositivo.
 
 ## Cómo probar
 `npm install && npm run dev` → abrir la URL. Código: `CALIGRAFIA` (o el de `.env`).

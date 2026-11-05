@@ -28,4 +28,14 @@ const NINJA_EN: NinjaLevel[] = [
   { title: 'Cursive', pool: ['c:a', 'c:e', 'c:i', 'c:o', 'c:u', 'c:l'], goal: 6 },
 ];
 
-export const NINJA_LEVELS: NinjaLevel[] = pick(NINJA_ES, NINJA_EN);
+// Francés: en la escuela francesa se lee por sílabas (méthode syllabique); se evitan ME/TE (suenan a pronombres).
+const NINJA_FR: NinjaLevel[] = [
+  { title: 'Voyelles A E I O U', pool: ['A', 'E', 'I', 'O', 'U'], goal: 6 },
+  { title: 'voyelles a e i o u', pool: ['a', 'e', 'i', 'o', 'u'], goal: 6 },
+  { title: 'Consonnes L T M', pool: ['L', 'T', 'M', 'N', 'S', 'V'], goal: 7 },
+  { title: 'consonnes m s t', pool: ['l', 'm', 'n', 's', 't', 'c'], goal: 7 },
+  { title: 'Syllabes', pool: ['MA', 'LO', 'LU', 'PA', 'NI', 'SA', 'LI', 'TO'], syllables: true, goal: 6 },
+  { title: 'Cursive', pool: ['c:a', 'c:e', 'c:i', 'c:o', 'c:u', 'c:l'], goal: 6 },
+];
+
+export const NINJA_LEVELS: NinjaLevel[] = pick(NINJA_ES, NINJA_EN, NINJA_FR);

@@ -20,6 +20,11 @@
       "source": "/en",
       "destination": "/en/",
       "permanent": false
+    },
+    {
+      "source": "/fr",
+      "destination": "/fr/",
+      "permanent": false
     }
   ]
 }

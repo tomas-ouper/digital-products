@@ -10,7 +10,7 @@ import { levelsScreen } from './screens/levels';
 import { playScreen } from './screens/play';
 import { missionScreen } from './screens/mission';
 import { parentsScreen } from './screens/parents';
-import { EN } from './core/i18n';
+import { LANG } from './core/i18n';
 
 register('access', accessScreen);
 register('device', deviceScreen);
@@ -41,6 +41,6 @@ else go('profiles');
 // Uno solo en la raíz: su alcance cubre / y /en/.
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register(EN ? '../sw.js' : './sw.js').catch(() => {});
+    navigator.serviceWorker.register(LANG !== 'es' ? '../sw.js' : './sw.js').catch(() => {});
   });
 }

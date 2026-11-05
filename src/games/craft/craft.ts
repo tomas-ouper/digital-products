@@ -6,7 +6,7 @@ import { World, SX, SY, SZ, B, BLOCKS, BLOCK_COLOR, buildGeometry, blockGeometry
 import { glyphCells, normalizeName } from './font5x7';
 import { say, letterName } from '../../core/voice';
 import { sfx } from '../../core/sound';
-import { tr } from '../../core/i18n';
+import { tr, FR } from '../../core/i18n';
 
 const HOTBAR_DEFAULT = [B.ROJO, B.NARANJA, B.AMARILLO, B.VERDE, B.AZUL, B.MORADO, B.PLANKS, B.BRICK, B.GLASS];
 const INVENTORY = [B.ROJO, B.NARANJA, B.AMARILLO, B.VERDE, B.AZUL, B.MORADO, B.ROSA, B.BLANCO, B.PLANKS, B.LOG, B.BRICK, B.STONE, B.GLASS, B.SAND, B.GRASS, B.DIRT, B.LEAVES, B.SNOW, B.GOLD];
@@ -338,14 +338,14 @@ export function start(ctx: GameContext): GameInstance {
   ui.className = 'mc-ui';
   ui.innerHTML = `
     <div class="mc-cross"></div>
-    <button class="mc-flight" aria-pressed="false">${tr('Volar', 'Fly')}</button>
-    <button class="mc-down" aria-label="${tr('Bajar', 'Down')}" hidden>↓</button>
+    <button class="mc-flight" aria-pressed="false">${tr('Volar', 'Fly', 'Voler')}</button>
+    <button class="mc-down" aria-label="${tr('Bajar', 'Down', 'Descendre')}" hidden>↓</button>
     <div class="mc-goal" hidden></div>
     <div class="mc-toast" hidden></div>
     <div class="mc-bar"></div>
-    <button class="mc-inv-btn" aria-label="${tr('Inventario', 'Inventory')}">▦</button>
-    <div class="mc-inv" hidden><div class="mc-inv-box"><div class="mc-inv-title">${tr('Bloques', 'Blocks')}</div><div class="mc-inv-grid"></div><button class="mc-inv-close">${tr('Listo', 'Done')}</button></div></div>
-    ${coarse ? `<div class="mc-joy"><div class="mc-knob"></div></div><button class="mc-jump" aria-label="${tr('Saltar', 'Jump')}">⤒</button>` : `<div class="mc-keys">${tr('Clic para controlar el mouse · WASD: caminar · Doble espacio o doble clic: volar · E: bloques · Esc: liberar', 'Click to control the mouse · WASD: walk · Double space or double click: fly · E: blocks · Esc: release')}</div>`}
+    <button class="mc-inv-btn" aria-label="${tr('Inventario', 'Inventory', 'Inventaire')}">▦</button>
+    <div class="mc-inv" hidden><div class="mc-inv-box"><div class="mc-inv-title">${tr('Bloques', 'Blocks', 'Blocs')}</div><div class="mc-inv-grid"></div><button class="mc-inv-close">${tr('Listo', 'Done', 'Terminé')}</button></div></div>
+    ${coarse ? `<div class="mc-joy"><div class="mc-knob"></div></div><button class="mc-jump" aria-label="${tr('Saltar', 'Jump', 'Sauter')}">⤒</button>` : `<div class="mc-keys">${tr('Clic para controlar el mouse · WASD: caminar · Doble espacio o doble clic: volar · E: bloques · Esc: liberar', 'Click to control the mouse · WASD: walk · Double space or double click: fly · E: blocks · Esc: release', 'Clique pour contrôler la souris · ZQSD : marcher · Double espace ou double clic : voler · E : blocs · Échap : libérer')}</div>`}
   `;
   host.append(ui);
   const goalEl = ui.querySelector('.mc-goal') as HTMLElement;
@@ -430,7 +430,7 @@ export function start(ctx: GameContext): GameInstance {
     }
     const n = countFilled();
     goalEl.hidden = false;
-    const label = lv.kind === 'apilar' ? tr('Torre', 'Tower') : lv.kind === 'colores' ? tr('Colores', 'Colors') : lv.kind === 'nombre' ? name : `${tr('Letra', 'Letter')} ${lv.kind === 'inicial' ? name[0] : lv.letter}`;
+    const label = lv.kind === 'apilar' ? tr('Torre', 'Tower', 'Tour') : lv.kind === 'colores' ? tr('Colores', 'Colors', 'Couleurs') : lv.kind === 'nombre' ? name : `${tr('Letra', 'Letter', 'Lettre')} ${lv.kind === 'inicial' ? name[0] : lv.letter}`;
     goalEl.innerHTML = `<b>${label}</b> <span>${n} / ${total}</span><i style="width:${(n / total) * 100}%"></i>`;
     if (lv.kind === 'apilar' && n > lastCount && n <= 10) say('num_' + n);
     lastCount = n;
@@ -463,7 +463,7 @@ export function start(ctx: GameContext): GameInstance {
       mistakes++;
       sfx.bad();
       say('craft_color_mal');
-      showToast(tr(`Aquí va ${BLOCKS[h.ghost.req].name.toLowerCase()}`, `${BLOCKS[h.ghost.req].name} goes here`));
+      showToast(tr(`Aquí va ${BLOCKS[h.ghost.req].name.toLowerCase()}`, `${BLOCKS[h.ghost.req].name} goes here`, `Ici : ${BLOCKS[h.ghost.req].name}`));
       return;
     }
     world.set(x, y, z, id);
@@ -502,10 +502,10 @@ export function start(ctx: GameContext): GameInstance {
     player.flying = !player.flying;
     player.vy = 0;
     jumpReq = false;
-    flightBtn.textContent = player.flying ? tr('Volar: sí', 'Fly: on') : tr('Volar', 'Fly');
+    flightBtn.textContent = player.flying ? tr('Volar: sí', 'Fly: on', 'Vol : activé') : tr('Volar', 'Fly', 'Voler');
     flightBtn.setAttribute('aria-pressed', String(player.flying));
     downBtn.hidden = !player.flying || !coarse;
-    showToast(player.flying ? coarse ? tr('¡A volar! Mantén ↑ para subir y ↓ para bajar', "Let's fly! Hold ↑ to go up and ↓ to go down") : tr('¡A volar! Espacio: subir · Shift: bajar', "Let's fly! Space: up · Shift: down") : tr('Vuelo desactivado', 'Flying off'));
+    showToast(player.flying ? coarse ? tr('¡A volar! Mantén ↑ para subir y ↓ para bajar', "Let's fly! Hold ↑ to go up and ↓ to go down", 'On vole ! Maintiens ↑ pour monter et ↓ pour descendre') : tr('¡A volar! Espacio: subir · Shift: bajar', "Let's fly! Space: up · Shift: down", 'On vole ! Espace : monter · Maj : descendre') : tr('Vuelo desactivado', 'Flying off', 'Vol désactivé'));
   };
   const jump = () => {
     const now = performance.now();
@@ -520,8 +520,8 @@ export function start(ctx: GameContext): GameInstance {
   const onLockError = () => {
     if (dead) return;
     lockUnavailable = true;
-    ui.querySelector('.mc-keys')?.replaceChildren(document.createTextNode(tr('Arrastra: mirar · Clic: quitar · Clic derecho: poner · Doble clic/espacio: volar · E: bloques', 'Drag: look · Click: remove · Right click: place · Double click/space: fly · E: blocks')));
-    showToast(tr('Arrastra para mirar · Doble clic: volar', 'Drag to look · Double click: fly'));
+    ui.querySelector('.mc-keys')?.replaceChildren(document.createTextNode(tr('Arrastra: mirar · Clic: quitar · Clic derecho: poner · Doble clic/espacio: volar · E: bloques', 'Drag: look · Click: remove · Right click: place · Double click/space: fly · E: blocks', 'Glisser : regarder · Clic : retirer · Clic droit : poser · Double clic/espace : voler · E : blocs')));
+    showToast(tr('Arrastra para mirar · Doble clic: volar', 'Drag to look · Double click: fly', 'Glisse pour regarder · Double clic : voler'));
   };
   function clearInput() {
     keys.clear();
@@ -538,8 +538,8 @@ export function start(ctx: GameContext): GameInstance {
     if (dead) return;
     const locked = document.pointerLockElement === el;
     ui.querySelector('.mc-keys')?.replaceChildren(document.createTextNode(locked
-      ? tr('Mouse: mirar · Clic: quitar · Clic derecho: poner · Doble clic/espacio: volar · Shift: bajar · E: bloques · Esc: salir', 'Mouse: look · Click: remove · Right click: place · Double click/space: fly · Shift: down · E: blocks · Esc: exit')
-      : tr('Clic para controlar el mouse · WASD: caminar · Doble espacio o doble clic: volar · E: bloques', 'Click to control the mouse · WASD: walk · Double space or double click: fly · E: blocks')));
+      ? tr('Mouse: mirar · Clic: quitar · Clic derecho: poner · Doble clic/espacio: volar · Shift: bajar · E: bloques · Esc: salir', 'Mouse: look · Click: remove · Right click: place · Double click/space: fly · Shift: down · E: blocks · Esc: exit', 'Souris : regarder · Clic : retirer · Clic droit : poser · Double clic/espace : voler · Maj : descendre · E : blocs · Échap : sortir')
+      : tr('Clic para controlar el mouse · WASD: caminar · Doble espacio o doble clic: volar · E: bloques', 'Click to control the mouse · WASD: walk · Double space or double click: fly · E: blocks', 'Clique pour contrôler la souris · ZQSD : marcher · Double espace ou double clic : voler · E : blocs')));
   };
   const onMouseMove = (e: MouseEvent) => {
     if (paused || !invEl.hidden || document.pointerLockElement !== el) return;
@@ -705,9 +705,9 @@ export function start(ctx: GameContext): GameInstance {
     t += dt;
     // movimiento
     let fx = 0, fz = 0;
-    if (keys.has('w') || keys.has('arrowup')) fz -= 1;
+    if (keys.has('w') || keys.has('arrowup') || (FR && keys.has('z'))) fz -= 1;
     if (keys.has('s') || keys.has('arrowdown')) fz += 1;
-    if (keys.has('a') || keys.has('arrowleft')) fx -= 1;
+    if (keys.has('a') || keys.has('arrowleft') || (FR && keys.has('q'))) fx -= 1;
     if (keys.has('d') || keys.has('arrowright')) fx += 1;
     fx += joy.x;
     fz += joy.y;

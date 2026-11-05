@@ -16,7 +16,7 @@ export function levelsScreen(root: HTMLElement, params: { game: string }) {
   // "Modo libre" de Montecraft siempre está abierto.
   const unlocked = (i: number) => i === 0 || (stars[i - 1] || 0) > 0 || (stars[i] || 0) > 0 || (g.id === 'craft' && i === g.levels.length - 1);
   root.append(
-    h('div', { class: 'topbar' }, iconButton(ICONS.home, tr('Inicio', 'Home'), () => go('hub')), h('h2', { style: { margin: '0 8px' } }, g.name), h('div', { class: 'spacer' }), soundToggle()),
+    h('div', { class: 'topbar' }, iconButton(ICONS.home, tr('Inicio', 'Home', 'Accueil'), () => go('hub')), h('h2', { style: { margin: '0 8px' } }, g.name), h('div', { class: 'spacer' }), soundToggle()),
     h(
       'div',
       { class: 'levels' },
