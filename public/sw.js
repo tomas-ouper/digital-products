@@ -26,8 +26,8 @@ self.addEventListener('fetch', (e) => {
         const cached = await caches.match(req);
         if (cached) return cached;
         if (req.mode === 'navigate') {
-          // /en/ tiene su propio HTML (versión en inglés).
-          const shell = await caches.match(url.pathname.includes('/en/') ? './en/index.html' : './index.html');
+          // /en/ y /fr/ tienen su propio HTML (versiones en inglés y en francés).
+          const shell = await caches.match(url.pathname.includes('/en/') ? './en/index.html' : url.pathname.includes('/fr/') ? './fr/index.html' : './index.html');
           if (shell) return shell;
         }
         return Response.error();

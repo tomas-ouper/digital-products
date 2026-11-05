@@ -149,7 +149,7 @@ class NinjaScene extends Phaser.Scene {
     if (location.search.includes('debug')) Object.assign(window as any, { __scene: this, __LETTERS: LETTERS });
     this.bg = this.add.graphics();
     this.guidePath = this.add.graphics().setDepth(2);
-    this.guide = this.add.text(0, 0, tr('Dibuja la letra · No basta con deslizar sobre ella', 'Draw the letter · A quick swipe over it is not enough'), { fontFamily: FONT, fontSize: '18px', color: '#ffffff', backgroundColor: '#24204dcc', padding: { x: 14, y: 8 }, align: 'center' }).setOrigin(0.5, 0).setDepth(15);
+    this.guide = this.add.text(0, 0, tr('Dibuja la letra · No basta con deslizar sobre ella', 'Draw the letter · A quick swipe over it is not enough', 'Dessine la lettre · Un simple trait par-dessus ne suffit pas'), { fontFamily: FONT, fontSize: '18px', color: '#ffffff', backgroundColor: '#24204dcc', padding: { x: 14, y: 8 }, align: 'center' }).setOrigin(0.5, 0).setDepth(15);
     this.trail = this.add.graphics().setDepth(20);
     this.bannerBox = this.add.graphics();
     this.bannerText = this.add.text(0, 0, '', { fontFamily: FONT, fontSize: '26px', color: '#3a3f6b', fontStyle: 'bold' }).setOrigin(0, 0.5);
@@ -265,7 +265,7 @@ class NinjaScene extends Phaser.Scene {
 
   setBanner() {
     const shown = this.lv.syllables ? `${this.target}` : glyph(this.target);
-    this.bannerText.setText(tr('Dibuja', 'Draw'));
+    this.bannerText.setText(tr('Dibuja', 'Draw', 'Dessine'));
     this.bannerLetter.setText(this.lv.syllables ? `${shown} → ${this.target[0]}` : shown);
     this.bannerLetter.setFontSize(this.lv.syllables ? 38 : /^[a-zñ]$/.test(shown) && !this.cursive ? 70 : 54);
     this.bannerLetter.setX(20 + this.bannerText.width + 12);
@@ -307,7 +307,7 @@ class NinjaScene extends Phaser.Scene {
     this.prevTarget = this.target;
     this.setBanner();
     this.drawGuide();
-    this.guide.setText(this.good < 2 ? tr('Practica con una sola letra: dibújala siguiendo la guía', 'Practice with one letter: draw it following the guide') : tr('Dibuja la letra indicada · Las letras esperan mientras trazas', 'Draw the letter you hear · Letters wait while you trace'));
+    this.guide.setText(this.good < 2 ? tr('Practica con una sola letra: dibújala siguiendo la guía', 'Practice with one letter: draw it following the guide', 'Entraîne-toi avec une lettre : dessine-la en suivant le guide') : tr('Dibuja la letra indicada · Las letras esperan mientras trazas', 'Draw the letter you hear · Letters wait while you trace', 'Dessine la lettre que tu entends · Les lettres attendent pendant que tu traces'));
     this.sayTarget();
     this.waves = 0;
     this.spawning = true;

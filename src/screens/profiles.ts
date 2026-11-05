@@ -7,14 +7,14 @@ import { sfx } from '../core/sound';
 import { tr } from '../core/i18n';
 
 /** "3-5 años" / "Ages 3-5" */
-export const ageLabel = (a: AgeGroup) => tr(a + ' años', 'Ages ' + a);
+export const ageLabel = (a: AgeGroup) => tr(a + ' años', 'Ages ' + a, a + ' ans');
 
 export function profilesScreen(root: HTMLElement) {
   root.className = 'screen center';
   const list = getProfiles();
   if (list.length === 0) return go('newProfile');
   root.append(
-    h('h1', {}, tr('¿Quién va a jugar?', "Who's playing?")),
+    h('h1', {}, tr('¿Quién va a jugar?', "Who's playing?", 'Qui va jouer ?')),
     h(
       'div',
       { class: 'profiles' },
@@ -34,9 +34,9 @@ export function profilesScreen(root: HTMLElement) {
           h('span', { class: 'meta' }, ageLabel(p.age))
         )
       ),
-      canAddProfile() ? h('button', { class: 'profile-tile add', onTap: () => go('newProfile') }, h('span', { style: { fontSize: '56px' } }, '+'), h('span', { class: 'meta' }, tr('Nuevo perfil', 'New profile'))) : null
+      canAddProfile() ? h('button', { class: 'profile-tile add', onTap: () => go('newProfile') }, h('span', { style: { fontSize: '56px' } }, '+'), h('span', { class: 'meta' }, tr('Nuevo perfil', 'New profile', 'Nouveau profil'))) : null
     ),
-    h('button', { class: 'btn ghost small', onTap: () => go('device') }, tr('¿Desde dónde juegas?', 'Where are you playing from?'))
+    h('button', { class: 'btn ghost small', onTap: () => go('device') }, tr('¿Desde dónde juegas?', 'Where are you playing from?', 'Sur quel appareil joues-tu ?'))
   );
   setTimeout(() => root.isConnected && say('quien_juega'), 300);
 }
@@ -45,7 +45,7 @@ export function newProfileScreen(root: HTMLElement) {
   root.className = 'screen';
   let avatar = 0;
   let age: AgeGroup | null = null;
-  const name = h('input', { class: 'big', type: 'text', maxlength: '12', placeholder: tr('Nombre', 'Name'), autocomplete: 'off', 'aria-label': tr('Nombre', 'Name') });
+  const name = h('input', { class: 'big', type: 'text', maxlength: '12', placeholder: tr('Nombre', 'Name', 'Prénom'), autocomplete: 'off', 'aria-label': tr('Nombre', 'Name', 'Prénom') });
   const err = h('div', { class: 'err' });
   const avWrap = h('div', { class: 'avatar-pick' });
   const drawAv = () => {
@@ -83,7 +83,7 @@ export function newProfileScreen(root: HTMLElement) {
             },
           },
           ageLabel(a),
-          h('small', {}, a === '3-5' ? tr('Todo se dice en voz alta', 'Everything is read aloud') : tr('Más desafíos', 'More challenges'))
+          h('small', {}, a === '3-5' ? tr('Todo se dice en voz alta', 'Everything is read aloud', 'Tout est lu à voix haute') : tr('Más desafíos', 'More challenges', 'Plus de défis'))
         )
       )
     );
@@ -92,12 +92,12 @@ export function newProfileScreen(root: HTMLElement) {
   const create = () => {
     const n = name.value.trim();
     if (!n) {
-      err.textContent = tr('Escribe un nombre.', 'Type a name.');
+      err.textContent = tr('Escribe un nombre.', 'Type a name.', 'Écris un prénom.');
       sfx.bad();
       return;
     }
     if (!age) {
-      err.textContent = tr('Elige la edad.', 'Pick an age.');
+      err.textContent = tr('Elige la edad.', 'Pick an age.', 'Choisis un âge.');
       sfx.bad();
       return;
     }
@@ -112,12 +112,12 @@ export function newProfileScreen(root: HTMLElement) {
     h(
       'div',
       { class: 'col maxw', style: { paddingBottom: '24px' } },
-      h('h1', {}, tr('Nuevo perfil', 'New profile')),
-      h('div', { class: 'card col w100' }, h('h2', {}, tr('Elige tu animalito', 'Pick your animal friend')), avWrap),
-      h('div', { class: 'card col w100' }, h('h2', {}, tr('¿Cómo te llamas?', "What's your name?")), name),
-      h('div', { class: 'card col w100' }, h('h2', {}, tr('¿Cuántos años tienes?', 'How old are you?')), ageWrap),
+      h('h1', {}, tr('Nuevo perfil', 'New profile', 'Nouveau profil')),
+      h('div', { class: 'card col w100' }, h('h2', {}, tr('Elige tu animalito', 'Pick your animal friend', 'Choisis ton ami animal')), avWrap),
+      h('div', { class: 'card col w100' }, h('h2', {}, tr('¿Cómo te llamas?', "What's your name?", 'Comment tu t’appelles ?')), name),
+      h('div', { class: 'card col w100' }, h('h2', {}, tr('¿Cuántos años tienes?', 'How old are you?', 'Quel âge as-tu ?')), ageWrap),
       err,
-      h('div', { class: 'row' }, hasProfiles ? h('button', { class: 'btn ghost', onTap: () => go('profiles') }, tr('Volver', 'Back')) : null, h('button', { class: 'btn green', onTap: create }, tr('¡Listo!', 'Done!')))
+      h('div', { class: 'row' }, hasProfiles ? h('button', { class: 'btn ghost', onTap: () => go('profiles') }, tr('Volver', 'Back', 'Retour')) : null, h('button', { class: 'btn green', onTap: create }, tr('¡Listo!', 'Done!', 'C’est prêt !')))
     )
   );
   setTimeout(() => root.isConnected && say('nuevo_perfil'), 300);

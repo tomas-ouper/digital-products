@@ -40,4 +40,18 @@ const CRASH_EN: CrashLevel[] = [
   { title: 'Make cursive cake', kind: 'palabra', word: 'cake', count: 2, pool: ['c', 'a', 'k', 'e', 's'], moves: 24, cursive: true },
 ];
 
-export const CRASH_LEVELS: CrashLevel[] = pick(CRASH_ES, CRASH_EN);
+// Francés: mismas letras para tachar (la L con LUNE); palabras de lectura inicial sin tildes: AMI, ROSE, LUNE, ami y chat.
+const CRASH_FR: CrashLevel[] = [
+  { title: 'Barre 6 A', kind: 'tacha', letter: 'A', count: 6, pool: ['A', 'E', 'O', 'S'], moves: 16 },
+  { title: 'Barre 9 O', kind: 'tacha', letter: 'O', count: 9, pool: ['A', 'E', 'O', 'S', 'L'], moves: 18 },
+  { title: 'Forme AMI', kind: 'palabra', word: 'AMI', count: 2, pool: ['A', 'M', 'I', 'E', 'S'], moves: 20 },
+  { title: 'Barre 12 M', kind: 'tacha', letter: 'M', count: 12, pool: ['M', 'A', 'S', 'O', 'E'], moves: 20 },
+  { title: 'Forme ROSE', kind: 'palabra', word: 'ROSE', count: 2, pool: ['R', 'O', 'S', 'E', 'A'], moves: 22 },
+  { title: 'Barre 12 L', kind: 'tacha', letter: 'L', count: 12, pool: ['L', 'U', 'N', 'E', 'S', 'A'], moves: 20 },
+  { title: 'Forme LUNE', kind: 'palabra', word: 'LUNE', count: 2, pool: ['L', 'U', 'N', 'E', 'S'], moves: 22 },
+  { title: 'Barre 9 a en cursive', kind: 'tacha', letter: 'a', count: 9, pool: ['a', 'e', 'o', 's', 'm'], moves: 18, cursive: true },
+  { title: 'Forme ami en cursive', kind: 'palabra', word: 'ami', count: 2, pool: ['a', 'm', 'i', 'e', 's'], moves: 22, cursive: true },
+  { title: 'Forme chat en cursive', kind: 'palabra', word: 'chat', count: 2, pool: ['c', 'h', 'a', 't', 's'], moves: 24, cursive: true },
+];
+
+export const CRASH_LEVELS: CrashLevel[] = pick(CRASH_ES, CRASH_EN, CRASH_FR);

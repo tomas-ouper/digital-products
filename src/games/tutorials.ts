@@ -125,4 +125,64 @@ const TUTORIALS_EN: Record<string, Tutorial> = {
   },
 };
 
-export const TUTORIALS: Record<string, Tutorial> = pick(TUTORIALS_ES, TUTORIALS_EN);
+// Francés: se habla de «tu» al chico; ZQSD es W A S D en un teclado AZERTY.
+const TUTORIALS_FR: Record<string, Tutorial> = {
+  snake: {
+    goal: 'Écris des lettres en guidant le petit serpent sur le tracé de chaque lettre.',
+    steps: [
+      ['👆', 'Fais glisser le petit serpent avec ton doigt. Sur un ordinateur, tu peux aussi utiliser les flèches.'],
+      ['⭐', 'Commence toujours à l’étoile et suis la flèche bleue.'],
+      ['🟠', 'Mange les points orange dans l’ordre : c’est comme ça qu’on écrit la lettre dans le bon sens.'],
+      ['⚠️', 'Si tu sors du chemin blanc, la lettre recommence.'],
+      ['🏆', 'Reste sur le chemin pour gagner 3 étoiles.'],
+    ],
+    levels: '17 lettres : minuscules → majuscules → cursive.',
+  },
+  ninja: {
+    goal: 'Coupe la lettre que dit la voix en la dessinant avec ton doigt.',
+    steps: [
+      ['🔊', 'Commence avec une seule lettre et un guide, pour t’entraîner sans te presser.'],
+      ['✍️', 'Dessine la lettre, pas juste un trait dessus. Pendant que tu traces, les lettres attendent.'],
+      ['🔪', 'Si ton tracé est la bonne lettre, la bulle est coupée : +1.'],
+      ['❌', 'Si tu coupes une autre lettre, tu perds un point.'],
+      ['🎯', 'Atteins le nombre de coupes demandé pour passer au niveau suivant.'],
+    ],
+    levels: 'Voyelles, consonnes, syllabes et cursive.',
+  },
+  crash: {
+    goal: 'Assemble des lettres identiques pour les barrer et forme des mots.',
+    steps: [
+      ['↔️', 'Échange deux tuiles voisines pour avoir TROIS lettres identiques sur une ligne ou une colonne.'],
+      ['✖️', 'Trois lettres identiques alignées sont barrées et de nouvelles tuiles tombent.'],
+      ['🔤', 'Pour les mots, touche ou glisse sur les lettres voisines dans l’ordre : A → M → I.'],
+      ['👣', 'Fais attention à tes coups : ils sont comptés.'],
+      ['💡', 'Si tu bloques, une tuile brille pour t’aider.'],
+    ],
+    levels: '10 niveaux : barrer des lettres, former AMI, ROSE, LUNE et des mots en cursive.',
+  },
+  angry: {
+    goal: 'Lance des formes avec le lance-pierre et fais tomber celles que demande la voix.',
+    steps: [
+      ['🔊', 'Fais tomber les formes avec un anneau doré et une flèche. Le compteur montre combien il en reste.'],
+      ['🔺', 'S’il y a des formes en bas, choisis celle qu’on te demande.'],
+      ['🎯', 'Tire la forme vers l’arrière et lâche-la. Les petits points montrent le chemin.'],
+      ['✅', 'Chaque forme qui tombe reçoit un ✓.'],
+      ['🧠', 'Dans « fais tomber seulement… », essaie de ne pas toucher les autres formes.'],
+    ],
+    levels: '8 niveaux : cercle, carré, triangle, rectangle, losange et étoile ; compter les côtés.',
+  },
+  craft: {
+    goal: 'Construis avec des blocs dans un monde en 3D que tu explores à la première personne.',
+    steps: [
+      ['🕹️', 'Marche avec le joystick (moitié gauche de l’écran). Sur un ordinateur : Z Q S D ou les flèches.'],
+      ['👀', 'Sur un ordinateur, clique pour capturer la souris et bouge-la pour regarder autour. Échap libère le curseur. Sur écran tactile, fais glisser.'],
+      ['🕊️', 'Un double clic ou un double espace active le vol. Espace monte et Maj descend. Sur écran tactile, utilise Voler et les flèches.'],
+      ['🧱', 'Avec la souris capturée : clic pour retirer, clic droit pour poser. Sur écran tactile : touche pour poser, reste appuyé pour retirer.'],
+      ['👻', 'Les ombres blanches montrent où va chaque bloc : touche-les pour les remplir.'],
+      ['🎨', 'Choisis un bloc dans la barre du bas. Le bouton ▦ ouvre tous les blocs.'],
+    ],
+    levels: 'Lettres en blocs, tour de 10, couleurs, ton initiale, ton prénom et mode libre.',
+  },
+};
+
+export const TUTORIALS: Record<string, Tutorial> = pick(TUTORIALS_ES, TUTORIALS_EN, TUTORIALS_FR);

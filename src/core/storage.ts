@@ -1,8 +1,8 @@
 // Guardado local seguro: si localStorage no está disponible (modo privado, iframe), usa memoria.
-// Cada idioma guarda aparte (mp: español, mp-en: inglés): perfiles, progreso y palabra clave no se mezclan.
-import { EN } from './i18n';
+// Cada idioma guarda aparte (mp: español, mp-en: inglés, mp-fr: francés): perfiles, progreso y palabra clave no se mezclan.
+import { EN, FR } from './i18n';
 
-const PREFIX = EN ? 'mp-en:' : 'mp:';
+const PREFIX = FR ? 'mp-fr:' : EN ? 'mp-en:' : 'mp:';
 const mem = new Map<string, string>();
 
 function rawGet(key: string): string | null {

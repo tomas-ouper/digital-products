@@ -4,6 +4,7 @@ Plataforma web de juegos educativos (3 a 8 años) del Kit Caligrafía Montessori
 
 **Jugar online:** https://montessoriplay.vercel.app · Palabra clave: **CALIGRAFIA**.
 **En inglés:** https://montessoriplay.vercel.app/en/ · Palabra clave: **HANDWRITING** (para el Kit en inglés, «Montessori Handwriting»).
+**En francés:** https://montessoriplay.vercel.app/fr/ · Palabra clave: **ECRITURE** (para el Kit en francés, «Écriture Montessori»).
 
 MVP gratuito, sin registro de cuentas. Los perfiles y el progreso se guardan en el navegador de cada dispositivo. En **Padres → Soporte y sugerencias** hay un enlace directo a WhatsApp de Tomás para dudas, problemas y propuestas.
 

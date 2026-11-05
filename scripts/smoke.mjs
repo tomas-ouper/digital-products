@@ -1,14 +1,17 @@
 // Prueba de humo: abre las pantallas y todos los niveles de los 5 juegos en los 4 tamaños,
-// en español (/) y en inglés (/en/), y reporta errores de consola, desbordes horizontales,
-// juegos que no arrancan y, en inglés, texto que quedó en español.
+// en español (/), en inglés (/en/) y en francés (/fr/), y reporta errores de consola, desbordes horizontales,
+// juegos que no arrancan, en inglés texto que quedó en español y en francés texto que quedó en español o en inglés.
 // Uso: npm run build && npm run preview (otra terminal) && npm run smoke
-// SMOKE_URL cambia la dirección base; SMOKE_LANGS=es o SMOKE_LANGS=en recorre un solo idioma.
+// SMOKE_URL cambia la dirección base; SMOKE_LANGS=es, en o fr recorre un solo idioma.
 import { chromium } from 'playwright';
 
 const BASE = (process.env.SMOKE_URL || 'http://localhost:4173/').replace(/\?.*$/, '').replace(/\/?$/, '/');
-const LANGS = (process.env.SMOKE_LANGS || 'es,en').split(',');
+const LANGS = (process.env.SMOKE_LANGS || 'es,en,fr').split(',');
 // Palabras que delatan español en la versión en inglés (se ignora el nombre "Tomás" del soporte).
 const SPANISH = /[áéíóúñ¿¡]|\b(el|la|los|las|del|que|con|para|una|letra|letras|nivel|niveles|toca|elige|arrastra|juega|jugar|tiempo|padres|bloques|derriba|lanza|forma|tacha|cursiva|perfil|volar)\b/i;
+// En francés: letras y palabras que no existen en francés (español) y palabras inglesas comunes.
+// Se ignoran "Tomás" (soporte) y "Montessori Play" (marca).
+const NOT_FRENCH = /[áíóúñ¿¡]|\b(el|los|las|del|para|una|letra|letras|nivel|niveles|toca|elige|arrastra|juega|jugar|tiempo|padres|bloques|derriba|lanza|forma|tacha|cursiva|perfil|volar|the|and|you|your|level|levels|letter|letters|pick|throw|draw|tap|drag|shapes|blocks|time|with|again|done|back)\b/i;
 const SIZES = [
   [390, 844],
   [844, 390],
@@ -23,8 +26,9 @@ const problems = [];
 
 for (const lang of LANGS) {
   const en = lang === 'en';
-  const URL = BASE + (en ? 'en/' : '') + '?debug&rec';
-  const P = en ? 'mp-en:' : 'mp:';
+  const fr = lang === 'fr';
+  const URL = BASE + (lang === 'es' ? '' : lang + '/') + '?debug&rec';
+  const P = lang === 'es' ? 'mp:' : `mp-${lang}:`;
   for (const [w0, hgt] of SIZES) {
     const w = `${lang} ${w0}`;
     const page = await browser.newPage({ viewport: { width: w0, height: hgt }, hasTouch: true });
@@ -34,7 +38,7 @@ for (const lang of LANGS) {
     await page.addInitScript(([P, name]) => {
       localStorage.setItem(P + 'settings', JSON.stringify({ unlocked: true, sound: false, voice: false, device: 'tablet', dailyLimitMin: 0, activeProfile: 'p1' }));
       localStorage.setItem(P + 'profiles', JSON.stringify([{ id: 'p1', name, avatar: 1, age: '6-8', createdAt: 1 }]));
-    }, [P, en ? 'Sophie' : 'Sofía']);
+    }, [P, fr ? 'Chloé' : en ? 'Sophie' : 'Sofía']);
     await page.goto(URL);
     await page.waitForFunction(() => typeof window.mpGo === 'function');
 
@@ -43,7 +47,7 @@ for (const lang of LANGS) {
       if (over > 1) problems.push(`${w}x${hgt} ${label}: desborde horizontal de ${over}px`);
       for (const e of errs) problems.push(`${w}x${hgt} ${label}: ${e}`);
       errs = [];
-      if (en) {
+      if (en || fr) {
         // Texto del DOM + textos de la escena Phaser activa (se dibujan en canvas).
         const texts = await page.evaluate(() => {
           const out = [document.body.innerText];
@@ -51,8 +55,9 @@ for (const lang of LANGS) {
           if (sc && sc.children) for (const o of sc.children.list) if (typeof o.text === 'string') out.push(o.text);
           return out.join('\n');
         });
-        for (const line of texts.replace(/Tomás/g, 'Tomas').split('\n')) {
-          if (SPANISH.test(line)) problems.push(`${w}x${hgt} ${label}: ¿español? «${line.trim().slice(0, 90)}»`);
+        for (const line of texts.replace(/Tomás/g, 'Tomas').replace(/Montessori Play/g, 'Montessori').split('\n')) {
+          if (en && SPANISH.test(line)) problems.push(`${w}x${hgt} ${label}: ¿español? «${line.trim().slice(0, 90)}»`);
+          if (fr && NOT_FRENCH.test(line)) problems.push(`${w}x${hgt} ${label}: ¿no es francés? «${line.trim().slice(0, 90)}»`);
         }
       }
     };
